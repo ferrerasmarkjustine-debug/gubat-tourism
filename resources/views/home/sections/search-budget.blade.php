@@ -26,11 +26,23 @@
 
                     <!-- Dates Selection -->
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label small fw-bold text-muted"><i class="bi bi-calendar-range-fill text-primary me-1"></i> Check-in & Check-out Dates</label>
-                        <div class="input-group">
-                            <input type="date" class="form-control border-2 py-2" name="checkin" id="checkin" style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;" min="{{ date('Y-m-d') }}">
-                            <span class="input-group-text bg-light border-2 px-2"><i class="bi bi-arrow-right"></i></span>
-                            <input type="date" class="form-control border-2 py-2" name="checkout" id="checkout" style="border-top-right-radius: 10px; border-bottom-right-radius: 10px;">
+                        <label class="form-label small fw-bold text-muted">
+                            <i class="bi bi-calendar-range-fill text-primary me-1"></i> Check-in & Check-out Dates
+                        </label>
+                        <div class="input-group date-range-wrapper">
+                            <span class="input-group-text bg-white border-2 border-end-0 py-2 px-3 text-primary" style="border-top-left-radius: 10px; border-bottom-left-radius: 10px; cursor: pointer;">
+                                <i class="bi bi-calendar3"></i>
+                            </span>
+                            <input type="text" class="form-control border-2 border-start-0 py-2 flatpickr-input-custom" id="date_range" placeholder="Select dates (Check-in → Check-out)" readonly style="border-top-right-radius: 10px; border-bottom-right-radius: 10px; padding-right: 40px;">
+                            
+                            <!-- Clear Selection Button -->
+                            <button type="button" class="date-range-clear-btn" id="clear_date_range" title="Clear selection">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                            
+                            <!-- Hidden inputs for check_in and check_out -->
+                            <input type="hidden" name="check_in" id="check_in" value="{{ request('check_in') }}">
+                            <input type="hidden" name="check_out" id="check_out" value="{{ request('check_out') }}">
                         </div>
                     </div>
 
@@ -155,17 +167,83 @@
             });
         }
 
-        // Date verification: Check-out must be after check-in
-        const checkinInput = document.getElementById('checkin');
-        const checkoutInput = document.getElementById('checkout');
+        // Flatpickr Date Range Picker Initialization
+        const dateRangeInput = document.getElementById('date_range');
+        const clearBtn = document.getElementById('clear_date_range');
+        const checkInHidden = document.getElementById('check_in');
+        const checkOutHidden = document.getElementById('check_out');
         
-        if (checkinInput && checkoutInput) {
-            checkinInput.addEventListener('change', function() {
-                checkoutInput.min = this.value;
-                if (checkoutInput.value && checkoutInput.value < this.value) {
-                    checkoutInput.value = this.value;
+        if (dateRangeInput && window.flatpickr) {
+            const initialCheckIn = checkInHidden ? checkInHidden.value : '';
+            const initialCheckOut = checkOutHidden ? checkOutHidden.value : '';
+            let defaultDates = [];
+            
+            if (initialCheckIn && initialCheckOut) {
+                defaultDates = [initialCheckIn, initialCheckOut];
+            }
+            
+            const fp = window.flatpickr(dateRangeInput, {
+                mode: 'range',
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'F j, Y',
+                altInputClass: 'form-control border-2 border-start-0 py-2 flatpickr-input-custom',
+                defaultDate: defaultDates,
+                locale: {
+                    rangeSeparator: ' → '
+                },
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length === 2) {
+                        const checkInDate = instance.formatDate(selectedDates[0], 'Y-m-d');
+                        const checkOutDate = instance.formatDate(selectedDates[1], 'Y-m-d');
+                        
+                        if (checkInHidden) checkInHidden.value = checkInDate;
+                        if (checkOutHidden) checkOutHidden.value = checkOutDate;
+                        
+                        // Close calendar popup automatically after selection of second date
+                        instance.close();
+                        
+                        // Show clear button
+                        if (clearBtn) clearBtn.style.display = 'flex';
+                    } else if (selectedDates.length === 1) {
+                        const checkInDate = instance.formatDate(selectedDates[0], 'Y-m-d');
+                        if (checkInHidden) checkInHidden.value = checkInDate;
+                        if (checkOutHidden) checkOutHidden.value = '';
+                        
+                        // Show clear button during selection
+                        if (clearBtn) clearBtn.style.display = 'flex';
+                    } else {
+                        if (checkInHidden) checkInHidden.value = '';
+                        if (checkOutHidden) checkOutHidden.value = '';
+                        if (clearBtn) clearBtn.style.display = 'none';
+                    }
                 }
             });
+
+            // Show clear button if dates were pre-filled
+            if (defaultDates.length === 2 && clearBtn) {
+                clearBtn.style.display = 'flex';
+            }
+
+            // Bind Clear Selection Action
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Avoid triggering flatpickr open
+                    fp.clear();
+                    if (checkInHidden) checkInHidden.value = '';
+                    if (checkOutHidden) checkOutHidden.value = '';
+                    clearBtn.style.display = 'none';
+                });
+            }
+
+            // Open Flatpickr when clicking the calendar icon
+            const calendarIcon = document.querySelector('.date-range-wrapper .input-group-text');
+            if (calendarIcon) {
+                calendarIcon.addEventListener('click', function() {
+                    fp.open();
+                });
+            }
         }
     });
 </script>

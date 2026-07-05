@@ -1,6 +1,7 @@
 /* Bootstrap & Icons */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'flatpickr/dist/flatpickr.min.css';
 
 /* ==========================================================================
    CSS CUSTOM VARIABLES & DESIGN SYSTEM
@@ -199,4 +200,134 @@ a {
     -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================================================
+   FLATPICKR CUSTOM THEME OVERRIDES (GUBAT TOURISM)
+   ========================================================================== */
+.flatpickr-calendar {
+    border-radius: 16px !important;
+    border: none !important;
+    box-shadow: 0 15px 35px rgba(15, 76, 129, 0.15) !important;
+    font-family: 'Outfit', 'Poppins', sans-serif !important;
+    padding: 8px !important;
+    background: #ffffff !important;
+}
+
+.flatpickr-day.selected, 
+.flatpickr-day.startRange, 
+.flatpickr-day.endRange, 
+.flatpickr-day.selected.inRange, 
+.flatpickr-day.startRange.inRange, 
+.flatpickr-day.endRange.inRange, 
+.flatpickr-day.selected:focus, 
+.flatpickr-day.startRange:focus, 
+.flatpickr-day.endRange:focus, 
+.flatpickr-day.selected:hover, 
+.flatpickr-day.startRange:hover, 
+.flatpickr-day.endRange:hover, 
+.flatpickr-day.selected.prevMonthDay, 
+.flatpickr-day.startRange.prevMonthDay, 
+.flatpickr-day.endRange.prevMonthDay, 
+.flatpickr-day.selected.nextMonthDay, 
+.flatpickr-day.startRange.nextMonthDay, 
+.flatpickr-day.endRange.nextMonthDay {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.flatpickr-day.inRange {
+    background: rgba(15, 76, 129, 0.08) !important;
+    border-color: transparent !important;
+    box-shadow: -5px 0 0 transparent, 5px 0 0 transparent !important;
+}
+
+.flatpickr-day:hover,
+.flatpickr-day.prevMonthDay:hover,
+.flatpickr-day.nextMonthDay:hover,
+.flatpickr-day.today:hover,
+.flatpickr-day.today.prevMonthDay:hover,
+.flatpickr-day.today.nextMonthDay:hover {
+    background: rgba(15, 76, 129, 0.12) !important;
+    border-color: transparent !important;
+    color: var(--primary-color) !important;
+}
+
+.flatpickr-day.today {
+    border-color: var(--accent-color) !important;
+    color: var(--dark-color) !important;
+    font-weight: bold;
+}
+
+.flatpickr-months .flatpickr-month {
+    color: var(--dark-color) !important;
+    fill: var(--dark-color) !important;
+}
+
+.flatpickr-current-month {
+    font-weight: 600 !important;
+    font-size: 1.1rem !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 600 !important;
+    color: var(--dark-color) !important;
+}
+
+.flatpickr-current-month input.cur-year {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 600 !important;
+    color: var(--dark-color) !important;
+}
+
+.flatpickr-weekday {
+    color: var(--primary-color) !important;
+    font-weight: 600 !important;
+    font-family: 'Outfit', sans-serif !important;
+}
+
+/* Date range picker wrappers & buttons */
+.date-range-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.date-range-clear-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #a0aec0;
+    cursor: pointer;
+    z-index: 5;
+    padding: 4px;
+    display: none; /* Managed by JS */
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+    border-radius: 50%;
+}
+
+.date-range-clear-btn:hover {
+    color: #e53e3e;
+    background: rgba(229, 62, 62, 0.1);
+}
+
+.date-range-clear-btn i {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+/* Style to make input feel premium */
+.flatpickr-input-custom[readonly] {
+    background-color: #ffffff !important;
+    cursor: pointer;
 }
