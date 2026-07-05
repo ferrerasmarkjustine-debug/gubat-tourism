@@ -1,0 +1,202 @@
+/* Bootstrap & Icons */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+/* ==========================================================================
+   CSS CUSTOM VARIABLES & DESIGN SYSTEM
+   ========================================================================== */
+:root {
+    --primary-color: #0F4C81;      /* Deep Ocean Blue */
+    --primary-hover: #0a355c;
+    --secondary-color: #198754;    /* Tropical Eco-Green */
+    --accent-color: #FFB347;       /* Warm Sunset Gold */
+    --dark-color: #1A365D;         /* Sorsogon Midnight Blue */
+    --light-color: #F8FAFC;        /* Sands White */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --card-shadow: 0 10px 30px rgba(15, 76, 129, 0.08);
+    --card-hover-shadow: 0 20px 40px rgba(15, 76, 129, 0.15);
+    --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   GLOBAL RESET & TYPOGRAPHY
+   ========================================================================== */
+body {
+    font-family: 'Outfit', 'Poppins', sans-serif;
+    background-color: #F4F7FA;
+    color: #2D3748;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+a {
+    text-decoration: none;
+    transition: var(--transition-smooth);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* ==========================================================================
+   UTILITY & STRUCTURAL COMPONENTS
+   ========================================================================== */
+.section-padding {
+    padding: 80px 0;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: var(--accent-color);
+    margin: 10px auto 0 auto;
+    border-radius: 2px;
+}
+
+.section-title.text-start::after {
+    margin: 10px 0 0 0;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Premium Buttons */
+.btn-tourism-primary {
+    background: linear-gradient(135deg, var(--primary-color), #1A5F9B);
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    box-shadow: 0 4px 15px rgba(15, 76, 129, 0.2);
+    transition: var(--transition-smooth);
+}
+
+.btn-tourism-primary:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(15, 76, 129, 0.35);
+}
+
+.btn-tourism-outline {
+    background: transparent;
+    color: var(--primary-color);
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+    border-radius: 50px;
+    padding: 10px 28px;
+    transition: var(--transition-smooth);
+}
+
+.btn-tourism-outline:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--card-shadow);
+}
+
+/* Premium Cards */
+.card-tourism {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    background: white;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition-smooth);
+}
+
+.card-tourism:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.card-tourism-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    height: 220px;
+}
+
+.card-tourism img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-smooth);
+}
+
+.card-tourism:hover img {
+    transform: scale(1.08);
+}
+
+.card-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Micro-animations */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Floating Navbar Scroll Style */
+.navbar-scrolled {
+    background: rgba(15, 76, 129, 0.9) !important;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
