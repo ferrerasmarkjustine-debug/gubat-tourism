@@ -9,11 +9,10 @@
             <form action="{{ route('search') }}" method="GET" id="smartSearchForm">
                 <div class="row g-3">
                     <!-- Location / Barangay Selection -->
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label class="form-label small fw-bold text-muted"><i class="bi bi-geo-alt-fill text-primary me-1"></i> Destination Barangay</label>
                         <select class="form-select border-2 py-2" name="barangay" style="border-radius: 10px;">
                             <option value="">All Barangays (Gubat)</option>
-                            <option value="Rizal">Rizal (Surfing Hub)</option>
                             <option value="Pinontingan">Pinontingan</option>
                             <option value="Panganiban">Panganiban</option>
                             <option value="Cota-na-daco">Cota-na-daco</option>
@@ -47,33 +46,13 @@
                     </div>
 
                     <!-- Guests & Rooms Selector -->
-                    <div class="col-lg-3 col-md-6">
-                        <label class="form-label small fw-bold text-muted"><i class="bi bi-people-fill text-primary me-1"></i> Guests & Rooms</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control border-2 py-2" name="guests" placeholder="Guests" min="1" max="20" style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
-                            <span class="input-group-text bg-light border-2 px-2"><i class="bi bi-house"></i></span>
-                            <input type="number" class="form-control border-2 py-2" name="rooms" placeholder="Rooms" min="1" max="10" style="border-top-right-radius: 10px; border-bottom-right-radius: 10px;">
-                        </div>
-                    </div>
-
-                    <!-- Search Button -->
-                    <div class="col-lg-2 col-md-6 d-flex align-items-end">
-                        <button type="submit" class="btn btn-tourism-primary w-100 py-2 d-flex align-items-center justify-content-center" style="height: 48px; border-radius: 10px;">
-                            <i class="bi bi-search me-2"></i> Search
-                        </button>
+                    <div class="col-lg-4 col-md-12">
+                        @include('components.guest-room-selector', ['prefix' => 'home_search'])
                     </div>
                 </div>
 
-                <!-- Toggle for Advanced Filters -->
-                <div class="mt-4">
-                    <button class="btn btn-link text-decoration-none p-0 d-flex align-items-center fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilters" aria-expanded="false" aria-controls="advancedFilters">
-                        <i class="bi bi-sliders me-2"></i> Custom Filters (Budget & Amenities)
-                        <i class="bi bi-chevron-down ms-2 small"></i>
-                    </button>
-                </div>
-
-                <!-- Collapsible Advanced Filters Drawer -->
-                <div class="collapse mt-4" id="advancedFilters">
+                <!-- Custom Filters (Always Open) -->
+                <div class="mt-4" id="advancedFilters">
                     <div class="card card-body border-0 bg-light p-4" style="border-radius: 15px;">
                         <div class="row g-4">
                             <!-- Budget Slider / Selector -->
@@ -147,6 +126,13 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Search Button at the End of the Search Panel -->
+                <div class="mt-4 pt-3 d-flex flex-column flex-sm-row justify-content-end align-items-sm-center gap-3">
+                    <button type="submit" class="btn btn-tourism-primary px-5 py-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="border-radius: 50px; font-size: 1.05rem;">
+                        <i class="bi bi-search me-2"></i> Search Accommodations
+                    </button>
                 </div>
             </form>
         </div>

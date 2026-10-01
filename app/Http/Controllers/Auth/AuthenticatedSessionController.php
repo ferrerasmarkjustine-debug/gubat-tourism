@@ -26,9 +26,29 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        $user = $request->user();
+
+        if (!$user->is_active) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'email' => 'Your account has been deactivated. Please contact the administrator.',
+            ]);
+        }
+
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if ($user->isSuperAdmin()) {
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
+        if ($user->isResortAdmin()) {
+            return redirect()->intended(route('resort.dashboard'));
+        }
+
+        return redirect()->intended(route('home'));
     }
 
     /**

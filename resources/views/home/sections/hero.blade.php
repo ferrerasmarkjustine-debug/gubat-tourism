@@ -1,4 +1,4 @@
-<section class="position-relative overflow-hidden text-white d-flex align-items-center" style="min-height: 80vh; background: linear-gradient(rgba(15, 76, 129, 0.4), rgba(10, 37, 64, 0.85)), url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;">
+<section class="position-relative overflow-hidden text-white d-flex align-items-center" style="min-height: 80vh; background: linear-gradient(rgba(15, 76, 129, 0.4), rgba(10, 37, 64, 0.85)), url('{{ asset('images/hero/hero_bg.jpg') }}') no-repeat center center/cover;">
     
     <!-- Animated Wave Shape Divider -->
     <div class="position-absolute bottom-0 start-0 w-100 overflow-hidden" style="height: 60px; z-index: 2; transform: translateY(1px);">
@@ -19,14 +19,10 @@
                     Beauty of <span class="text-warning">Gubat, Sorsogon</span>
                 </h1>
                 <p class="lead text-white-50 fs-5 mb-4" style="max-width: 650px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-                    Welcome to the surfing sanctuary of South Luzon. Home to Lola Sayong Surf Camp, pristine sandy coastlines, historical sights, and traditional Bicolano hospitality.
-                </p>
+                   Discover the beauty of Gubat, Sorsogon, where stunning coastlines, vibrant local culture, historical landmarks, and unforgettable adventures await.</p>
                 <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
                     <a href="#search-widget" class="btn btn-warning btn-lg rounded-pill px-4 py-3 fw-bold text-dark d-flex align-items-center shadow">
                         <i class="bi bi-calendar-check me-2"></i> Book Accommodation
-                    </a>
-                    <a href="{{ route('destinations') }}" class="btn btn-outline-light btn-lg rounded-pill px-4 py-3 fw-bold d-flex align-items-center">
-                        <i class="bi bi-geo-alt me-2"></i> Explore Attractions
                     </a>
                 </div>
             </div>
@@ -36,12 +32,12 @@
                 <div class="card glass-panel text-white p-4 animate-float" style="background: rgba(255, 255, 255, 0.1); border-radius: 24px; border: 1px solid rgba(255,255,255,0.2);">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="small fw-semibold text-warning"><i class="bi bi-clock"></i> LIVE FORECAST</span>
-                        <span class="badge bg-success rounded-pill">Gubat, Sorsogon</span>
+                        
                     </div>
                     <div class="d-flex align-items-center mb-4">
                         <i class="bi bi-sun-fill text-warning display-4 me-3"></i>
                         <div>
-                            <h2 class="mb-0 fw-bold">31°C</h2>
+                            <h2 class="mb-0 fw-bold text-white">31°C</h2>
                             <p class="mb-0 text-white-50 small">Sunny & Perfect for Surfing</p>
                         </div>
                     </div>

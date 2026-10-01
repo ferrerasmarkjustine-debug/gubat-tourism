@@ -7,12 +7,17 @@
    CSS CUSTOM VARIABLES & DESIGN SYSTEM
    ========================================================================== */
 :root {
-    --primary-color: #0F4C81;      /* Deep Ocean Blue */
+    --primary-color: #0F4C81;
+    /* Deep Ocean Blue */
     --primary-hover: #0a355c;
-    --secondary-color: #198754;    /* Tropical Eco-Green */
-    --accent-color: #FFB347;       /* Warm Sunset Gold */
-    --dark-color: #1A365D;         /* Sorsogon Midnight Blue */
-    --light-color: #F8FAFC;        /* Sands White */
+    --secondary-color: #198754;
+    /* Tropical Eco-Green */
+    --accent-color: #FFB347;
+    /* Warm Sunset Gold */
+    --dark-color: #1A365D;
+    /* Sorsogon Midnight Blue */
+    --light-color: #F8FAFC;
+    /* Sands White */
     --glass-bg: rgba(255, 255, 255, 0.85);
     --glass-border: rgba(255, 255, 255, 0.3);
     --card-shadow: 0 10px 30px rgba(15, 76, 129, 0.08);
@@ -31,7 +36,12 @@ body {
     scroll-behavior: smooth;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
     color: var(--dark-color);
@@ -46,13 +56,16 @@ a {
 ::-webkit-scrollbar {
     width: 8px;
 }
+
 ::-webkit-scrollbar-track {
     background: #F1F5F9;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #CBD5E1;
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
 }
@@ -106,6 +119,7 @@ a {
     box-shadow: 0 4px 15px rgba(15, 76, 129, 0.2);
     transition: var(--transition-smooth);
 }
+
 
 .btn-tourism-primary:hover {
     color: white;
@@ -179,14 +193,22 @@ a {
     border-radius: 50px;
     font-weight: 600;
     font-size: 0.8rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Micro-animations */
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
 .animate-float {
@@ -214,23 +236,23 @@ a {
     background: #ffffff !important;
 }
 
-.flatpickr-day.selected, 
-.flatpickr-day.startRange, 
-.flatpickr-day.endRange, 
-.flatpickr-day.selected.inRange, 
-.flatpickr-day.startRange.inRange, 
-.flatpickr-day.endRange.inRange, 
-.flatpickr-day.selected:focus, 
-.flatpickr-day.startRange:focus, 
-.flatpickr-day.endRange:focus, 
-.flatpickr-day.selected:hover, 
-.flatpickr-day.startRange:hover, 
-.flatpickr-day.endRange:hover, 
-.flatpickr-day.selected.prevMonthDay, 
-.flatpickr-day.startRange.prevMonthDay, 
-.flatpickr-day.endRange.prevMonthDay, 
-.flatpickr-day.selected.nextMonthDay, 
-.flatpickr-day.startRange.nextMonthDay, 
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.startRange.prevMonthDay,
+.flatpickr-day.endRange.prevMonthDay,
+.flatpickr-day.selected.nextMonthDay,
+.flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
     background: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
@@ -309,7 +331,8 @@ a {
     cursor: pointer;
     z-index: 5;
     padding: 4px;
-    display: none; /* Managed by JS */
+    display: none;
+    /* Managed by JS */
     align-items: center;
     justify-content: center;
     transition: var(--transition-smooth);

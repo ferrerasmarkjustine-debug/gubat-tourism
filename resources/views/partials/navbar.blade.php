@@ -51,7 +51,7 @@
                             </li>
                             
                             {{-- Check role or fallback to default dashboards --}}
-                            @if(Auth::user()->email === 'admin@gubat.gov.ph')
+                            @if(Auth::user()->isSuperAdmin())
                                 <li>
                                     <a class="dropdown-item py-2 d-flex align-items-center" href="{{ route('admin.dashboard') }}">
                                         <i class="bi bi-shield-check text-primary me-2"></i> LGU Admin Portal
@@ -87,9 +87,6 @@
                         <a href="{{ route('login') }}" class="btn btn-outline-light rounded-pill px-4">
                             <i class="bi bi-box-arrow-in-right me-1"></i> Login
                         </a>
-                        <a href="{{ route('register') }}" class="btn btn-warning rounded-pill px-4 shadow-sm text-dark fw-bold">
-                            <i class="bi bi-person-plus me-1"></i> Register
-                        </a>
                     </li>
                 @endauth
             </ul>
@@ -114,4 +111,4 @@
             }
         });
     });
-</script>
+</script>

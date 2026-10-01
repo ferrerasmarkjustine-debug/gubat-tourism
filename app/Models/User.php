@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'resort_id',
+        'is_active',
     ];
 
     /**
@@ -43,6 +46,31 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Resort assigned to this user (if resort admin).
+     */
+    public function resort(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Resort::class);
+    }
+
+    /**
+     * Determine if the user is an LGU Super Admin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin' || $this->email === 'admin@gubat.gov.ph';
+    }
+
+    /**
+     * Determine if the user is a Resort Admin.
+     */
+    public function isResortAdmin(): bool
+    {
+        return $this->role === 'resort_admin';
     }
 }

@@ -56,7 +56,7 @@
             {
                 name: "Lola Sayong Surf Camp",
                 category: "Beach & Surfing",
-                coords: [12.9023, 124.1374],
+                coords: [12.9234, 124.1504],
                 description: "Famous surfing camp and cottages.",
                 icon: "bi-tsunami",
                 badgeClass: "bg-warning text-dark"
@@ -64,7 +64,7 @@
             {
                 name: "Rizal Public Beach",
                 category: "Beach & Surfing",
-                coords: [12.9015, 124.1368],
+                coords: [ 12.8919, 124.13407],
                 description: "Prisitine coastline, public cottages & picnics.",
                 icon: "bi-water",
                 badgeClass: "bg-info text-dark"
@@ -80,7 +80,7 @@
             {
                 name: "Bulacao Weaving Center",
                 category: "Livelihood & Crafts",
-                coords: [12.9234, 124.1102],
+                coords: [12.9255, 124.1180],
                 description: "Traditional abaca weaving weavers.",
                 icon: "bi-basket",
                 badgeClass: "bg-success"
@@ -88,7 +88,7 @@
             {
                 name: "Bentuco Clay Pottery",
                 category: "Livelihood & Crafts",
-                coords: [12.9356, 124.0894],
+                coords: [12.9355, 123.9515],
                 description: "Locally-crafted clay and earthenware jars.",
                 icon: "bi-palette",
                 badgeClass: "bg-success"
@@ -100,6 +100,14 @@
                 description: "Municipal Tourism Office headquarters.",
                 icon: "bi-building-fill",
                 badgeClass: "bg-secondary"
+            },
+            {
+                name: "Buenavista Gubat Surf Camp",
+                category: "Beach & Surfing",
+                coords: [12.8985, 124.1189],
+                description: "Famous surfing camp and cottages.",
+                icon: "bi bi-water",
+                badgeClass: "bg-warning text-dark"
             }
         ];
 
