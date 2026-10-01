@@ -161,6 +161,16 @@
                     </a>
                 </li>
 
+                {{-- Back to Website --}}
+                <li class="nav-item">
+                    <a href="{{ route('home') }}"
+                       class="nav-link px-3 py-2 rounded-pill fw-semibold text-dark"
+                       id="nav-back-to-site"
+                       title="Return to public website">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Back to Website
+                    </a>
+                </li>
+
                 {{-- Logout — plain form submit, zero JS --}}
                 <li class="nav-item ms-lg-2">
                     <form method="POST" action="{{ route('logout') }}" id="lgu-admin-logout-form">
