@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'admin@gubat.gov.ph'],
             [
-                'name' => 'LGU Super Admin',
+                'name' => 'LGU Admin',
                 'password' => \Illuminate\Support\Facades\Hash::make('password'),
                 'role' => 'super_admin',
                 'is_active' => true,

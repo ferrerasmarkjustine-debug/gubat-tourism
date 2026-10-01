@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
+            'lgu_admin' => \App\Http\Middleware\LguAdminMiddleware::class,
             'super_admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
             'resort_admin' => \App\Http\Middleware\ResortAdminMiddleware::class,
         ]);

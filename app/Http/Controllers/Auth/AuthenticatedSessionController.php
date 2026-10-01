@@ -40,7 +40,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($user->isSuperAdmin()) {
+        if ($user->isLguAdmin()) {
             return redirect()->intended(route('admin.dashboard'));
         }
 
@@ -62,6 +62,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login')->with('status', 'You have been logged out successfully.');
     }
 }

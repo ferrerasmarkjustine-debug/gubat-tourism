@@ -44,7 +44,7 @@ class AdminManagementTest extends TestCase
         // Create super admin
         $this->superAdmin = User::create([
             'email' => 'admin@gubat.gov.ph',
-            'name' => 'LGU Super Admin',
+            'name' => 'LGU Admin',
             'password' => Hash::make('password'),
             'role' => 'super_admin',
             'is_active' => true,
@@ -78,7 +78,7 @@ class AdminManagementTest extends TestCase
     {
         $response = $this->actingAs($this->superAdmin)->get(route('admin.dashboard'));
         $response->assertOk();
-        $response->assertSee('LGU Super Admin Portal');
+        $response->assertSee('LGU Admin Portal');
 
         $response2 = $this->actingAs($this->superAdmin)->get(route('admin.resort-admins.index'));
         $response2->assertOk();

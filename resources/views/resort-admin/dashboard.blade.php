@@ -39,7 +39,7 @@
             <div class="alert alert-warning rounded-4 shadow-sm p-4 text-center">
                 <i class="bi bi-exclamation-triangle fs-1 text-warning d-block mb-2"></i>
                 <h4 class="fw-bold">No Resort Assigned</h4>
-                <p class="text-muted mb-0">Your account is active, but you are not yet linked to an authorized resort in Gubat. Please contact the LGU Super Admin to assign your resort.</p>
+                <p class="text-muted mb-0">Your account is active, but you are not yet linked to an authorized resort in Gubat. Please contact the LGU Admin to assign your resort.</p>
             </div>
         @else
             <!-- Assigned Resort Welcome Card -->

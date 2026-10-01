@@ -29,6 +29,9 @@ Route::view('/about', 'about.index')->name('about');
 
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\ResortAdminController;
+use App\Http\Controllers\SuperAdmin\ResortController as SuperAdminResortController;
+use App\Http\Controllers\SuperAdmin\DestinationController as SuperAdminDestinationController;
+use App\Http\Controllers\SuperAdmin\ReservationController as SuperAdminReservationController;
 use App\Http\Controllers\ResortAdmin\DashboardController as ResortAdminDashboardController;
 
 /*
@@ -44,12 +47,21 @@ Route::middleware(['auth', 'resort_admin'])->prefix('resort-admin')->name('resor
 
 /*
 |--------------------------------------------------------------------------
-| LGU Super Admin (Protected)
+| LGU Admin (Protected)
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Resorts overview
+    Route::get('/resorts', [SuperAdminResortController::class, 'index'])->name('resorts');
+
+    // Destinations overview
+    Route::get('/destinations', [SuperAdminDestinationController::class, 'index'])->name('destinations');
+
+    // Reservations overview
+    Route::get('/reservations', [SuperAdminReservationController::class, 'index'])->name('reservations');
 
     // Resort Admin Management
     Route::get('/resort-admins', [ResortAdminController::class, 'index'])->name('resort-admins.index');

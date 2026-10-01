@@ -131,7 +131,7 @@
                 <!-- Search Button at the End of the Search Panel -->
                 <div class="mt-4 pt-3 d-flex flex-column flex-sm-row justify-content-end align-items-sm-center gap-3">
                     <button type="submit" class="btn btn-tourism-primary px-5 py-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="border-radius: 50px; font-size: 1.05rem;">
-                        <i class="bi bi-search me-2"></i> Search Accommodations
+                        <i class="bi bi-search me-2"></i> Search 
                     </button>
                 </div>
             </form>

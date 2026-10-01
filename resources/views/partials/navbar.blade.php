@@ -51,10 +51,20 @@
                             </li>
                             
                             {{-- Check role or fallback to default dashboards --}}
-                            @if(Auth::user()->isSuperAdmin())
+                            @if(Auth::user()->isLguAdmin())
                                 <li>
-                                    <a class="dropdown-item py-2 d-flex align-items-center" href="{{ route('admin.dashboard') }}">
-                                        <i class="bi bi-shield-check text-primary me-2"></i> LGU Admin Portal
+                                    <a class="dropdown-item py-2 d-flex align-items-center fw-semibold" href="{{ route('admin.dashboard') }}">
+                                        <i class="bi bi-speedometer2 text-primary me-2"></i> LGU Admin Dashboard
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center" href="{{ route('admin.resort-admins.index') }}">
+                                        <i class="bi bi-people-fill text-success me-2"></i> Resort Admins
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 d-flex align-items-center" href="{{ route('admin.resorts') }}">
+                                        <i class="bi bi-building text-info me-2"></i> Manage Resorts
                                     </a>
                                 </li>
                             @elseif(Auth::user()->role === 'resort_admin')

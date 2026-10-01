@@ -1,8 +1,7 @@
-@extends('layouts.guest')
+@extends('layouts.admin')
 
 @section('content')
-<div class="bg-light pb-5">
-    @include('super-admin.partials.nav')
+<div class="pb-5">
 
     <div class="container">
         <!-- Page Header -->

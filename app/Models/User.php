@@ -59,11 +59,21 @@ class User extends Authenticatable
     }
 
     /**
-     * Determine if the user is an LGU Super Admin.
+     * Determine if the user is an LGU Admin (primary method used throughout the system).
+     */
+    public function isLguAdmin(): bool
+    {
+        return $this->role === 'lgu_admin'
+            || $this->role === 'super_admin'
+            || $this->email === 'admin@gubat.gov.ph';
+    }
+
+    /**
+     * Alias for isLguAdmin() — kept for backward compatibility.
      */
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'super_admin' || $this->email === 'admin@gubat.gov.ph';
+        return $this->isLguAdmin();
     }
 
     /**

@@ -34,10 +34,10 @@ class EndToEndAdminFlowTest extends TestCase
             'is_lgu_approved' => true,
         ]);
 
-        // 1. Login as LGU Super Admin
+        // 1. Login as LGU Admin
         $superAdmin = User::create([
             'email' => 'admin@gubat.gov.ph',
-            'name' => 'LGU Super Admin',
+            'name' => 'LGU Admin',
             'password' => Hash::make('password'),
             'role' => 'super_admin',
             'is_active' => true,
