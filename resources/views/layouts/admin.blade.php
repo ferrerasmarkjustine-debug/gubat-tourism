@@ -27,8 +27,6 @@
         {{ $slot ?? '' }}
     </main>
 
-    @include('partials.footer')
-
     {{-- Bootstrap JS CDN fallback – ensures dropdowns work even without Vite dev server --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmRh3B6wI4kj6/S6/d3bEz0RpQT"

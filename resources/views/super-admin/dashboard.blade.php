@@ -9,11 +9,21 @@
             <div>
                 <h2 class="fw-bold mb-1" style="color: var(--primary-color);">Overview & Statistics</h2>
                 <p class="text-muted mb-0">Monitor tourism resorts and resort administrative accounts across Gubat.</p>
+                <small class="text-muted">Signed in as <strong>{{ auth()->user()->name }}</strong></small>
             </div>
-            <div class="mt-3 mt-md-0">
+            <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center">
                 <a href="{{ route('admin.resort-admins.create') }}" class="btn btn-tourism-primary px-4 py-2 rounded-pill shadow-sm text-white fw-semibold" style="background: var(--primary-color);">
                     <i class="bi bi-person-plus-fill me-2"></i> Add Resort Admin
                 </a>
+                {{-- Always-visible logout — plain POST form, no JS required --}}
+                <form method="POST" action="{{ route('logout') }}" id="dashboard-logout-form">
+                    @csrf
+                    <button type="submit"
+                            class="btn btn-danger rounded-pill px-4 py-2 fw-semibold"
+                            onclick="return confirm('Log out of LGU Admin Portal?')">
+                        <i class="bi bi-box-arrow-right me-1"></i> Log Out
+                    </button>
+                </form>
             </div>
         </div>
 
