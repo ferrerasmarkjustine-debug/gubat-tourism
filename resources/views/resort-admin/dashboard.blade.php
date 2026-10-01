@@ -72,7 +72,7 @@
                             </div>
                         </div>
                         <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                            <a href="{{ route('resorts') }}" target="_blank" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                            <a href="{{ route('resorts') }}" class="btn btn-outline-primary rounded-pill px-4 py-2">
                                 <i class="bi bi-eye me-1"></i> View on Public Site
                             </a>
                         </div>

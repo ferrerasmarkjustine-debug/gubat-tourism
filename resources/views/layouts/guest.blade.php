@@ -22,6 +22,7 @@
     <!-- Page Content -->
     <main class="flex-grow-1">
         @yield('content')
+        {{ $slot ?? '' }}
     </main>
 
     @include('partials.footer')
