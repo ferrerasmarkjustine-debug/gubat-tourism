@@ -1,38 +1,7 @@
-@extends('layouts.guest')
+@extends('layouts.resort-admin')
 
 @section('content')
 <div class="bg-light pb-5">
-    <!-- Resort Admin Header Bar -->
-    <div class="bg-white border-bottom shadow-sm mb-4">
-        <div class="container py-3">
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
-                <div class="d-flex align-items-center">
-                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 44px; height: 44px;">
-                        <i class="bi bi-building-check fs-5"></i>
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <h5 class="mb-0 fw-bold text-dark">Resort Administrator Portal</h5>
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-2 py-1 small">
-                                Verified Admin
-                            </span>
-                        </div>
-                        <small class="text-muted">Assigned Resort: <strong class="text-dark">{{ $resort ? $resort->name : 'Unassigned' }}</strong></small>
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-muted small me-2 d-none d-md-inline">Welcome, <strong>{{ $user->name }}</strong></span>
-                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                            <i class="bi bi-box-arrow-right me-1"></i> Log Out
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="container">
         @if(!$resort)

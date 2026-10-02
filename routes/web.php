@@ -26,6 +26,13 @@ Route::get('/events', [EventsController::class, 'index'])->name('events');
 
 Route::view('/about', 'about.index')->name('about');
 
+// Booking routes
+use App\Http\Controllers\Resort\BookingController;
+Route::get('/booking/create', [BookingController::class, 'create'])->name('booking.create');
+Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
+Route::get('/booking/{booking}/success', [BookingController::class, 'success'])->name('booking.success');
+
+
 
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\ResortAdminController;
@@ -33,6 +40,7 @@ use App\Http\Controllers\SuperAdmin\ResortController as SuperAdminResortControll
 use App\Http\Controllers\SuperAdmin\DestinationController as SuperAdminDestinationController;
 use App\Http\Controllers\SuperAdmin\ReservationController as SuperAdminReservationController;
 use App\Http\Controllers\ResortAdmin\DashboardController as ResortAdminDashboardController;
+use App\Http\Controllers\ResortAdmin\BookingsController as ResortAdminBookingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,8 +48,14 @@ use App\Http\Controllers\ResortAdmin\DashboardController as ResortAdminDashboard
 |--------------------------------------------------------------------------
 */
 
+
+
 Route::middleware(['auth', 'resort_admin'])->prefix('resort-admin')->name('resort.')->group(function () {
     Route::get('/dashboard', [ResortAdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/bookings', [ResortAdminBookingsController::class, 'index'])->name('bookings');
+    Route::get('/accommodations/create', function () {
+        return view('resort-admin.coming-soon');
+    })->name('accommodations.create');
 });
 
 

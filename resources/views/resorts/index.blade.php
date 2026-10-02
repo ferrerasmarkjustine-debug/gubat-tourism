@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     </a>
                                 </div>
                                 <div class="col-6">
-                                    <a href="{{ route('search') }}?resort_id={{ $resort->id }}" class="btn btn-tourism-primary btn-sm w-100 rounded-pill py-2 text-center text-white fw-bold">
+                                    <a href="{{ route('booking.create', ['resort_id' => $resort->id]) }}" class="btn btn-tourism-primary btn-sm w-100 rounded-pill py-2 text-center text-white fw-bold">
                                         Book Now
                                     </a>
                                 </div>

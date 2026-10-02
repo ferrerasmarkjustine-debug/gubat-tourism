@@ -11,7 +11,7 @@
         <div class="row g-4 align-items-stretch">
             <!-- Weather Widget Card (Live/Mock Weather details) -->
             <div class="col-lg-5">
-                <div class="card card-tourism h-100 bg-gradient text-white p-4" style="background: linear-gradient(135deg, var(--primary-color), var(--dark-color)); border-radius: 20px;">
+                <div class="card card-tourism h-100 text-white p-4" style="background: linear-gradient(135deg, var(--primary-color), var(--dark-color)) !important; background-color: var(--primary-color); border-radius: 20px;">
                     <h5 class="fw-bold mb-3 d-flex align-items-center"><i class="bi bi-cloud-sun me-2 text-warning"></i> Gubat Live Weather</h5>
                     
                     <div class="d-flex align-items-center gap-4 mb-4">

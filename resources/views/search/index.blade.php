@@ -3,9 +3,9 @@
 @section('content')
 
 <!-- Hero Sub-header Section -->
-<div class="bg-gradient py-5 text-white" style="background: linear-gradient(135deg, var(--dark-color), var(--primary-color)); border-bottom: 4px solid var(--accent-color);">
+<div class="py-5 text-white" style="background: linear-gradient(135deg, var(--dark-color), var(--primary-color)) !important; background-color: var(--dark-color); border-bottom: 4px solid var(--accent-color);">
     <div class="container py-3 text-center">
-        <h1 class="fw-bold font-outfit text-white mb-2">Search Results</h1>
+        <h1 class="fw-bold font-outfit text-white mb-2" style="color: #ffffff !important;">Search Results</h1>
         <p class="text-white-50 mb-0">Browse through handpicked properties and book your ideal stay in Sorsogon</p>
     </div>
 </div>
@@ -178,7 +178,14 @@
                                                         <h5 class="fw-bold text-success mb-0">₱{{ number_format($accommodation->price_per_night) }}</h5>
                                                     @endif
                                                 </div>
-                                                <a href="{{ route('resorts') }}?id={{ $accommodation->resort->id }}&room={{ $accommodation->id }}&check_in={{ $checkIn }}&check_out={{ $checkOut }}&rooms={{ $roomsRequested }}&adults={{ $adults }}&children={{ $children }}&guests={{ $adults + $children }}" class="btn btn-tourism-primary rounded-pill px-4 fw-bold">
+                                                <a href="{{ route('booking.create', [
+                                                    'accommodation_id' => $accommodation->id,
+                                                    'check_in'  => $checkIn,
+                                                    'check_out' => $checkOut,
+                                                    'rooms'     => $roomsRequested,
+                                                    'adults'    => $adults,
+                                                    'children'  => $children,
+                                                ]) }}" class="btn btn-tourism-primary rounded-pill px-4 fw-bold">
                                                     Reserve Stay <i class="bi bi-chevron-right ms-1"></i>
                                                 </a>
                                             </div>

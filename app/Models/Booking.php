@@ -8,11 +8,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Booking extends Model
 {
     protected $fillable = [
-        'accommodation_id', 'check_in', 'check_out', 'rooms_booked', 'guests_count', 'status'
+        'accommodation_id',
+        'guest_name',
+        'guest_email',
+        'guest_phone',
+        'check_in',
+        'check_out',
+        'rooms_booked',
+        'guests_count',
+        'special_requests',
+        'status',
     ];
 
     protected $casts = [
-        'check_in' => 'date',
+        'check_in'  => 'date',
         'check_out' => 'date',
     ];
 
