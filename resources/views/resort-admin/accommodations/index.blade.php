@@ -87,27 +87,177 @@
                                 </div>
                             @endif
 
-                            <div class="row g-2 py-2 border-top border-bottom small text-muted mb-3">
-                                <div class="col-6">
-                                    <i class="bi bi-people me-1"></i> Up to {{ $acc->max_guests }} Guests
+                            <!-- Live Unit Inventory & Reservation Tracker -->
+                            <div class="border rounded-3 p-3 bg-light mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="small fw-semibold text-dark">
+                                        <i class="bi bi-box-seam text-primary me-1"></i> Unit Inventory
+                                    </span>
+                                    @php
+                                        $available = $acc->available_units;
+                                        $booked = $acc->booked_units;
+                                        $total = $acc->total_units;
+                                        $percent = $total > 0 ? round(($booked / $total) * 100) : 0;
+                                    @endphp
+
+                                    @if($available == 0)
+                                        <span class="badge bg-danger rounded-pill px-2 py-1">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Fully Booked (0 left)
+                                        </span>
+                                    @elseif($available == 1)
+                                        <span class="badge bg-warning text-dark rounded-pill px-2 py-1">
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Low Stock (1 left)
+                                        </span>
+                                    @else
+                                        <span class="badge bg-success rounded-pill px-2 py-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i> {{ $available }} Available
+                                        </span>
+                                    @endif
                                 </div>
-                                <div class="col-6 text-end">
-                                    <i class="bi bi-door-open me-1"></i> {{ $acc->total_units }} {{ Str::plural('Unit', $acc->total_units) }}
+
+                                <div class="progress" style="height: 6px;" title="{{ $booked }} of {{ $total }} units booked today ({{ $percent }}% occupied)">
+                                    <div class="progress-bar {{ $percent >= 100 ? 'bg-danger' : ($percent >= 70 ? 'bg-warning' : 'bg-primary') }}"
+                                         role="progressbar"
+                                         style="width: {{ min(100, $percent) }}%"></div>
+                                </div>
+
+                                <div class="d-flex justify-content-between text-muted mt-2" style="font-size: 0.78rem;">
+                                    <span><strong>{{ $total }}</strong> Total {{ Str::plural('Unit', $total) }}</span>
+                                    <span class="text-danger fw-semibold"><strong>{{ $booked }}</strong> Booked</span>
+                                    <span class="text-success fw-bold"><strong>{{ $available }}</strong> Available</span>
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="row g-2 py-1 small text-muted mb-3">
+                                <div class="col-12">
+                                    <i class="bi bi-people me-1"></i> Accommodates up to <strong>{{ $acc->max_guests }}</strong> guests per unit
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top gap-2">
                                 <div>
-                                    <small class="text-muted d-block">Price per night</small>
+                                    <small class="text-muted d-block" style="font-size:0.75rem;">Price per night</small>
                                     <strong class="text-primary fs-5">₱{{ number_format($acc->price_per_night, 2) }}</strong>
                                 </div>
-                                @if($acc->status === 'approved')
-                                    <a href="{{ route('booking.create', ['accommodation_id' => $acc->id]) }}"
-                                       target="_blank"
-                                       class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                        <i class="bi bi-eye me-1"></i> View Form
+                                <div class="d-flex gap-1">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#accDetailModal{{ $acc->id }}">
+                                        <i class="bi bi-eye me-1"></i> Details
+                                    </button>
+                                    <a href="{{ route('resort.accommodations.edit', $acc->id) }}"
+                                       class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold">
+                                        <i class="bi bi-pencil-square me-1"></i> Edit
                                     </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full Accommodation Card Details Modal -->
+                <div class="modal fade" id="accDetailModal{{ $acc->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $acc->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content rounded-4 border-0 shadow overflow-hidden">
+                            <div class="position-relative">
+                                <img src="{{ $acc->image_url ?: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80' }}"
+                                     alt="{{ $acc->name }}"
+                                     class="w-100"
+                                     style="height: 250px; object-fit: cover;">
+                                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <div class="position-absolute bottom-0 start-0 m-3 d-flex gap-2 align-items-center">
+                                    <span class="badge bg-dark bg-opacity-75 text-white text-capitalize rounded-pill px-3 py-2">
+                                        <i class="bi bi-house me-1"></i> {{ $acc->type }}
+                                    </span>
+                                    @if($acc->status === 'approved')
+                                        <span class="badge bg-success rounded-pill px-3 py-2">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Approved & Live
+                                        </span>
+                                    @elseif($acc->status === 'pending')
+                                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                            <i class="bi bi-clock-history me-1"></i> Pending LGU Review
+                                        </span>
+                                    @else
+                                        <span class="badge bg-danger rounded-pill px-3 py-2">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Rejected
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="modal-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h4 class="fw-bold text-dark mb-1">{{ $acc->name }}</h4>
+                                        <span class="text-muted"><i class="bi bi-building me-1"></i>{{ $resort->name }}</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted d-block">Nightly Rate</small>
+                                        <h3 class="fw-bold text-primary mb-0">₱{{ number_format($acc->price_per_night, 2) }}</h3>
+                                    </div>
+                                </div>
+
+                                @if($acc->status === 'rejected' && $acc->rejection_reason)
+                                    <div class="alert alert-danger rounded-3 mb-3 p-3">
+                                        <strong class="d-block mb-1"><i class="bi bi-exclamation-octagon-fill me-1"></i> LGU Tourism Feedback:</strong>
+                                        <span>{{ $acc->rejection_reason }}</span>
+                                    </div>
                                 @endif
+
+                                <!-- Inventory & Capacity Overview -->
+                                <div class="card bg-light border-0 rounded-3 p-3 mb-3">
+                                    <div class="row text-center g-2">
+                                        <div class="col-4 border-end">
+                                            <small class="text-muted d-block">Total Units</small>
+                                            <h5 class="fw-bold text-dark mb-0">{{ $acc->total_units }}</h5>
+                                        </div>
+                                        <div class="col-4 border-end">
+                                            <small class="text-muted d-block">Booked Today</small>
+                                            <h5 class="fw-bold text-danger mb-0">{{ $acc->booked_units }}</h5>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Available Now</small>
+                                            <h5 class="fw-bold text-success mb-0">{{ $acc->available_units }}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <h6 class="fw-bold text-dark mb-1">Room Description</h6>
+                                    <p class="text-muted mb-0">{{ $acc->description ?: 'No detailed description provided.' }}</p>
+                                </div>
+
+                                <!-- Guest Capacity -->
+                                <div class="mb-3">
+                                    <h6 class="fw-bold text-dark mb-1">Guest Capacity</h6>
+                                    <p class="text-muted mb-0"><i class="bi bi-people me-1 text-primary"></i> Accommodates up to <strong>{{ $acc->max_guests }} guests</strong> per unit</p>
+                                </div>
+
+                                <!-- Amenities -->
+                                <div class="mb-2">
+                                    <h6 class="fw-bold text-dark mb-2">Amenities Included</h6>
+                                    @if($acc->amenities->isNotEmpty())
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach($acc->amenities as $amenity)
+                                                <span class="badge bg-white text-dark border px-3 py-2 rounded-pill fw-normal">
+                                                    <i class="bi {{ $amenity->icon_class }} text-primary me-1"></i> {{ $amenity->name }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <span class="text-muted small">No specific amenities selected.</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="modal-footer border-top bg-light d-flex justify-content-between">
+                                <a href="{{ route('resort.accommodations.edit', $acc->id) }}"
+                                   class="btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                                    <i class="bi bi-pencil-square me-1"></i> Edit This Accommodation
+                                </a>
+                                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>

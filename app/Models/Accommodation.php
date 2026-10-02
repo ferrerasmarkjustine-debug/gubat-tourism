@@ -34,6 +34,39 @@ class Accommodation extends Model
         return $this->status === 'pending';
     }
 
+    /**
+     * Get currently active booked units count for today or a specific date range.
+     */
+    public function getBookedUnitsCount($checkIn = null, $checkOut = null): int
+    {
+        $today = now()->toDateString();
+        $start = $checkIn ? \Carbon\Carbon::parse($checkIn)->toDateString() : $today;
+        $end   = $checkOut ? \Carbon\Carbon::parse($checkOut)->toDateString() : now()->addDay()->toDateString();
+
+        return (int) $this->bookings()
+            ->where('status', 'confirmed')
+            ->where('check_in', '<', $end)
+            ->where('check_out', '>', $start)
+            ->sum('rooms_booked');
+    }
+
+    /**
+     * Get remaining available units today.
+     */
+    public function getAvailableUnitsAttribute(): int
+    {
+        $booked = $this->getBookedUnitsCount();
+        return max(0, $this->total_units - $booked);
+    }
+
+    /**
+     * Get total active booked units today.
+     */
+    public function getBookedUnitsAttribute(): int
+    {
+        return $this->getBookedUnitsCount();
+    }
+
     public function resort(): BelongsTo
     {
         return $this->belongsTo(Resort::class);

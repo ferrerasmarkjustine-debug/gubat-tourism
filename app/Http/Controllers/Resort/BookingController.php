@@ -103,6 +103,21 @@ class BookingController extends Controller
             'special_requests' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        $accommodation = Accommodation::findOrFail($validated['accommodation_id']);
+        $roomsRequested = (int) $validated['rooms_booked'];
+
+        // Live Overbooking Protection Check
+        $bookedCount = $accommodation->getBookedUnitsCount($validated['check_in'], $validated['check_out']);
+        $availableUnits = max(0, $accommodation->total_units - $bookedCount);
+
+        if ($roomsRequested > $availableUnits) {
+            return back()->withInput()->withErrors([
+                'rooms_booked' => $availableUnits > 0
+                    ? "Only {$availableUnits} unit(s) of '{$accommodation->name}' are remaining for the selected dates. Please adjust your room count."
+                    : "Sorry, '{$accommodation->name}' is fully booked for the selected dates. Please choose different dates or select another room."
+            ]);
+        }
+
         $booking = Booking::create([
             'accommodation_id' => $validated['accommodation_id'],
             'guest_name'       => $validated['guest_name'],

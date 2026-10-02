@@ -95,7 +95,8 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="fw-semibold text-dark small">{{ $booking->accommodation->name }}</span>
+                                    <div class="fw-bold text-dark small">{{ $booking->accommodation->name }}</div>
+                                    <small class="text-muted text-capitalize">{{ $booking->accommodation->type }}</small>
                                 </td>
                                 <td>
                                     <span class="fw-semibold">{{ $booking->check_in->format('M j, Y') }}</span>
@@ -109,8 +110,10 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span>{{ $booking->rooms_booked }} {{ Str::plural('room', $booking->rooms_booked) }}</span>
-                                    <small class="text-muted d-block">{{ $booking->guests_count }} {{ Str::plural('guest', $booking->guests_count) }}</small>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1">
+                                        <i class="bi bi-door-closed-fill me-1"></i>{{ $booking->rooms_booked }} {{ Str::plural('unit', $booking->rooms_booked) }}
+                                    </span>
+                                    <small class="text-muted d-block mt-1">{{ $booking->guests_count }} {{ Str::plural('guest', $booking->guests_count) }}</small>
                                 </td>
                                 <td>
                                     <small class="text-muted">{{ $booking->created_at->format('M j, Y') }}</small>

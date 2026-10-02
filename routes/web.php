@@ -56,6 +56,8 @@ Route::middleware(['auth', 'resort_admin'])->prefix('resort-admin')->name('resor
     Route::get('/accommodations', [ResortAdminAccommodationController::class, 'index'])->name('accommodations.index');
     Route::get('/accommodations/create', [ResortAdminAccommodationController::class, 'create'])->name('accommodations.create');
     Route::post('/accommodations', [ResortAdminAccommodationController::class, 'store'])->name('accommodations.store');
+    Route::get('/accommodations/{accommodation}/edit', [ResortAdminAccommodationController::class, 'edit'])->name('accommodations.edit');
+    Route::put('/accommodations/{accommodation}', [ResortAdminAccommodationController::class, 'update'])->name('accommodations.update');
 });
 
 

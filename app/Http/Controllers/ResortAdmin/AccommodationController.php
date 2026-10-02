@@ -89,4 +89,64 @@ class AccommodationController extends Controller
             "Accommodation '{$accommodation->name}' has been submitted! It is now pending review and approval by the LGU Tourism Office."
         );
     }
+
+    /**
+     * Show the form for editing an accommodation.
+     */
+    public function edit(Accommodation $accommodation): View|RedirectResponse
+    {
+        $user = auth()->user();
+        $resort = $user->resort;
+
+        if (!$resort || $accommodation->resort_id !== $resort->id) {
+            abort(403, 'Unauthorized. You can only edit accommodations belonging to your assigned resort.');
+        }
+
+        $amenities = Amenity::orderBy('name')->get();
+        $selectedAmenities = $accommodation->amenities()->pluck('amenities.id')->toArray();
+
+        return view('resort-admin.accommodations.edit', compact('user', 'resort', 'accommodation', 'amenities', 'selectedAmenities'));
+    }
+
+    /**
+     * Update the specified accommodation.
+     */
+    public function update(Request $request, Accommodation $accommodation): RedirectResponse
+    {
+        $user = auth()->user();
+        $resort = $user->resort;
+
+        if (!$resort || $accommodation->resort_id !== $resort->id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        $validated = $request->validate([
+            'name'            => ['required', 'string', 'max:255'],
+            'type'            => ['required', 'string', 'in:room,cottage,villa,dorm'],
+            'price_per_night' => ['required', 'numeric', 'min:0'],
+            'max_guests'      => ['required', 'integer', 'min:1', 'max:50'],
+            'total_units'     => ['required', 'integer', 'min:1', 'max:100'],
+            'description'     => ['nullable', 'string', 'max:2000'],
+            'image_url'       => ['nullable', 'url', 'max:500'],
+            'amenities'       => ['nullable', 'array'],
+            'amenities.*'     => ['exists:amenities,id'],
+        ]);
+
+        $accommodation->update([
+            'name'            => $validated['name'],
+            'type'            => $validated['type'],
+            'price_per_night' => $validated['price_per_night'],
+            'max_guests'      => $validated['max_guests'],
+            'total_units'     => $validated['total_units'],
+            'description'     => $validated['description'] ?? null,
+            'image_url'       => $validated['image_url'] ?: $accommodation->image_url,
+        ]);
+
+        $accommodation->amenities()->sync($validated['amenities'] ?? []);
+
+        return redirect()->route('resort.accommodations.index')->with(
+            'success',
+            "Accommodation '{$accommodation->name}' has been updated successfully!"
+        );
+    }
 }
