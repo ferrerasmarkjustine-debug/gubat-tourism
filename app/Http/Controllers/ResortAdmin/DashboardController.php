@@ -28,10 +28,10 @@ class DashboardController extends Controller
         $today = now()->toDateString();
         $occupiedUnitsToday = $resort
             ? (int) $resort->bookings()
-                ->where('status', 'confirmed')
-                ->where('check_in', '<=', $today)
-                ->where('check_out', '>', $today)
-                ->sum('rooms_booked')
+                ->where('bookings.status', 'confirmed')
+                ->where('bookings.check_in', '<=', $today)
+                ->where('bookings.check_out', '>', $today)
+                ->sum('bookings.rooms_booked')
             : 0;
 
         $availableUnitsToday = max(0, $totalUnits - $occupiedUnitsToday);
