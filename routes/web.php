@@ -80,8 +80,10 @@ Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.'
     Route::post('/accommodations/{accommodation}/approve', [AccommodationApprovalController::class, 'approve'])->name('accommodations.approve');
     Route::post('/accommodations/{accommodation}/reject', [AccommodationApprovalController::class, 'reject'])->name('accommodations.reject');
 
-    // Destinations overview
+    // Destinations management
     Route::get('/destinations', [SuperAdminDestinationController::class, 'index'])->name('destinations');
+    Route::put('/destinations/{destination}', [SuperAdminDestinationController::class, 'update'])->name('destinations.update');
+    Route::patch('/destinations/{destination}/toggle-featured', [SuperAdminDestinationController::class, 'toggleFeatured'])->name('destinations.toggle-featured');
 
     // Reservations overview
     Route::get('/reservations', [SuperAdminReservationController::class, 'index'])->name('reservations');
