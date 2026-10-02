@@ -11,8 +11,28 @@ class Accommodation extends Model
 {
     protected $fillable = [
         'resort_id', 'name', 'type', 'price_per_night', 'max_guests',
-        'total_units', 'description', 'image_url'
+        'total_units', 'description', 'image_url', 'status', 'rejection_reason'
     ];
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
 
     public function resort(): BelongsTo
     {

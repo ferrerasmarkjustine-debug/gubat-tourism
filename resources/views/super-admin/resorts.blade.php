@@ -12,12 +12,22 @@
             </ol>
         </nav>
 
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4 shadow-sm" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 pb-2 border-bottom gap-3">
             <div>
                 <h2 class="fw-bold mb-1" style="color: var(--primary-color);">Resorts Management</h2>
                 <p class="text-muted mb-0">View registered resorts across Gubat and their assigned Resort Administrators.</p>
             </div>
             <div class="d-flex gap-2">
+                <a href="{{ route('admin.resorts.create') }}" class="btn btn-success px-4 py-2 rounded-pill shadow-sm fw-semibold">
+                    <i class="bi bi-plus-circle me-1"></i> Add New Resort
+                </a>
                 <a href="{{ route('admin.resort-admins.create') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm fw-semibold">
                     <i class="bi bi-person-plus-fill me-2"></i> Add Resort Admin
                 </a>

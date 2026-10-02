@@ -15,7 +15,12 @@ class ResortsController extends Controller
     public function index(): View
     {
         try {
-            $resorts = Resort::with(['barangay', 'accommodations.amenities'])->get();
+            $resorts = Resort::with([
+                'barangay',
+                'accommodations' => function ($q) {
+                    $q->where('status', 'approved')->with('amenities');
+                }
+            ])->get();
 
             if ($resorts->isEmpty()) {
                 $resorts = $this->getFallbackResorts();

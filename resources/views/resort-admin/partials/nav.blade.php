@@ -78,7 +78,16 @@
                     </a>
                 </li>
 
-                {{-- Add Accommodation (in development) --}}
+                {{-- Accommodations --}}
+                <li class="nav-item">
+                    <a href="{{ route('resort.accommodations.index') }}"
+                       class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('resort.accommodations.index') ? 'bg-secondary text-white' : 'text-dark' }}"
+                       id="ra-nav-accommodations">
+                        <i class="bi bi-door-open me-1"></i> Accommodations
+                    </a>
+                </li>
+
+                {{-- Add Accommodation --}}
                 <li class="nav-item">
                     <a href="{{ route('resort.accommodations.create') }}"
                        class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('resort.accommodations.create') ? 'bg-warning text-dark' : 'text-dark' }}"

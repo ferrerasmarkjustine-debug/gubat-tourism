@@ -46,8 +46,8 @@ class SearchController extends Controller
         if ($totalGuests < 1) $totalGuests = 1;
         if ($roomsRequested < 1) $roomsRequested = 1;
 
-        // 2. Query accommodations
-        $query = Accommodation::query()
+        // 2. Query accommodations (only LGU approved)
+        $query = Accommodation::approved()
             ->with(['resort.barangay.municipality', 'amenities']);
 
         // Filter by Resort Location: Municipality

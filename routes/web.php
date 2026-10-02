@@ -39,8 +39,10 @@ use App\Http\Controllers\SuperAdmin\ResortAdminController;
 use App\Http\Controllers\SuperAdmin\ResortController as SuperAdminResortController;
 use App\Http\Controllers\SuperAdmin\DestinationController as SuperAdminDestinationController;
 use App\Http\Controllers\SuperAdmin\ReservationController as SuperAdminReservationController;
+use App\Http\Controllers\SuperAdmin\AccommodationApprovalController;
 use App\Http\Controllers\ResortAdmin\DashboardController as ResortAdminDashboardController;
 use App\Http\Controllers\ResortAdmin\BookingsController as ResortAdminBookingsController;
+use App\Http\Controllers\ResortAdmin\AccommodationController as ResortAdminAccommodationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,14 +50,12 @@ use App\Http\Controllers\ResortAdmin\BookingsController as ResortAdminBookingsCo
 |--------------------------------------------------------------------------
 */
 
-
-
 Route::middleware(['auth', 'resort_admin'])->prefix('resort-admin')->name('resort.')->group(function () {
     Route::get('/dashboard', [ResortAdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/bookings', [ResortAdminBookingsController::class, 'index'])->name('bookings');
-    Route::get('/accommodations/create', function () {
-        return view('resort-admin.coming-soon');
-    })->name('accommodations.create');
+    Route::get('/accommodations', [ResortAdminAccommodationController::class, 'index'])->name('accommodations.index');
+    Route::get('/accommodations/create', [ResortAdminAccommodationController::class, 'create'])->name('accommodations.create');
+    Route::post('/accommodations', [ResortAdminAccommodationController::class, 'store'])->name('accommodations.store');
 });
 
 
@@ -68,8 +68,15 @@ Route::middleware(['auth', 'resort_admin'])->prefix('resort-admin')->name('resor
 Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
 
-    // Resorts overview
+    // Resorts Management
     Route::get('/resorts', [SuperAdminResortController::class, 'index'])->name('resorts');
+    Route::get('/resorts/create', [SuperAdminResortController::class, 'create'])->name('resorts.create');
+    Route::post('/resorts', [SuperAdminResortController::class, 'store'])->name('resorts.store');
+
+    // Accommodations Approval Workflow
+    Route::get('/accommodations', [AccommodationApprovalController::class, 'index'])->name('accommodations.index');
+    Route::post('/accommodations/{accommodation}/approve', [AccommodationApprovalController::class, 'approve'])->name('accommodations.approve');
+    Route::post('/accommodations/{accommodation}/reject', [AccommodationApprovalController::class, 'reject'])->name('accommodations.reject');
 
     // Destinations overview
     Route::get('/destinations', [SuperAdminDestinationController::class, 'index'])->name('destinations');

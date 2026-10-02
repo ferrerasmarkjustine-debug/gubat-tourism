@@ -121,9 +121,22 @@
                 {{-- Resorts --}}
                 <li class="nav-item">
                     <a href="{{ route('admin.resorts') }}"
-                       class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('admin.resorts') ? 'bg-primary text-white' : 'text-dark' }}"
+                       class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('admin.resorts*') ? 'bg-primary text-white' : 'text-dark' }}"
                        id="nav-resorts">
                         <i class="bi bi-building me-1"></i> Resorts
+                    </a>
+                </li>
+
+                {{-- Accommodation Approvals --}}
+                <li class="nav-item">
+                    <a href="{{ route('admin.accommodations.index') }}"
+                       class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('admin.accommodations.*') ? 'bg-warning text-dark' : 'text-dark' }}"
+                       id="nav-approvals">
+                        <i class="bi bi-patch-check-fill me-1"></i> Approvals
+                        @php $pendingCount = \App\Models\Accommodation::where('status', 'pending')->count(); @endphp
+                        @if($pendingCount > 0)
+                            <span class="badge bg-danger text-white rounded-pill ms-1">{{ $pendingCount }}</span>
+                        @endif
                     </a>
                 </li>
 
