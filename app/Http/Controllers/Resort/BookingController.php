@@ -90,6 +90,16 @@ class BookingController extends Controller
             $checkInDate = Carbon::parse($request->input('check_in'));
             $request->merge(['check_out' => $checkInDate->copy()->addDay()->toDateString()]);
         }
+        if (!$request->filled('rooms_booked') && $request->filled('rooms')) {
+            $request->merge(['rooms_booked' => $request->input('rooms')]);
+        }
+        if (!$request->filled('guests_count')) {
+            if ($request->filled('guests')) {
+                $request->merge(['guests_count' => $request->input('guests')]);
+            } elseif ($request->filled('adults')) {
+                $request->merge(['guests_count' => (int)$request->input('adults') + (int)$request->input('children', 0)]);
+            }
+        }
 
         $validated = $request->validate([
             'accommodation_id' => ['required', 'exists:accommodations,id'],

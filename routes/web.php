@@ -38,6 +38,7 @@ use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardCo
 use App\Http\Controllers\SuperAdmin\ResortAdminController;
 use App\Http\Controllers\SuperAdmin\ResortController as SuperAdminResortController;
 use App\Http\Controllers\SuperAdmin\DestinationController as SuperAdminDestinationController;
+use App\Http\Controllers\SuperAdmin\EventController as SuperAdminEventController;
 use App\Http\Controllers\SuperAdmin\ReservationController as SuperAdminReservationController;
 use App\Http\Controllers\SuperAdmin\AccommodationApprovalController;
 use App\Http\Controllers\ResortAdmin\DashboardController as ResortAdminDashboardController;
@@ -87,6 +88,16 @@ Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.'
 
     // Reservations overview
     Route::get('/reservations', [SuperAdminReservationController::class, 'index'])->name('reservations');
+
+    // Events & Announcements Management
+    Route::get('/events', [SuperAdminEventController::class, 'index'])->name('events.index');
+    Route::post('/events', [SuperAdminEventController::class, 'storeEvent'])->name('events.store');
+    Route::put('/events/{event}', [SuperAdminEventController::class, 'updateEvent'])->name('events.update');
+    Route::delete('/events/{event}', [SuperAdminEventController::class, 'destroyEvent'])->name('events.destroy');
+
+    Route::post('/announcements', [SuperAdminEventController::class, 'storeAnnouncement'])->name('announcements.store');
+    Route::put('/announcements/{announcement}', [SuperAdminEventController::class, 'updateAnnouncement'])->name('announcements.update');
+    Route::delete('/announcements/{announcement}', [SuperAdminEventController::class, 'destroyAnnouncement'])->name('announcements.destroy');
 
     // Resort Admin Management
     Route::get('/resort-admins', [ResortAdminController::class, 'index'])->name('resort-admins.index');
