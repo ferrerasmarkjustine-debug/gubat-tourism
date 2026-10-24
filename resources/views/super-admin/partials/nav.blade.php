@@ -54,10 +54,132 @@
     text-decoration: none;
 }
 .nav-css-dropdown-menu a:hover { background: #f0f4ff; }
+
+/* Keep all navbar items in one horizontal line with icon strictly to the left of text */
+#lgu-admin-navbar .nav-link,
+#lgu-admin-navbar .nav-css-dropdown > span,
+#lgu-admin-navbar .btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex-direction: row !important;
+    white-space: nowrap !important;
+    gap: 0.45rem !important;
+}
+
+#lgu-admin-navbar .nav-link i,
+#lgu-admin-navbar .nav-css-dropdown > span i,
+#lgu-admin-navbar .btn i {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.05rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+#lgu-admin-navbar .navbar-nav {
+    flex-wrap: nowrap !important;
+}
+
+#lgu-admin-navbar .nav-link {
+    padding: 0.45rem 0.85rem !important;
+    font-size: 0.9rem !important;
+}
+
+/* ==========================================================================
+   PREMIUM HOVER DESIGNS & MICRO-INTERACTIONS
+   ========================================================================== */
+#lgu-admin-navbar .nav-link,
+#lgu-admin-navbar .nav-css-dropdown > span {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+#lgu-admin-navbar .nav-link i,
+#lgu-admin-navbar .nav-css-dropdown > span i {
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Inactive items hover: soft blue background, blue text, subtle lift, and gentle shadow */
+#lgu-admin-navbar .nav-link:not(.bg-primary):not(.bg-warning):hover,
+#lgu-admin-navbar .nav-css-dropdown:hover > span:not(.bg-primary) {
+    background-color: #eef4ff !important;
+    color: #0d6efd !important;
+    border-color: rgba(13, 110, 253, 0.18) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(13, 110, 253, 0.12) !important;
+}
+
+/* Icon playful pop-up on hover */
+#lgu-admin-navbar .nav-link:hover i,
+#lgu-admin-navbar .nav-css-dropdown:hover > span i {
+    transform: scale(1.18);
+    color: inherit;
+}
+
+/* Active primary pill hover: enhanced depth and vibrant glow */
+#lgu-admin-navbar .nav-link.bg-primary:hover,
+#lgu-admin-navbar .nav-css-dropdown > span.bg-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.4) !important;
+    filter: brightness(1.05);
+}
+
+/* Active warning pill hover (Approvals) */
+#lgu-admin-navbar .nav-link.bg-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.45) !important;
+    filter: brightness(1.03);
+}
+
+/* Dropdown menu items hover: smooth slide and blue accent */
+.nav-css-dropdown-menu a,
+.css-dropdown-menu .dd-item {
+    transition: all 0.2s ease !important;
+}
+.nav-css-dropdown-menu a:hover,
+.css-dropdown-menu .dd-item:hover {
+    background: #eef4ff !important;
+    color: #0d6efd !important;
+    padding-left: 18px !important;
+}
+.css-dropdown-menu .dd-item.text-danger:hover {
+    background: #fff5f5 !important;
+    color: #dc3545 !important;
+}
+
+/* Brand badge playful hover */
+#lgu-admin-navbar .navbar-brand {
+    transition: transform 0.25s ease;
+}
+#lgu-admin-navbar .navbar-brand:hover {
+    transform: translateY(-1px);
+}
+#lgu-admin-navbar .navbar-brand:hover .bg-primary {
+    transform: scale(1.08) rotate(-4deg);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.35);
+}
+
+/* Logout button hover */
+#lgu-admin-navbar #btn-logout {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+#lgu-admin-navbar #btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.38) !important;
+    filter: brightness(1.05);
+}
+#lgu-admin-navbar #btn-logout:hover i {
+    transform: scale(1.18) translateX(2px);
+    transition: transform 0.25s ease;
+}
 </style>
 
 <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm mb-4" id="lgu-admin-navbar">
-    <div class="container">
+    <div class="container-fluid px-xl-4 px-3">
 
         {{-- Brand with CSS-only hover dropdown --}}
         <div class="css-dropdown">
@@ -143,9 +265,27 @@
                 {{-- Destinations --}}
                 <li class="nav-item">
                     <a href="{{ route('admin.destinations') }}"
-                       class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('admin.destinations') ? 'bg-primary text-white' : 'text-dark' }}"
+                       class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('admin.destinations*') ? 'bg-primary text-white' : 'text-dark' }}"
                        id="nav-destinations">
                         <i class="bi bi-geo-alt-fill me-1"></i> Destinations
+                    </a>
+                </li>
+
+                {{-- Events & Announcements --}}
+                <li class="nav-item">
+                    <a href="{{ route('admin.events.index') }}"
+                       class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('admin.events*') || request()->routeIs('admin.announcements*') ? 'bg-primary text-white' : 'text-dark' }}"
+                       id="nav-admin-events">
+                        <i class="bi bi-calendar-event me-1"></i> Events &amp; News
+                    </a>
+                </li>
+
+                {{-- Crafts & Livelihood --}}
+                <li class="nav-item">
+                    <a href="{{ route('admin.crafts.index') }}"
+                       class="nav-link px-3 py-2 rounded-pill fw-semibold {{ request()->routeIs('admin.crafts*') ? 'bg-primary text-white' : 'text-dark' }}"
+                       id="nav-admin-crafts">
+                        <i class="bi bi-tools me-1"></i> Crafts
                     </a>
                 </li>
 

@@ -30,10 +30,108 @@
 }
 .ra-dropdown-menu .ra-dd-item:hover { background: #f0f4ff; }
 .ra-dropdown-menu .ra-dd-header { padding: 8px 16px 6px; border-bottom: 1px solid #eee; margin-bottom: 4px; }
+
+/* Keep all navbar items in one horizontal line with icon strictly to the left of text */
+#resort-admin-navbar .nav-link,
+#resort-admin-navbar .btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex-direction: row !important;
+    white-space: nowrap !important;
+    gap: 0.45rem !important;
+}
+
+#resort-admin-navbar .nav-link i,
+#resort-admin-navbar .btn i {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.05rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+#resort-admin-navbar .navbar-nav {
+    flex-wrap: nowrap !important;
+}
+
+#resort-admin-navbar .nav-link {
+    padding: 0.45rem 0.85rem !important;
+    font-size: 0.9rem !important;
+}
+
+/* ==========================================================================
+   PREMIUM HOVER DESIGNS & MICRO-INTERACTIONS
+   ========================================================================== */
+#resort-admin-navbar .nav-link {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+#resort-admin-navbar .nav-link i {
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Inactive items hover: soft green background, green text, subtle lift, and gentle shadow */
+#resort-admin-navbar .nav-link:not(.bg-success):not(.bg-primary):not(.bg-secondary):not(.bg-warning):hover {
+    background-color: #f0fdf4 !important;
+    color: #198754 !important;
+    border-color: rgba(25, 135, 84, 0.2) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(25, 135, 84, 0.12) !important;
+}
+
+/* Icon pop on hover */
+#resort-admin-navbar .nav-link:hover i {
+    transform: scale(1.18);
+    color: inherit;
+}
+
+/* Active pills hover */
+#resort-admin-navbar .nav-link.bg-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(25, 135, 84, 0.4) !important;
+    filter: brightness(1.05);
+}
+#resort-admin-navbar .nav-link.bg-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.4) !important;
+    filter: brightness(1.05);
+}
+#resort-admin-navbar .nav-link.bg-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.45) !important;
+    filter: brightness(1.03);
+}
+
+/* Dropdown menu items hover */
+.ra-dropdown-menu .ra-dd-item {
+    transition: all 0.2s ease !important;
+}
+.ra-dropdown-menu .ra-dd-item:hover {
+    background: #f0fdf4 !important;
+    color: #198754 !important;
+    padding-left: 18px !important;
+}
+
+/* Brand badge playful hover */
+#resort-admin-navbar .navbar-brand {
+    transition: transform 0.25s ease;
+}
+#resort-admin-navbar .navbar-brand:hover {
+    transform: translateY(-1px);
+}
+#resort-admin-navbar .navbar-brand:hover .bg-success {
+    transform: scale(1.08) rotate(-4deg);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 16px rgba(25, 135, 84, 0.35);
+}
 </style>
 
 <nav class="navbar navbar-expand-lg resort-admin-nav mb-4" id="resort-admin-navbar">
-    <div class="container">
+    <div class="container-fluid px-xl-4 px-3">
 
         {{-- Brand --}}
         <a href="{{ route('resort.dashboard') }}" class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" id="resortAdminBrand">

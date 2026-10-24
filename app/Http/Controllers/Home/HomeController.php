@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\Announcement;
 use App\Models\Testimonial;
 use App\Models\WeatherTip;
+use App\Models\Craft;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 use Exception;
@@ -52,11 +53,41 @@ class HomeController extends Controller
                 $weatherTips = $this->getFallbackWeatherTips();
             }
 
+            $churchSpots = $heritageSpots->filter(function($s) {
+                $c = strtolower($s->category ?? '');
+                return str_contains($c, 'church') || str_contains($c, 'chapel') || str_contains($c, 'parish');
+            });
+            $historySpots = $heritageSpots->filter(function($s) {
+                $c = strtolower($s->category ?? '');
+                return str_contains($c, 'heritage') || str_contains($c, 'history') || str_contains($c, 'landmark') || str_contains($c, 'ancestral');
+            });
+            $featuredCrafts = Craft::where('is_featured', true)->get();
+            if ($featuredCrafts->isEmpty()) {
+                $featuredCrafts = Craft::take(3)->get();
+            }
+            if ($featuredCrafts->isNotEmpty()) {
+                $craftSpots = $featuredCrafts;
+            } else {
+                $craftSpots = $this->getFallbackCrafts();
+            }
+            $natureSpots = $this->getFallbackNature();
+
+            if ($churchSpots->isEmpty()) {
+                $churchSpots = $this->getFallbackChurches();
+            }
+            if ($historySpots->isEmpty()) {
+                $historySpots = $this->getFallbackHistory();
+            }
+
         } catch (Exception $e) {
             // Severe fallback to prevent site failure
             $featuredDestinations = $this->getFallbackDestinations();
             $featuredResorts = $this->getFallbackResorts();
             $heritageSpots = $this->getFallbackHeritage();
+            $churchSpots = $this->getFallbackChurches();
+            $historySpots = $this->getFallbackHistory();
+            $craftSpots = $this->getFallbackCrafts();
+            $natureSpots = $this->getFallbackNature();
             $events = $this->getFallbackEvents();
             $announcements = $this->getFallbackAnnouncements();
             $testimonials = $this->getFallbackTestimonials();
@@ -67,6 +98,10 @@ class HomeController extends Controller
             'featuredDestinations',
             'featuredResorts',
             'heritageSpots',
+            'churchSpots',
+            'historySpots',
+            'craftSpots',
+            'natureSpots',
             'events',
             'announcements',
             'testimonials',
@@ -131,7 +166,7 @@ class HomeController extends Controller
                 'google_map_url' => 'https://maps.google.com/?q=Gubat+Bay+Beach+Resort+Sorsogon',
                 'barangay' => (object)['name' => 'Pinontingan'],
                 'accommodations' => collect([
-                    (object)['price_per_night' => 2500, 'max_guests' => 4]
+                    (object)['price_per_night' => 2500, 'max_guests' => 4, 'amenities' => collect([])]
                 ])
             ],
             (object)[
@@ -146,7 +181,7 @@ class HomeController extends Controller
                 'google_map_url' => 'https://maps.google.com/?q=Rizal+Beach+Gubat+Sorsogon',
                 'barangay' => (object)['name' => 'Rizal'],
                 'accommodations' => collect([
-                    (object)['price_per_night' => 1200, 'max_guests' => 6]
+                    (object)['price_per_night' => 1200, 'max_guests' => 6, 'amenities' => collect([])]
                 ])
             ],
             (object)[
@@ -161,7 +196,7 @@ class HomeController extends Controller
                 'google_map_url' => 'https://maps.google.com/?q=Lola+Sayong+Surf+Camp+Gubat+Sorsogon',
                 'barangay' => (object)['name' => 'Rizal'],
                 'accommodations' => collect([
-                    (object)['price_per_night' => 3200, 'max_guests' => 3]
+                    (object)['price_per_night' => 3200, 'max_guests' => 3, 'amenities' => collect([])]
                 ])
             ]
         ]);
@@ -315,6 +350,132 @@ class HomeController extends Controller
                 'title' => 'Getting Around Gubat',
                 'content' => 'Standard tricycle fares operate on fixed regulatory bounds inside the town center. If you are traveling to beachfront areas like Rizal or Pinontingan, agree on a price beforehand or hire verified tourist tricycles.',
                 'icon_class' => 'bi-bicycle'
+            ]
+        ]);
+    }
+
+    private function getFallbackChurches()
+    {
+        return collect([
+            (object)[
+                'id' => 4,
+                'name' => 'St. Anthony of Padua Parish',
+                'description' => 'Serving as the center of faith in Gubat since the early 1900s, this historic church features traditional Sorsoganon architectural elements and celebrated bell towers.',
+                'category' => 'Century-Old Church',
+                'image_url' => 'https://images.unsplash.com/photo-1548625361-155deee223cb?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=St+Anthony+of+Padua+Parish+Gubat+Sorsogon',
+                'municipality' => (object)['name' => 'Gubat'],
+                'barangay' => (object)['name' => 'Cota-na-daco'],
+                'barangay_name' => 'Cota-na-daco'
+            ],
+            (object)[
+                'id' => 3,
+                'name' => 'Barcelona Old Church',
+                'description' => 'Built in 1874 by Franciscan friars, this coral stone fortress church showcases authentic Bicol Spanish-colonial craftsmanship constructed with egg-white mortar.',
+                'category' => 'Heritage Landmark',
+                'image_url' => 'https://images.unsplash.com/photo-1590073844006-33379778ae09?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=Barcelona+Church+Sorsogon',
+                'municipality' => (object)['name' => 'Barcelona'],
+                'barangay' => (object)['name' => 'Poblacion'],
+                'barangay_name' => 'Poblacion'
+            ]
+        ]);
+    }
+
+    private function getFallbackHistory()
+    {
+        return collect([
+            (object)[
+                'id' => 7,
+                'name' => 'Gubat Heritage Ancestral Houses',
+                'description' => 'Explore preserved Bahay na Bato structures featuring capiz shell windows, hardwood narra pillars, and Spanish-era stone foundations that tell the story of Gubat\'s colonial past.',
+                'category' => 'Historical Heritage',
+                'image_url' => 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=Poblacion+Gubat+Sorsogon',
+                'municipality' => (object)['name' => 'Gubat'],
+                'barangay' => (object)['name' => 'Poblacion'],
+                'barangay_name' => 'Poblacion'
+            ],
+            (object)[
+                'id' => 8,
+                'name' => 'Gubat Municipal Hall Heritage Building',
+                'description' => 'One of Sorsogon\'s most well-preserved municipal halls, the Gubat Municipal Hall stands as a proud colonial-era civic structure surrounded by a shaded plaza and heritage marker stones.',
+                'category' => 'Civic Landmark',
+                'image_url' => 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=Gubat+Municipal+Hall+Sorsogon',
+                'municipality' => (object)['name' => 'Gubat'],
+                'barangay' => (object)['name' => 'Poblacion'],
+                'barangay_name' => 'Poblacion'
+            ]
+        ]);
+    }
+
+    private function getFallbackCrafts()
+    {
+        return collect([
+            (object)[
+                'id' => 5,
+                'name' => 'Bulacao Abaca Weaving Association',
+                'description' => 'Witness local master artisans transform raw natural abaca fibers into world-class hand-woven mats, slippers, elegant bags, and native tapestries.',
+                'category' => 'Livelihood Center',
+                'craft_type' => 'Abaca Weaving',
+                'image_url' => 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=Gubat+Sorsogon+Abaca+Weavers',
+                'municipality' => (object)['name' => 'Gubat'],
+                'barangay' => (object)['name' => 'Bulacao'],
+                'barangay_name' => 'Bulacao'
+            ],
+            (object)[
+                'id' => 6,
+                'name' => 'Bentuco Clay Crafts',
+                'description' => 'Experience traditional Bicol clay kneading and pottery wheels. Shop terracotta cooking pots, decorative planters, and customized garden brick ornaments.',
+                'category' => 'Traditional Pottery',
+                'craft_type' => 'Clay Pottery',
+                'image_url' => 'https://images.unsplash.com/photo-1565192647048-f997ded879f0?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=Bentuco+Gubat+Sorsogon',
+                'municipality' => (object)['name' => 'Gubat'],
+                'barangay' => (object)['name' => 'Bentuco'],
+                'barangay_name' => 'Bentuco'
+            ],
+            (object)[
+                'id' => 8,
+                'name' => 'Gubat Delicacy & Pili Confections',
+                'description' => 'Traditional culinary livelihood featuring handcrafted crispy pili nut treats, roasted mazapan, sweet molido, and coconut confectionery from local farm cooperatives.',
+                'category' => 'Culinary Crafts',
+                'craft_type' => 'Native Delicacies',
+                'image_url' => 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=Poblacion+Gubat+Sorsogon',
+                'municipality' => (object)['name' => 'Gubat'],
+                'barangay' => (object)['name' => 'Poblacion'],
+                'barangay_name' => 'Poblacion'
+            ]
+        ]);
+    }
+
+    private function getFallbackNature()
+    {
+        return collect([
+            (object)[
+                'id' => 10,
+                'name' => 'Pinontingan Mangrove Eco-Park',
+                'description' => 'Protected coastal mangrove sanctuary featuring bamboo boardwalks, birdwatching observation towers, and river kayak trails.',
+                'category' => 'Mangrove Forest',
+                'image_url' => 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=Pinontingan+Gubat+Sorsogon',
+                'municipality' => (object)['name' => 'Gubat'],
+                'barangay' => (object)['name' => 'Pinontingan'],
+                'barangay_name' => 'Pinontingan'
+            ],
+            (object)[
+                'id' => 11,
+                'name' => 'Lapus-Lapus Marine Sanctuary',
+                'description' => 'Pristine coastal reef preservation zone ideal for snorkeling, tidal pool exploration, and educational marine biodiversity visits.',
+                'category' => 'Marine Reserve',
+                'image_url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+                'google_map_url' => 'https://maps.google.com/?q=Gubat+Sorsogon+Marine+Sanctuary',
+                'municipality' => (object)['name' => 'Gubat'],
+                'barangay' => (object)['name' => 'Dancalan'],
+                'barangay_name' => 'Dancalan'
             ]
         ]);
     }

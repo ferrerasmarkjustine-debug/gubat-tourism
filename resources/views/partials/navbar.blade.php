@@ -54,17 +54,22 @@
                     </a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link {{ request()->routeIs('resorts') ? 'active text-warning fw-bold' : 'text-white-50' }}" href="{{ route('resorts') }}">
+                    <a class="nav-link {{ request()->routeIs('resorts*') ? 'active text-warning fw-bold' : 'text-white-50' }}" href="{{ route('resorts') }}">
                         <i class="bi bi-building me-1"></i> Resorts
                     </a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link {{ request()->routeIs('destinations') ? 'active text-warning fw-bold' : 'text-white-50' }}" href="{{ route('destinations') }}">
+                    <a class="nav-link {{ request()->routeIs('destinations*') ? 'active text-warning fw-bold' : 'text-white-50' }}" href="{{ route('destinations') }}">
                         <i class="bi bi-geo-alt me-1"></i> Destinations
                     </a>
                 </li>
                 <li class="nav-item px-2">
-                    <a class="nav-link {{ request()->routeIs('events') ? 'active text-warning fw-bold' : 'text-white-50' }}" href="{{ route('events') }}">
+                    <a class="nav-link {{ request()->routeIs('crafts*') ? 'active text-warning fw-bold' : 'text-white-50' }}" href="{{ route('crafts') }}">
+                        <i class="bi bi-tools me-1"></i> Crafts
+                    </a>
+                </li>
+                <li class="nav-item px-2">
+                    <a class="nav-link {{ request()->routeIs('events*') ? 'active text-warning fw-bold' : 'text-white-50' }}" href="{{ route('events') }}">
                         <i class="bi bi-calendar-event me-1"></i> Events
                     </a>
                 </li>

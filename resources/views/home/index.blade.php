@@ -11,28 +11,40 @@
     <!-- 3. Explore Categories -->
     @include('home.sections.categories')
 
-    <!-- 4. Featured Destinations -->
+    <!-- 4. Featured Destinations (Beach & Surfing) -->
     @include('home.sections.featured-destinations')
 
     <!-- 5. Featured Resorts & Accommodations -->
     @include('home.sections.destinations')
 
-    <!-- 6. Historical Places, Churches & Livelihood Centers -->
-    @include('home.sections.tourist-spots')
+    <!-- 6. Historic Churches -->
+    @include('home.sections.churches')
 
-    <!-- 7. Upcoming Events -->
+    <!-- 7. History & Heritage Landmarks -->
+    @include('home.sections.history')
+
+    <!-- 8. Nature & Ecotourism -->
+    @include('home.sections.nature')
+
+    <!-- 8. Traditional Crafts & Local Livelihood -->
+    @include('home.sections.crafts')
+
+    <!-- 9. Upcoming Events -->
     @include('home.sections.events')
 
-    <!-- 8. Interactive Map -->
+    <!-- 10. Interactive Map -->
     @include('home.sections.map')
 
-    <!-- 9. LGU Announcements -->
+    <!-- 11. LGU Announcements -->
     @include('home.sections.announcements')
 
-    <!-- 10. Weather & Travel Tips -->
+    <!-- 12. Weather & Travel Tips -->
     @include('home.sections.weather')
 
-    <!-- 11. Testimonials -->
+    <!-- 13. Testimonials -->
     @include('home.sections.testimonials')
 
-@endsection
+    <!-- Floating Navigation Capsule (Bottom Right Corner) -->
+    @include('home.partials.floating-nav')
+
+@endsection

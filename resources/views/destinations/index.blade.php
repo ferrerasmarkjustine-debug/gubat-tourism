@@ -54,10 +54,7 @@
     </div>
 </section>
 
-{{-- ================================================================
-     BROWSE BY CATEGORY (reused from home/sections/categories)
-================================================================ --}}
-@include('home.sections.categories')
+
 
 {{-- ================================================================
      FEATURED TOURIST DESTINATIONS

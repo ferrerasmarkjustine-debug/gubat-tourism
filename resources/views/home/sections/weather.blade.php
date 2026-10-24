@@ -13,7 +13,7 @@
             <div class="col-lg-5">
                 <div class="card card-tourism h-100 text-white p-4 shadow-sm" style="background: linear-gradient(135deg, var(--primary-color), var(--dark-color)) !important; background-color: var(--primary-color); border-radius: 20px;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0 d-flex align-items-center">
+                        <h5 class="fw-bold mb-0 d-flex align-items-center text-white">
                             <i id="weather-header-icon" class="bi bi-cloud-sun me-2 text-warning"></i> Gubat Live Weather
                         </h5>
                         <span id="weather-status-badge" class="badge bg-success bg-opacity-25 text-white border border-success border-opacity-50 px-2 py-1 rounded-pill small">
@@ -119,6 +119,11 @@ document.addEventListener('DOMContentLoaded', function () {
         badgeEl.innerHTML = '<i class="bi bi-broadcast me-1 text-success"></i> Live Gubat';
         badgeEl.className = 'badge bg-success bg-opacity-25 text-white border border-success border-opacity-50 px-2 py-1 rounded-pill small';
 
+        const heroBtnText = document.getElementById('hero-weather-btn-text');
+        if (heroBtnText) {
+            heroBtnText.textContent = temp + '°C Live Weather & Waves';
+        }
+
         if (iconEl) {
             iconEl.className = 'bi ' + condition.icon + ' me-2 text-warning';
         }
@@ -130,6 +135,11 @@ document.addEventListener('DOMContentLoaded', function () {
         detailsEl.textContent = 'Humidity: 75% | Wind: 14 km/h NE';
         badgeEl.innerHTML = '<i class="bi bi-clock-history me-1"></i> Seasonal Guide';
         badgeEl.className = 'badge bg-warning bg-opacity-25 text-white border border-warning border-opacity-50 px-2 py-1 rounded-pill small';
+
+        const heroBtnText = document.getElementById('hero-weather-btn-text');
+        if (heroBtnText) {
+            heroBtnText.textContent = '30°C Live Weather & Waves';
+        }
     }
 
     // Check cache first (valid for 10 minutes)

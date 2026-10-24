@@ -1,4 +1,5 @@
-<section class="section-padding bg-white" id="destinations-section">
+<section class="section-padding bg-white" id="beach-surfing-section">
+    <span id="destinations-section"></span>
     <div class="container">
         <div class="row align-items-end mb-5">
             <div class="col-md-8 text-start">

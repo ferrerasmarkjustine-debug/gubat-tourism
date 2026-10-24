@@ -59,7 +59,7 @@
 
             <!-- Crafts & Local Food Card (Light Brown) -->
             <div class="col-xl-3 col-md-6">
-                <a href="{{ route('destinations') }}?category=livelihood" class="card card-tourism h-100 border-0 text-center p-4">
+                <a href="{{ route('crafts') }}" class="card card-tourism h-100 border-0 text-center p-4">
                     <div class="card-body">
                         <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4" style="width: 70px; height: 70px; font-size: 2rem; background-color: rgba(141, 110, 99, 0.15); color: #8D6E63;">
                             <i class="bi bi-tools"></i>

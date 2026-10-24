@@ -44,11 +44,10 @@
         // Initialize Map
         const map = L.map('tourismMap').setView(gubatCoords, 13);
 
-        // Load OpenStreetMap Tiles (Positron Lite/NoLabels style is premium, or standard OSM)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            maxZoom: 20
+        // Load OpenStreetMap Tiles (100% Free, No API key required)
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+            maxZoom: 19
         }).addTo(map);
 
         // Landmark points database

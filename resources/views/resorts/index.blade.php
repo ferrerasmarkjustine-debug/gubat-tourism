@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="d-flex gap-3 mb-4 text-primary fs-5 border-top border-bottom py-2">
                                 @if(isset($resort->accommodations) && $resort->accommodations->isNotEmpty())
                                     @php
-                                        $uniqueAmenities = $resort->accommodations->flatMap(fn($acc) => $acc->amenities)->unique('id')->take(5);
+                                        $uniqueAmenities = $resort->accommodations->flatMap(fn($acc) => $acc->amenities ?? [])->unique('id')->take(5);
                                     @endphp
                                     @forelse($uniqueAmenities as $amenity)
                                         <span title="{{ $amenity->name }}"><i class="bi {{ $amenity->icon_class }}"></i></span>

@@ -7,6 +7,7 @@ use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\Resort\ResortsController;
 use App\Http\Controllers\Destination\DestinationsController;
 use App\Http\Controllers\Events\EventsController;
+use App\Http\Controllers\Crafts\CraftsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/resorts', [ResortsController::class, 'index'])->name('resorts');
 
 Route::get('/destinations', [DestinationsController::class, 'index'])->name('destinations');
+
+Route::get('/crafts', [CraftsController::class, 'index'])->name('crafts');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
@@ -39,6 +42,7 @@ use App\Http\Controllers\SuperAdmin\ResortAdminController;
 use App\Http\Controllers\SuperAdmin\ResortController as SuperAdminResortController;
 use App\Http\Controllers\SuperAdmin\DestinationController as SuperAdminDestinationController;
 use App\Http\Controllers\SuperAdmin\EventController as SuperAdminEventController;
+use App\Http\Controllers\SuperAdmin\CraftController as SuperAdminCraftController;
 use App\Http\Controllers\SuperAdmin\ReservationController as SuperAdminReservationController;
 use App\Http\Controllers\SuperAdmin\AccommodationApprovalController;
 use App\Http\Controllers\ResortAdmin\DashboardController as ResortAdminDashboardController;
@@ -98,6 +102,13 @@ Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.'
     Route::post('/announcements', [SuperAdminEventController::class, 'storeAnnouncement'])->name('announcements.store');
     Route::put('/announcements/{announcement}', [SuperAdminEventController::class, 'updateAnnouncement'])->name('announcements.update');
     Route::delete('/announcements/{announcement}', [SuperAdminEventController::class, 'destroyAnnouncement'])->name('announcements.destroy');
+
+    // Crafts & Livelihood Management
+    Route::get('/crafts', [SuperAdminCraftController::class, 'index'])->name('crafts.index');
+    Route::post('/crafts', [SuperAdminCraftController::class, 'store'])->name('crafts.store');
+    Route::put('/crafts/{craft}', [SuperAdminCraftController::class, 'update'])->name('crafts.update');
+    Route::delete('/crafts/{craft}', [SuperAdminCraftController::class, 'destroy'])->name('crafts.destroy');
+    Route::patch('/crafts/{craft}/toggle-featured', [SuperAdminCraftController::class, 'toggleFeatured'])->name('crafts.toggle-featured');
 
     // Resort Admin Management
     Route::get('/resort-admins', [ResortAdminController::class, 'index'])->name('resort-admins.index');

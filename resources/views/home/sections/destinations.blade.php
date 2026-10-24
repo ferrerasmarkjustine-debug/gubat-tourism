@@ -50,7 +50,7 @@
                                 @if(isset($resort->accommodations) && $resort->accommodations->isNotEmpty())
                                     @php
                                         $uniqueAmenities = $resort->accommodations->flatMap(function($acc) {
-                                            return $acc->amenities;
+                                            return $acc->amenities ?? [];
                                         })->unique('id')->take(5);
                                     @endphp
                                     @forelse($uniqueAmenities as $amenity)
