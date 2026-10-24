@@ -72,10 +72,18 @@
                                     <input type="password" 
                                            id="password" 
                                            name="password" 
-                                           class="form-control border-start-0 ps-0 @error('password') is-invalid @enderror" 
+                                           class="form-control border-start-0 border-end-0 ps-0 @error('password') is-invalid @enderror" 
                                            placeholder="Enter your password"
                                            required 
                                            autocomplete="current-password">
+                                    <button class="btn btn-light bg-light border border-start-0 text-muted d-flex align-items-center" 
+                                            type="button" 
+                                            id="togglePassword" 
+                                            aria-label="Show password" 
+                                            title="Show password"
+                                            style="border-color: #dee2e6;">
+                                        <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                                    </button>
                                 </div>
                             </div>
 
@@ -106,4 +114,31 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const icon = document.getElementById('togglePasswordIcon');
+
+        if (toggleBtn && passwordInput && icon) {
+            toggleBtn.addEventListener('click', function () {
+                const isPassword = passwordInput.getAttribute('type') === 'password';
+                passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                
+                if (isPassword) {
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                    toggleBtn.setAttribute('title', 'Hide password');
+                    toggleBtn.setAttribute('aria-label', 'Hide password');
+                } else {
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                    toggleBtn.setAttribute('title', 'Show password');
+                    toggleBtn.setAttribute('aria-label', 'Show password');
+                }
+            });
+        }
+    });
+</script>
 @endsection
