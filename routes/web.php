@@ -80,6 +80,8 @@ Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.'
     Route::get('/resorts', [SuperAdminResortController::class, 'index'])->name('resorts');
     Route::get('/resorts/create', [SuperAdminResortController::class, 'create'])->name('resorts.create');
     Route::post('/resorts', [SuperAdminResortController::class, 'store'])->name('resorts.store');
+    Route::put('/resorts/{resort}', [SuperAdminResortController::class, 'update'])->name('resorts.update');
+    Route::delete('/resorts/{resort}', [SuperAdminResortController::class, 'destroy'])->name('resorts.destroy');
 
     // Accommodations Approval Workflow
     Route::get('/accommodations', [AccommodationApprovalController::class, 'index'])->name('accommodations.index');

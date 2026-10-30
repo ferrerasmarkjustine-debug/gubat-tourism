@@ -137,7 +137,7 @@
 
 {{-- Create Destination Modal --}}
 <div class="modal fade" id="createDestinationModal" tabindex="-1" aria-labelledby="createDestinationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content rounded-4 border-0 shadow">
             <div class="modal-header border-bottom px-4 pt-4 pb-3">
                 <h5 class="modal-title fw-bold text-dark d-flex align-items-center" id="createDestinationModalLabel">
@@ -148,49 +148,118 @@
             <form method="POST" action="{{ route('admin.destinations.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body px-4 py-3">
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <label class="form-label small fw-bold text-muted">Destination Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Dancalan Beach Eco-Park" value="{{ old('name') }}" required>
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label small fw-bold text-muted">Destination Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Dancalan Beach Eco-Park" value="{{ old('name') }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
+                                    <input type="text" name="category" list="categoryOptionsNew" class="form-control rounded-3" placeholder="Select or type..." value="{{ old('category') }}" required>
+                                    <datalist id="categoryOptionsNew">
+                                        <option value="Surf Haven">
+                                        <option value="Public Beach">
+                                        <option value="Heritage Landmark">
+                                        <option value="Century-Old Church">
+                                        <option value="Traditional Pottery">
+                                        <option value="Livelihood Center">
+                                        <option value="Historical Heritage">
+                                        <option value="Eco-Tourism Site">
+                                        <option value="Nature Reserve">
+                                    </datalist>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-muted">Description</label>
+                                    <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Describe the destination highlights, activities, views, and visitor attractions...">{{ old('description') }}</textarea>
+                                </div>
+                                <div class="col-12">
+                                    @include('partials.image-uploader', [
+                                        'id' => 'dest_create',
+                                        'label' => 'Cover Photo (Primary Card Banner)',
+                                        'currentImage' => old('image_url'),
+                                        'helperText' => 'Select a cover photo for this destination from your computer (JPG, PNG, WebP up to 5MB).'
+                                    ])
+                                </div>
+                                <div class="col-12 mt-2 pt-3 border-top">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label small fw-bold text-dark mb-0">
+                                            <i class="bi bi-images text-primary me-1"></i> Additional Gallery Photos (Up to 10 Photos)
+                                        </label>
+                                        <span class="badge bg-light text-muted border small">Max 10 photos</span>
+                                    </div>
+                                    <div class="form-text text-muted small mb-2">
+                                        Select up to 10 additional photos. When visitors click the card or explore, they can scroll through these photos.
+                                    </div>
+                                    <input type="file" name="gallery_images[]" id="gallery_create" class="form-control rounded-3 gallery-input" multiple accept="image/jpeg,image/png,image/webp">
+                                    <div id="gallery_create_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-muted">Google Maps Pin URL</label>
+                                    <input type="url" name="google_map_url" class="form-control rounded-3" value="{{ old('google_map_url') }}" placeholder="https://maps.google.com/...">
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" name="featured" id="featuredCheckNew" value="1" {{ old('featured') ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-semibold text-dark" for="featuredCheckNew">
+                                            Feature this destination
+                                        </label>
+                                        <div class="form-text text-muted small">Featured destinations appear prominently on the public homepage and featured spots section.</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
-                            <input type="text" name="category" list="categoryOptionsNew" class="form-control rounded-3" placeholder="Select or type..." value="{{ old('category') }}" required>
-                            <datalist id="categoryOptionsNew">
-                                <option value="Surf Haven">
-                                <option value="Public Beach">
-                                <option value="Heritage Landmark">
-                                <option value="Century-Old Church">
-                                <option value="Traditional Pottery">
-                                <option value="Livelihood Center">
-                                <option value="Historical Heritage">
-                                <option value="Eco-Tourism Site">
-                                <option value="Nature Reserve">
-                            </datalist>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted">Description</label>
-                            <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Describe the destination highlights, activities, views, and visitor attractions...">{{ old('description') }}</textarea>
-                        </div>
-                        <div class="col-12">
-                            @include('partials.image-uploader', [
-                                'id' => 'dest_create',
-                                'label' => 'Destination Photo',
-                                'currentImage' => old('image_url'),
-                                'helperText' => 'Select a photo of this destination from your computer (JPG, PNG, WebP up to 5MB).'
-                            ])
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted">Google Maps Pin URL</label>
-                            <input type="url" name="google_map_url" class="form-control rounded-3" value="{{ old('google_map_url') }}" placeholder="https://maps.google.com/...">
-                        </div>
-                        <div class="col-12">
-                            <div class="form-check form-switch mt-2">
-                                <input class="form-check-input" type="checkbox" name="featured" id="featuredCheckNew" value="1" {{ old('featured') ? 'checked' : '' }}>
-                                <label class="form-check-label fw-semibold text-dark" for="featuredCheckNew">
-                                    Feature this destination
-                                </label>
-                                <div class="form-text text-muted small">Featured destinations appear prominently on the public homepage and featured spots section.</div>
+
+                        <!-- Live Card Preview Column -->
+                        <div class="col-lg-5 align-self-start">
+                            <div class="sticky-top" style="top: 15px;">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill fw-semibold">
+                                        <i class="bi bi-eye-fill me-1"></i> Live Card Preview
+                                    </span>
+                                    <small class="text-muted">Public card layout</small>
+                                </div>
+
+                                <div class="card card-tourism border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                                    <div class="card-tourism-img-wrapper position-relative overflow-hidden" style="height: 200px;">
+                                        <span class="badge text-white card-badge shadow-sm px-3 py-2 live-dest-cat" style="background-color: #0284c7; font-size: 0.75rem;">
+                                            <i class="bi bi-geo-alt-fill me-1"></i> Category
+                                        </span>
+                                        <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-2 py-1 rounded-pill small fw-bold shadow-sm live-dest-feat" style="z-index: 2; display: none;">
+                                            <i class="bi bi-star-fill text-dark me-1"></i> Featured
+                                        </span>
+                                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" 
+                                             alt="Live Preview" 
+                                             class="w-100 h-100 live-dest-img" 
+                                             style="object-fit: cover;">
+                                    </div>
+                                    <div class="card-body p-4 d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small text-muted fw-semibold">
+                                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> Gubat, Sorsogon
+                                            </span>
+                                            <span class="badge bg-light text-secondary border small">
+                                                <i class="bi bi-shield-check text-success me-1"></i> LGU Verified
+                                            </span>
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-1 live-dest-name">Destination Name</h5>
+                                        <p class="small text-muted mb-3 live-dest-desc">
+                                            Describe the destination highlights, activities, views, and visitor attractions...
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                            <div class="text-warning small">
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <i class="bi bi-star-fill"></i>
+                                                <span class="text-dark fw-bold ms-1">5.0</span>
+                                            </div>
+                                            <span class="btn btn-sm btn-outline-primary rounded-pill px-3">Explore</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -209,7 +278,7 @@
 {{-- Modals rendered outside table for proper stacking --}}
 @foreach($destinations as $dest)
     <div class="modal fade" id="editModal-{{ $dest->id }}" tabindex="-1" aria-labelledby="editModalLabel-{{ $dest->id }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content rounded-4 border-0 shadow">
                 <div class="modal-header border-bottom px-4 pt-4 pb-3">
                     <h5 class="modal-title fw-bold text-dark d-flex align-items-center" id="editModalLabel-{{ $dest->id }}">
@@ -221,47 +290,145 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-body px-4 py-3">
-                        <div class="row g-3">
-                            <div class="col-md-8">
-                                <label class="form-label small fw-bold text-muted">Destination Name <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control rounded-3" value="{{ old('name', $dest->name) }}" required>
+                        <div class="row g-4">
+                            <div class="col-lg-7">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold text-muted">Destination Name <span class="text-danger">*</span></label>
+                                        <input type="text" name="name" class="form-control rounded-3" value="{{ old('name', $dest->name) }}" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
+                                        <input type="text" name="category" list="categoryOptions" class="form-control rounded-3" value="{{ old('category', $dest->category) }}" required>
+                                        <datalist id="categoryOptions">
+                                            <option value="Surf Haven">
+                                            <option value="Public Beach">
+                                            <option value="Heritage Landmark">
+                                            <option value="Century-Old Church">
+                                            <option value="Traditional Pottery">
+                                            <option value="Livelihood Center">
+                                            <option value="Historical Heritage">
+                                        </datalist>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted">Description</label>
+                                        <textarea name="description" class="form-control rounded-3" rows="3">{{ old('description', $dest->description) }}</textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        @include('partials.image-uploader', [
+                                            'id' => 'dest_' . $dest->id,
+                                            'label' => 'Cover Photo (Primary Card Banner)',
+                                            'currentImage' => old('image_url', $dest->image_url),
+                                            'helperText' => 'Upload a cover photo of this tourist destination from your computer (JPG, PNG, WebP up to 5MB).'
+                                        ])
+                                    </div>
+                                    <div class="col-12 mt-2 pt-3 border-top">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label small fw-bold text-dark mb-0">
+                                                <i class="bi bi-images text-primary me-1"></i> Additional Gallery Photos (Up to 10 Photos)
+                                            </label>
+                                            <span class="badge bg-light text-muted border small">Max 10 photos</span>
+                                        </div>
+                                        <div class="form-text text-muted small mb-2">
+                                            Upload extra photos for the enlarged detail view gallery. Click the red button to remove any photo.
+                                        </div>
+
+                                        @if(!empty($dest->gallery_images) && is_array($dest->gallery_images) && count($dest->gallery_images) > 0)
+                                            <div class="p-2 bg-light rounded-3 mb-2 border">
+                                                <div class="small fw-semibold text-muted mb-2">
+                                                    Current Gallery ({{ count($dest->gallery_images) }}/10 photos):
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @foreach($dest->gallery_images as $gIdx => $gPath)
+                                                        @php
+                                                            $gSrc = \Illuminate\Support\Str::startsWith($gPath, ['http://', 'https://']) ? $gPath : asset($gPath);
+                                                        @endphp
+                                                        <div class="position-relative border rounded-3 p-1 bg-white shadow-sm" style="width: 75px; height: 75px;">
+                                                            <img src="{{ $gSrc }}" class="w-100 h-100 rounded-2" style="object-fit: cover;">
+                                                            <input type="hidden" name="retained_gallery_images[]" value="{{ $gPath }}">
+                                                            <button type="button" class="btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 11px; line-height: 1;" title="Remove this photo" onclick="this.parentElement.remove();">
+                                                                <i class="bi bi-x"></i>
+                                                            </button>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <input type="file" name="gallery_images[]" id="gallery_edit_{{ $dest->id }}" class="form-control rounded-3 gallery-input" multiple accept="image/jpeg,image/png,image/webp">
+                                        <div id="gallery_edit_{{ $dest->id }}_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted">Google Maps URL</label>
+                                        <input type="url" name="google_map_url" class="form-control rounded-3" value="{{ old('google_map_url', $dest->google_map_url) }}" placeholder="https://maps.google.com/...">
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check form-switch mt-2">
+                                            <input class="form-check-input" type="checkbox" name="featured" id="featuredCheck-{{ $dest->id }}" value="1" {{ $dest->featured ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-semibold text-dark" for="featuredCheck-{{ $dest->id }}">
+                                                Feature this destination
+                                            </label>
+                                            <div class="form-text text-muted small">Featured destinations appear prominently on the public homepage and featured spots section.</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
-                                <input type="text" name="category" list="categoryOptions" class="form-control rounded-3" value="{{ old('category', $dest->category) }}" required>
-                                <datalist id="categoryOptions">
-                                    <option value="Surf Haven">
-                                    <option value="Public Beach">
-                                    <option value="Heritage Landmark">
-                                    <option value="Century-Old Church">
-                                    <option value="Traditional Pottery">
-                                    <option value="Livelihood Center">
-                                    <option value="Historical Heritage">
-                                </datalist>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label small fw-bold text-muted">Description</label>
-                                <textarea name="description" class="form-control rounded-3" rows="3">{{ old('description', $dest->description) }}</textarea>
-                            </div>
-                            <div class="col-12">
-                                @include('partials.image-uploader', [
-                                    'id' => 'dest_' . $dest->id,
-                                    'label' => 'Destination Photo',
-                                    'currentImage' => old('image_url', $dest->image_url),
-                                    'helperText' => 'Upload a photo of this tourist destination from your computer (JPG, PNG, WebP up to 5MB).'
-                                ])
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label small fw-bold text-muted">Google Maps URL</label>
-                                <input type="url" name="google_map_url" class="form-control rounded-3" value="{{ old('google_map_url', $dest->google_map_url) }}" placeholder="https://maps.google.com/...">
-                            </div>
-                            <div class="col-12">
-                                <div class="form-check form-switch mt-2">
-                                    <input class="form-check-input" type="checkbox" name="featured" id="featuredCheck-{{ $dest->id }}" value="1" {{ $dest->featured ? 'checked' : '' }}>
-                                    <label class="form-check-label fw-semibold text-dark" for="featuredCheck-{{ $dest->id }}">
-                                        Feature this destination
-                                    </label>
-                                    <div class="form-text text-muted small">Featured destinations appear prominently on the public homepage and featured spots section.</div>
+
+                            <!-- Live Card Preview Column -->
+                            <div class="col-lg-5 align-self-start">
+                                <div class="sticky-top" style="top: 15px;">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill fw-semibold">
+                                            <i class="bi bi-eye-fill me-1"></i> Live Card Preview
+                                        </span>
+                                        <small class="text-muted">Public card layout</small>
+                                    </div>
+
+                                    @php
+                                        $destImgSrc = $dest->image_url 
+                                            ? (str_starts_with($dest->image_url, 'http') ? $dest->image_url : asset($dest->image_url)) 
+                                            : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80';
+                                    @endphp
+
+                                    <div class="card card-tourism border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                                        <div class="card-tourism-img-wrapper position-relative overflow-hidden" style="height: 200px;">
+                                            <span class="badge text-white card-badge shadow-sm px-3 py-2 live-dest-cat" style="background-color: #0284c7; font-size: 0.75rem;">
+                                                <i class="bi bi-geo-alt-fill me-1"></i> {{ $dest->category }}
+                                            </span>
+                                            <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-2 py-1 rounded-pill small fw-bold shadow-sm live-dest-feat" style="z-index: 2; {{ $dest->featured ? '' : 'display: none;' }}">
+                                                <i class="bi bi-star-fill text-dark me-1"></i> Featured
+                                            </span>
+                                            <img src="{{ $destImgSrc }}" 
+                                                 alt="{{ $dest->name }}" 
+                                                 class="w-100 h-100 live-dest-img" 
+                                                 style="object-fit: cover;">
+                                        </div>
+                                        <div class="card-body p-4 d-flex flex-column">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="small text-muted fw-semibold">
+                                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $dest->municipality ? $dest->municipality->name : 'Gubat' }}, Sorsogon
+                                                </span>
+                                                <span class="badge bg-light text-secondary border small">
+                                                    <i class="bi bi-shield-check text-success me-1"></i> LGU Verified
+                                                </span>
+                                            </div>
+                                            <h5 class="fw-bold text-dark mb-1 live-dest-name">{{ $dest->name }}</h5>
+                                            <p class="small text-muted mb-3 live-dest-desc">
+                                                {{ Str::limit($dest->description, 90) }}
+                                            </p>
+                                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                                <div class="text-warning small">
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <span class="text-dark fw-bold ms-1">{{ number_format($dest->rating, 1) }}</span>
+                                                </div>
+                                                <span class="btn btn-sm btn-outline-primary rounded-pill px-3">Explore</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -277,4 +444,84 @@
         </div>
     </div>
 @endforeach
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function initDestSync(modalSelector, uploaderId) {
+        const modal = document.querySelector(modalSelector);
+        if (!modal) return;
+        const nameInput = modal.querySelector('input[name="name"]');
+        const catInput = modal.querySelector('input[name="category"]');
+        const descInput = modal.querySelector('textarea[name="description"]');
+        const featInput = modal.querySelector('input[name="featured"]');
+
+        const prevName = modal.querySelector('.live-dest-name');
+        const prevCat = modal.querySelector('.live-dest-cat');
+        const prevDesc = modal.querySelector('.live-dest-desc');
+        const prevFeat = modal.querySelector('.live-dest-feat');
+        const prevImg = modal.querySelector('.live-dest-img');
+
+        function update() {
+            if (prevName && nameInput) prevName.textContent = nameInput.value.trim() || 'Destination Name';
+            if (prevCat && catInput) prevCat.innerHTML = `<i class="bi bi-geo-alt-fill me-1"></i> ${catInput.value.trim() || 'Category'}`;
+            if (prevDesc && descInput) {
+                const t = descInput.value.trim();
+                prevDesc.textContent = t ? (t.length > 90 ? t.substring(0, 90) + '...' : t) : 'Destination highlights and activities...';
+            }
+            if (prevFeat && featInput) {
+                prevFeat.style.display = featInput.checked ? 'inline-block' : 'none';
+            }
+        }
+
+        [nameInput, catInput, descInput, featInput].forEach(el => {
+            if (el) {
+                el.addEventListener('input', update);
+                el.addEventListener('change', update);
+            }
+        });
+
+        window.addEventListener('tourist-image-updated', function(e) {
+            if (prevImg && e.detail && e.detail.src && e.detail.uploaderId === uploaderId) {
+                prevImg.src = e.detail.src;
+            }
+        });
+
+        update();
+    }
+
+    initDestSync('#createDestinationModal', 'dest_create');
+    @foreach($destinations as $dest)
+        initDestSync('#editModal-{{ $dest->id }}', 'dest_{{ $dest->id }}');
+    @endforeach
+
+    // Instant client-side thumbnail preview for multiple gallery photos
+    document.addEventListener('change', function(e) {
+        if (e.target.matches('.gallery-input')) {
+            const previewId = e.target.id + '_preview';
+            const previewContainer = document.getElementById(previewId);
+            if (!previewContainer) return;
+            previewContainer.replaceChildren();
+
+            const files = Array.from(e.target.files).slice(0, 10);
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        const wrap = document.createElement('div');
+                        wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+                        wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+                        const img = document.createElement('img');
+                        img.src = evt.target.result;
+                        img.className = 'w-100 h-100 rounded-2';
+                        img.style.objectFit = 'cover';
+                        wrap.appendChild(img);
+                        previewContainer.appendChild(wrap);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+});
+</script>
 @endsection

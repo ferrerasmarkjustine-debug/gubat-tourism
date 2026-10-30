@@ -24,8 +24,9 @@
             </div>
         </div>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
+        <div class="row g-4">
+            <!-- Form Column -->
+            <div class="col-lg-7">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="card-header bg-white py-3 px-4 border-bottom">
                         <h5 class="mb-0 fw-bold text-dark d-flex align-items-center">
@@ -49,7 +50,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('admin.resorts.store') }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('admin.resorts.store') }}" enctype="multipart/form-data" id="resortCreateForm">
                             @csrf
 
                             <!-- Resort Name -->
@@ -96,7 +97,7 @@
                                             id="category"
                                             name="category"
                                             required>
-                                        <option value="" disabled selected>-- Select Category --</option>
+                                        <option value="" disabled {{ old('category') ? '' : 'selected' }}>-- Select Category --</option>
                                         <option value="luxury" {{ old('category') == 'luxury' ? 'selected' : '' }}>Luxury Resort</option>
                                         <option value="eco" {{ old('category') == 'eco' ? 'selected' : '' }}>Eco Lodge / Nature Camp</option>
                                         <option value="homestay" {{ old('category') == 'homestay' ? 'selected' : '' }}>Homestay / Villa</option>
@@ -131,10 +132,26 @@
 
                             <!-- Cover Image Uploader (Local File or URL) -->
                             @include('partials.image-uploader', [
+                                'id' => 'resort_create',
                                 'label' => 'Resort Cover Photo',
                                 'currentImage' => old('image_url'),
                                 'helperText' => 'Select a photo of the resort from your computer (JPG, PNG, WebP up to 5MB).'
                             ])
+
+                            <!-- Additional Gallery Photos (Up to 10) -->
+                            <div class="mb-3 pt-3 border-top">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label fw-semibold text-dark mb-0">
+                                        <i class="bi bi-images text-primary me-1"></i> Additional Gallery Photos (Up to 10 Photos)
+                                    </label>
+                                    <span class="badge bg-light text-muted border small">Max 10 photos</span>
+                                </div>
+                                <div class="form-text text-muted small mb-2">
+                                    Select up to 10 additional photos. When visitors click the card or explore, they can scroll horizontally through these photos in the enlarged modal.
+                                </div>
+                                <input type="file" name="gallery_images[]" id="resort_gallery_create" class="form-control rounded-3 gallery-input" multiple accept="image/jpeg,image/png,image/webp">
+                                <div id="resort_gallery_create_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                            </div>
 
                             <!-- Google Map URL -->
                             <div class="mb-3">
@@ -198,7 +215,170 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Live Card Preview Column -->
+            <div class="col-lg-5 align-self-start">
+                <div class="sticky-top" style="top: 85px; z-index: 10;">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold">
+                            <i class="bi bi-eye-fill me-1"></i> Live Card Preview
+                        </span>
+                        <small class="text-muted">Public directory card</small>
+                    </div>
+
+                    <div class="card card-tourism border-0 shadow rounded-4 overflow-hidden bg-white">
+                        <div class="position-relative overflow-hidden" style="height: 220px;">
+                            <img id="previewResortImage"
+                                 src="{{ asset('images/resorts/gubat_bay_beach_resort.jpg') }}"
+                                 alt="Resort Preview"
+                                 class="w-100 h-100"
+                                 style="object-fit: cover;">
+                            
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="badge bg-success text-white shadow-sm px-3 py-2 rounded-pill" id="previewResortRateBadge">
+                                    From ₱1,500 / night
+                                </span>
+                            </div>
+
+                            <div class="position-absolute top-0 end-0 m-3" id="previewLguAccreditedBadge">
+                                <span class="badge bg-primary shadow-sm px-3 py-2 rounded-pill">
+                                    <i class="bi bi-patch-check-fill me-1"></i> LGU Accredited
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small text-muted" id="previewResortLocation">
+                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i>Brgy. Rizal, Gubat
+                                </span>
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-1" id="previewResortName">Resort / Establishment Name</h5>
+                            <p class="small text-muted mb-3" id="previewResortDesc">
+                                Describe amenities, beach view, surfing access, or dining options...
+                            </p>
+
+                            {{-- Badges --}}
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge bg-secondary-subtle text-secondary small"><i class="bi bi-people me-1"></i>Max 4 Guests</span>
+                                <span class="badge bg-secondary-subtle text-secondary small"><i class="bi bi-house-door me-1"></i>Units Available</span>
+                                <span class="badge bg-info-subtle text-info small text-capitalize" id="previewResortCategoryBadge">
+                                    Resort
+                                </span>
+                            </div>
+
+                            {{-- Amenity Icons --}}
+                            <div class="d-flex gap-3 mb-3 text-primary fs-5 border-top border-bottom py-2">
+                                <span title="WiFi"><i class="bi bi-wifi"></i></span>
+                                <span title="Parking"><i class="bi bi-p-circle"></i></span>
+                                <span title="Air Conditioning"><i class="bi bi-snow"></i></span>
+                                <span title="Restaurant / Cafe"><i class="bi bi-cup-hot"></i></span>
+                            </div>
+
+                            {{-- Rating --}}
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="text-warning">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-half"></i>
+                                </div>
+                                <span class="small fw-bold text-dark">4.8</span>
+                                <span class="small text-muted">(New listing)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const nameInput = document.getElementById('name');
+    const barangaySelect = document.getElementById('barangay_id');
+    const categorySelect = document.getElementById('category');
+    const descInput = document.getElementById('description');
+    const lguSwitch = document.getElementById('is_lgu_approved');
+
+    const previewName = document.getElementById('previewResortName');
+    const previewLocation = document.getElementById('previewResortLocation');
+    const previewCategory = document.getElementById('previewResortCategoryBadge');
+    const previewDesc = document.getElementById('previewResortDesc');
+    const previewImage = document.getElementById('previewResortImage');
+    const previewLguBadge = document.getElementById('previewLguAccreditedBadge');
+
+    function updatePreview() {
+        if (previewName) {
+            previewName.textContent = nameInput && nameInput.value.trim() ? nameInput.value.trim() : 'Resort / Establishment Name';
+        }
+        if (previewLocation) {
+            let brgyText = 'Gubat Proper';
+            if (barangaySelect && barangaySelect.selectedIndex > 0) {
+                brgyText = barangaySelect.options[barangaySelect.selectedIndex].text.trim();
+            }
+            previewLocation.innerHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i>Brgy. ${brgyText}, Gubat`;
+        }
+        if (previewCategory) {
+            const cat = categorySelect && categorySelect.value ? categorySelect.value : 'Resort';
+            previewCategory.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+        }
+        if (previewDesc) {
+            previewDesc.textContent = descInput && descInput.value.trim() 
+                ? (descInput.value.trim().length > 110 ? descInput.value.trim().substring(0, 110) + '...' : descInput.value.trim())
+                : 'Describe amenities, beach view, surfing access, or dining options...';
+        }
+        if (previewLguBadge) {
+            previewLguBadge.style.display = lguSwitch && lguSwitch.checked ? 'block' : 'none';
+        }
+    }
+
+    [nameInput, barangaySelect, categorySelect, descInput, lguSwitch].forEach(elem => {
+        if (elem) {
+            elem.addEventListener('input', updatePreview);
+            elem.addEventListener('change', updatePreview);
+        }
+    });
+
+    window.addEventListener('tourist-image-updated', function (e) {
+        if (previewImage && e.detail && e.detail.src) {
+            previewImage.src = e.detail.src;
+        }
+    });
+
+    // Instant client-side thumbnail preview for multiple gallery photos
+    const galleryInput = document.getElementById('resort_gallery_create');
+    const galleryPreview = document.getElementById('resort_gallery_create_preview');
+    if (galleryInput && galleryPreview) {
+        galleryInput.addEventListener('change', function(e) {
+            galleryPreview.replaceChildren();
+            const files = Array.from(e.target.files).slice(0, 10);
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        const wrap = document.createElement('div');
+                        wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+                        wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+                        const img = document.createElement('img');
+                        img.src = evt.target.result;
+                        img.className = 'w-100 h-100 rounded-2';
+                        img.style.objectFit = 'cover';
+                        wrap.appendChild(img);
+                        galleryPreview.appendChild(wrap);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    }
+
+    updatePreview();
+});
+</script>
     </div>
 </div>
 @endsection

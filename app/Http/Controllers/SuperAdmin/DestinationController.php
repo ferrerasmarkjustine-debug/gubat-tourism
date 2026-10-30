@@ -32,17 +32,21 @@ class DestinationController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name'           => ['required', 'string', 'max:255'],
-            'category'       => ['required', 'string', 'max:100'],
-            'description'    => ['nullable', 'string', 'max:2000'],
-            'image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
-            'image_url'      => ['nullable', 'string', 'max:500'],
-            'google_map_url' => ['nullable', 'url', 'max:500'],
-            'featured'       => ['nullable'],
+            'name'             => ['required', 'string', 'max:255'],
+            'category'         => ['required', 'string', 'max:100'],
+            'description'      => ['nullable', 'string', 'max:2000'],
+            'image'            => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'image_url'        => ['nullable', 'string', 'max:500'],
+            'gallery_images'   => ['nullable', 'array', 'max:10'],
+            'gallery_images.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'google_map_url'   => ['nullable', 'url', 'max:500'],
+            'featured'         => ['nullable'],
         ]);
 
         $finalImageUrl = $this->handleImageUpload($request, 'destinations')
             ?: 'images/destinations/rizal_beach.jpg';
+
+        $galleryImages = $this->handleMultipleImagesUpload($request, 'destinations', [], 'gallery_images', 'retained_gallery_images', 10);
 
         $destination = Destination::create([
             'municipality_id' => 1, // Default to Gubat
@@ -50,6 +54,7 @@ class DestinationController extends Controller
             'category'        => $validated['category'],
             'description'     => $validated['description'] ?? null,
             'image_url'       => $finalImageUrl,
+            'gallery_images'  => !empty($galleryImages) ? $galleryImages : null,
             'rating'          => 5.0,
             'reviews_count'   => 0,
             'google_map_url'  => $validated['google_map_url'] ?? null,
@@ -65,23 +70,30 @@ class DestinationController extends Controller
     public function update(Request $request, Destination $destination): RedirectResponse
     {
         $validated = $request->validate([
-            'name'           => ['required', 'string', 'max:255'],
-            'category'       => ['required', 'string', 'max:100'],
-            'description'    => ['nullable', 'string', 'max:2000'],
-            'image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
-            'image_url'      => ['nullable', 'string', 'max:500'],
-            'google_map_url' => ['nullable', 'url', 'max:500'],
-            'featured'       => ['nullable'],
+            'name'                    => ['required', 'string', 'max:255'],
+            'category'                => ['required', 'string', 'max:100'],
+            'description'             => ['nullable', 'string', 'max:2000'],
+            'image'                   => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'image_url'               => ['nullable', 'string', 'max:500'],
+            'gallery_images'          => ['nullable', 'array', 'max:10'],
+            'gallery_images.*'        => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'retained_gallery_images' => ['nullable', 'array'],
+            'google_map_url'          => ['nullable', 'url', 'max:500'],
+            'featured'                => ['nullable'],
         ]);
 
         $finalImageUrl = $this->handleImageUpload($request, 'destinations', $destination->image_url)
             ?? $destination->image_url;
+
+        $existingGallery = is_array($destination->gallery_images) ? $destination->gallery_images : [];
+        $galleryImages = $this->handleMultipleImagesUpload($request, 'destinations', $existingGallery, 'gallery_images', 'retained_gallery_images', 10);
 
         $destination->update([
             'name'           => $validated['name'],
             'category'       => $validated['category'],
             'description'    => $validated['description'] ?? null,
             'image_url'      => $finalImageUrl,
+            'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
             'google_map_url' => $validated['google_map_url'] ?? null,
             'featured'       => $request->has('featured'),
         ]);

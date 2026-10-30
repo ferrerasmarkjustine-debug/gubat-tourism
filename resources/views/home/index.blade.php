@@ -47,4 +47,7 @@
     <!-- Floating Navigation Capsule (Bottom Right Corner) -->
     @include('home.partials.floating-nav')
 
+    <!-- Enlarged Quick View Modal for Homepage Cards -->
+    @include('home.partials.quick-view-modal')
+
 @endsection

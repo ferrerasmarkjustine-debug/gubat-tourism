@@ -20,10 +20,12 @@ class Craft extends Model
         'contact',
         'badge_color',
         'is_featured',
+        'gallery_images',
     ];
 
     protected $casts = [
         'products' => 'array',
+        'gallery_images' => 'array',
         'is_featured' => 'boolean',
     ];
 }

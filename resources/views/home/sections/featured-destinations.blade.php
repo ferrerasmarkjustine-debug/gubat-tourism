@@ -15,13 +15,36 @@
 
         <div class="row g-4">
             @foreach($featuredDestinations as $dest)
+                @php
+                    $coverUrl = str_starts_with($dest->image_url ?? '', 'http')
+                        ? $dest->image_url
+                        : asset($dest->image_url ?? 'images/destinations/rizal_beach.jpg');
+                @endphp
                 <div class="col-lg-4 col-md-6">
-                    <div class="card card-tourism h-100">
-                        <div class="card-tourism-img-wrapper">
+                    <div class="card card-tourism h-100 home-spot-card-clickable"
+                         style="cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease;"
+                         data-id="{{ $dest->id }}"
+                         data-title="{{ $dest->name }}"
+                         data-category="{{ $dest->category }}"
+                         data-location="{{ $dest->barangay->name ?? '' }}{{ isset($dest->barangay->name) ? ', ' : '' }}{{ $dest->municipality->name ?? 'Sorsogon' }}"
+                         data-desc="{{ $dest->description }}"
+                         data-rating="{{ number_format($dest->rating, 1) }}"
+                         data-reviews="{{ $dest->reviews_count }}"
+                         data-cover="{{ $coverUrl }}"
+                         data-gallery="{{ json_encode($dest->gallery_images ?? []) }}"
+                         data-map="{{ $dest->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($dest->name . ' Gubat Sorsogon') }}">
+                        <div class="card-tourism-img-wrapper position-relative">
                             <span class="badge bg-warning text-dark card-badge">
                                 <i class="bi bi-tsunami me-1"></i> {{ $dest->category }}
                             </span>
-                            <img src="{{ str_starts_with($dest->image_url ?? '', 'http') ? $dest->image_url : asset($dest->image_url ?? 'images/destinations/rizal_beach.jpg') . '?v=2' }}" alt="{{ $dest->name }}">
+                            @if(!empty($dest->gallery_images) && count($dest->gallery_images) > 0)
+                                <div class="position-absolute top-0 end-0 m-3" style="z-index: 3;">
+                                    <span class="badge bg-dark bg-opacity-75 text-white px-2 py-1 rounded-pill small shadow-sm">
+                                        <i class="bi bi-images me-1"></i> {{ count($dest->gallery_images) + 1 }} Photos
+                                    </span>
+                                </div>
+                            @endif
+                            <img src="{{ $coverUrl . '?v=2' }}" alt="{{ $dest->name }}">
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -52,14 +75,14 @@
 
                             <div class="row g-2 mt-auto">
                                 <div class="col-6">
-                                    <a href="{{ $dest->google_map_url }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2">
+                                    <a href="{{ $dest->google_map_url }}" target="_blank" onclick="event.stopPropagation();" class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2">
                                         <i class="bi bi-map me-1"></i> View Maps
                                     </a>
                                 </div>
                                 <div class="col-6">
-                                    <a href="{{ route('destinations') }}?id={{ $dest->id }}" class="btn btn-tourism-primary btn-sm w-100 rounded-pill py-2 text-center">
+                                    <button type="button" class="btn btn-tourism-primary btn-sm w-100 rounded-pill py-2 text-center text-white fw-bold view-spot-details-btn">
                                         View Details
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>

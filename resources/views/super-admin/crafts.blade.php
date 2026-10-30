@@ -201,84 +201,178 @@
 
                             {{-- Edit Modal for each craft --}}
                             <div class="modal fade" id="editCraftModal{{ $craft->id }}" tabindex="-1" aria-labelledby="editCraftLabel{{ $craft->id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-dialog modal-xl modal-dialog-centered">
                                     <div class="modal-content rounded-4 border-0 shadow">
                                         <form method="POST" action="{{ route('admin.crafts.update', $craft) }}" enctype="multipart/form-data">
                                             @csrf
                                             @method('PUT')
                                             <div class="modal-header border-bottom px-4 pt-4 pb-3">
                                                 <h5 class="modal-title fw-bold text-dark" id="editCraftLabel{{ $craft->id }}">
-                                                    <i class="bi bi-pencil-square text-primary me-2"></i> Edit Craft Entry
+                                                    <i class="bi bi-pencil-square text-primary me-2"></i> Edit Craft Entry: {{ $craft->name }}
                                                 </h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body p-4">
-                                                <div class="row g-3">
-                                                    <div class="col-md-8">
-                                                        <label class="form-label fw-semibold small text-muted">Guild / Maker / Association Name <span class="text-danger">*</span></label>
-                                                        <input type="text" name="name" class="form-control rounded-3" value="{{ old('name', $craft->name) }}" required>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label class="form-label fw-semibold small text-muted">Category <span class="text-danger">*</span></label>
-                                                        <select name="category_slug" class="form-select rounded-3" required>
-                                                            @foreach($categories as $slug => $meta)
-                                                                <option value="{{ $slug }}" {{ old('category_slug', $craft->category_slug) === $slug ? 'selected' : '' }}>
-                                                                    {{ $meta['name'] }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                                <div class="row g-4">
+                                                    <div class="col-lg-7">
+                                                        <div class="row g-3">
+                                                            <div class="col-md-8">
+                                                                <label class="form-label fw-semibold small text-muted">Guild / Maker / Association Name <span class="text-danger">*</span></label>
+                                                                <input type="text" name="name" class="form-control rounded-3" value="{{ old('name', $craft->name) }}" required>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="form-label fw-semibold small text-muted">Category <span class="text-danger">*</span></label>
+                                                                <select name="category_slug" class="form-select rounded-3" required>
+                                                                    @foreach($categories as $slug => $meta)
+                                                                        <option value="{{ $slug }}" {{ old('category_slug', $craft->category_slug) === $slug ? 'selected' : '' }}>
+                                                                            {{ $meta['name'] }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <label class="form-label fw-semibold small text-muted">Highlight Badge Text</label>
+                                                                <input type="text" name="highlight" class="form-control rounded-3" placeholder="e.g. 100% Sustainable & Handcrafted" value="{{ old('highlight', $craft->highlight) }}">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label fw-semibold small text-muted">Barangay Name</label>
+                                                                <input type="text" name="barangay" class="form-control rounded-3" placeholder="e.g. Bulacao" value="{{ old('barangay', $craft->barangay) }}">
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold small text-muted">Detailed Description <span class="text-danger">*</span></label>
+                                                                <textarea name="description" rows="3" class="form-control rounded-3" required>{{ old('description', $craft->description) }}</textarea>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold small text-muted">Products Offered (comma-separated)</label>
+                                                                @php
+                                                                    $productsStr = is_array($craft->products) ? implode(', ', $craft->products) : $craft->products;
+                                                                @endphp
+                                                                <input type="text" name="products" class="form-control rounded-3" placeholder="e.g. Abaca Bags, Table Runners, Slippers" value="{{ old('products', $productsStr) }}">
+                                                                <small class="text-muted">Separate multiple items with a comma.</small>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <label class="form-label fw-semibold small text-muted">Address / Physical Landmark</label>
+                                                                <input type="text" name="address" class="form-control rounded-3" placeholder="e.g. Brgy. Bulacao, Gubat, Sorsogon" value="{{ old('address', $craft->address) }}">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label fw-semibold small text-muted">Contact Info</label>
+                                                                <input type="text" name="contact" class="form-control rounded-3" placeholder="e.g. +63 917 555 4231" value="{{ old('contact', $craft->contact) }}">
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-semibold small text-muted">Google Maps URL</label>
+                                                                <input type="url" name="google_map_url" class="form-control rounded-3" placeholder="https://maps.google.com/..." value="{{ old('google_map_url', $craft->google_map_url) }}">
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                @include('partials.image-uploader', [
+                                                                    'id' => 'craft_edit_' . $craft->id,
+                                                                    'label' => 'Cover Photo (Primary Card Banner)',
+                                                                    'currentImage' => old('image_url', $craft->image_url),
+                                                                    'helperText' => 'Select a cover photo to replace the current craft picture (JPG, PNG, WebP up to 5MB).'
+                                                                ])
+                                                            </div>
+                                                            <div class="col-12 mt-2 pt-3 border-top">
+                                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <label class="form-label small fw-bold text-dark mb-0">
+                                                                        <i class="bi bi-images text-primary me-1"></i> Additional Gallery Photos (Up to 10 Photos)
+                                                                    </label>
+                                                                    <span class="badge bg-light text-muted border small">Max 10 photos</span>
+                                                                </div>
+                                                                <div class="form-text text-muted small mb-2">
+                                                                    Upload extra craft photos for the enlarged detail view gallery. Click the red button to remove any photo.
+                                                                </div>
+
+                                                                @if(!empty($craft->gallery_images) && is_array($craft->gallery_images) && count($craft->gallery_images) > 0)
+                                                                    <div class="p-2 bg-light rounded-3 mb-2 border">
+                                                                        <div class="small fw-semibold text-muted mb-2">
+                                                                            Current Gallery ({{ count($craft->gallery_images) }}/10 photos):
+                                                                        </div>
+                                                                        <div class="d-flex flex-wrap gap-2">
+                                                                            @foreach($craft->gallery_images as $gIdx => $gPath)
+                                                                                @php
+                                                                                    $gSrc = \Illuminate\Support\Str::startsWith($gPath, ['http://', 'https://']) ? $gPath : asset($gPath);
+                                                                                @endphp
+                                                                                <div class="position-relative border rounded-3 p-1 bg-white shadow-sm" style="width: 75px; height: 75px;">
+                                                                                    <img src="{{ $gSrc }}" class="w-100 h-100 rounded-2" style="object-fit: cover;">
+                                                                                    <input type="hidden" name="retained_gallery_images[]" value="{{ $gPath }}">
+                                                                                    <button type="button" class="btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 11px; line-height: 1;" title="Remove this photo" onclick="this.parentElement.remove();">
+                                                                                        <i class="bi bi-x"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
+
+                                                                <input type="file" name="gallery_images[]" id="craft_gallery_edit_{{ $craft->id }}" class="form-control rounded-3 craft-gallery-input" multiple accept="image/jpeg,image/png,image/webp">
+                                                                <div id="craft_gallery_edit_{{ $craft->id }}_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <div class="form-check form-switch mt-2">
+                                                                    <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured_{{ $craft->id }}" value="1" {{ old('is_featured', $craft->is_featured) ? 'checked' : '' }}>
+                                                                    <label class="form-check-label fw-semibold text-dark" for="is_featured_{{ $craft->id }}">Feature on Homepage Crafts Section</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold small text-muted">Highlight Badge Text</label>
-                                                        <input type="text" name="highlight" class="form-control rounded-3" placeholder="e.g. 100% Sustainable & Handcrafted" value="{{ old('highlight', $craft->highlight) }}">
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold small text-muted">Barangay Name</label>
-                                                        <input type="text" name="barangay" class="form-control rounded-3" placeholder="e.g. Bulacao" value="{{ old('barangay', $craft->barangay) }}">
-                                                    </div>
+                                                    <!-- Live Preview Column -->
+                                                    <div class="col-lg-5 align-self-start">
+                                                        <div class="sticky-top" style="top: 15px;">
+                                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill fw-semibold">
+                                                                    <i class="bi bi-eye-fill me-1"></i> Live Card Preview
+                                                                </span>
+                                                                <small class="text-muted">Public directory card</small>
+                                                            </div>
 
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-semibold small text-muted">Detailed Description <span class="text-danger">*</span></label>
-                                                        <textarea name="description" rows="3" class="form-control rounded-3" required>{{ old('description', $craft->description) }}</textarea>
-                                                    </div>
+                                                            <div class="card card-tourism p-3 shadow-sm border-0 bg-white" style="border-radius: 18px;">
+                                                                <div class="position-relative mb-3" style="height: 180px; border-radius: 14px; overflow: hidden;">
+                                                                    <img src="{{ $craft->image_url ? asset($craft->image_url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80' }}" 
+                                                                         alt="{{ $craft->name }}" 
+                                                                         class="w-100 h-100 live-craft-img" 
+                                                                         style="object-fit: cover;">
+                                                                    <span class="badge position-absolute top-0 start-0 m-2 shadow-sm fw-bold px-3 py-1 rounded-pill live-craft-cat" style="background-color: {{ $craft->badge_color ?? '#0d6efd' }}; color: #ffffff;">
+                                                                        {{ $craft->category_name }}
+                                                                    </span>
+                                                                </div>
 
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-semibold small text-muted">Products Offered (comma-separated)</label>
-                                                        @php
-                                                            $productsStr = is_array($craft->products) ? implode(', ', $craft->products) : $craft->products;
-                                                        @endphp
-                                                        <input type="text" name="products" class="form-control rounded-3" placeholder="e.g. Abaca Bags, Table Runners, Slippers" value="{{ old('products', $productsStr) }}">
-                                                        <small class="text-muted">Separate multiple items with a comma.</small>
-                                                    </div>
+                                                                <div class="mb-1">
+                                                                    <span class="badge bg-light text-dark border small fw-semibold">
+                                                                        <i class="bi bi-patch-check-fill text-warning me-1"></i> <span class="live-craft-high">{{ $craft->highlight ?: 'Handcrafted' }}</span>
+                                                                    </span>
+                                                                </div>
+                                                                <h5 class="fw-bold text-dark mb-2 live-craft-name">{{ $craft->name }}</h5>
+                                                                <p class="text-muted small mb-3 live-craft-desc" style="line-height: 1.5;">
+                                                                    {{ Str::limit($craft->description, 80) }}
+                                                                </p>
 
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold small text-muted">Address / Physical Landmark</label>
-                                                        <input type="text" name="address" class="form-control rounded-3" placeholder="e.g. Brgy. Bulacao, Gubat, Sorsogon" value="{{ old('address', $craft->address) }}">
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold small text-muted">Contact Info</label>
-                                                        <input type="text" name="contact" class="form-control rounded-3" placeholder="e.g. +63 917 555 4231" value="{{ old('contact', $craft->contact) }}">
-                                                    </div>
+                                                                <div class="mb-3">
+                                                                    <small class="fw-bold text-uppercase text-muted d-block mb-1" style="font-size: 0.7rem;">Signature Products:</small>
+                                                                    <div class="d-flex flex-wrap gap-1 live-craft-prods">
+                                                                        @if(!empty($craft->products) && is_array($craft->products))
+                                                                            @foreach($craft->products as $p)
+                                                                                <span class="badge bg-white text-secondary border small">• {{ $p }}</span>
+                                                                            @endforeach
+                                                                        @else
+                                                                            <span class="badge bg-white text-secondary border small">• Handcrafted Goods</span>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
 
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-semibold small text-muted">Google Maps URL</label>
-                                                        <input type="url" name="google_map_url" class="form-control rounded-3" placeholder="https://maps.google.com/..." value="{{ old('google_map_url', $craft->google_map_url) }}">
-                                                    </div>
-
-                                                    <div class="col-12">
-                                                        @include('partials.image-uploader', [
-                                                            'id' => 'craft_edit_' . $craft->id,
-                                                            'label' => 'Craft Product Photo',
-                                                            'currentImage' => old('image_url', $craft->image_url),
-                                                            'helperText' => 'Select a photo from your computer to replace the current craft picture (JPG, PNG, WebP up to 5MB).'
-                                                        ])
-                                                    </div>
-
-                                                    <div class="col-12">
-                                                        <div class="form-check form-switch mt-2">
-                                                            <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured_{{ $craft->id }}" value="1" {{ old('is_featured', $craft->is_featured) ? 'checked' : '' }}>
-                                                            <label class="form-check-label fw-semibold text-dark" for="is_featured_{{ $craft->id }}">Feature on Homepage Crafts Section</label>
+                                                                <div class="border-top pt-2 d-flex justify-content-between align-items-center">
+                                                                    <small class="text-muted">
+                                                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="live-craft-addr">{{ $craft->address ?: 'Gubat, Sorsogon' }}</span>
+                                                                    </small>
+                                                                    <span class="btn btn-outline-primary btn-sm rounded-pill px-2 py-0" style="font-size: 0.75rem;">Directions</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -339,7 +433,7 @@
 
 {{-- Create Modal --}}
 <div class="modal fade" id="createCraftModal" tabindex="-1" aria-labelledby="createCraftModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content rounded-4 border-0 shadow">
             <form method="POST" action="{{ route('admin.crafts.store') }}" enctype="multipart/form-data">
                 @csrf
@@ -350,69 +444,134 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-8">
-                            <label class="form-label fw-semibold small text-muted">Guild / Maker / Association Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Bulacao Abaca Weaving Association" value="{{ old('name') }}" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold small text-muted">Category <span class="text-danger">*</span></label>
-                            <select name="category_slug" class="form-select rounded-3" required>
-                                @foreach($categories as $slug => $meta)
-                                    <option value="{{ $slug }}" {{ old('category_slug') === $slug ? 'selected' : '' }}>
-                                        {{ $meta['name'] }}
-                                    </option>
-                                @endforeach
-                            </select>
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label class="form-label fw-semibold small text-muted">Guild / Maker / Association Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Bulacao Abaca Weaving Association" value="{{ old('name') }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold small text-muted">Category <span class="text-danger">*</span></label>
+                                    <select name="category_slug" class="form-select rounded-3" required>
+                                        @foreach($categories as $slug => $meta)
+                                            <option value="{{ $slug }}" {{ old('category_slug') === $slug ? 'selected' : '' }}>
+                                                {{ $meta['name'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small text-muted">Highlight Badge Text</label>
+                                    <input type="text" name="highlight" class="form-control rounded-3" placeholder="e.g. 100% Sustainable & Handcrafted" value="{{ old('highlight') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small text-muted">Barangay Name</label>
+                                    <input type="text" name="barangay" class="form-control rounded-3" placeholder="e.g. Bulacao" value="{{ old('barangay') }}">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold small text-muted">Detailed Description <span class="text-danger">*</span></label>
+                                    <textarea name="description" rows="3" class="form-control rounded-3" placeholder="Describe the master artisan history, sustainable materials, and cultural value..." required>{{ old('description') }}</textarea>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold small text-muted">Products Offered (comma-separated)</label>
+                                    <input type="text" name="products" class="form-control rounded-3" placeholder="e.g. Abaca Bags, Table Runners, Slippers" value="{{ old('products') }}">
+                                    <small class="text-muted">Separate multiple items with a comma.</small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small text-muted">Address / Physical Landmark</label>
+                                    <input type="text" name="address" class="form-control rounded-3" placeholder="e.g. Brgy. Bulacao, Gubat, Sorsogon" value="{{ old('address') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold small text-muted">Contact Info</label>
+                                    <input type="text" name="contact" class="form-control rounded-3" placeholder="e.g. +63 917 555 4231" value="{{ old('contact') }}">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold small text-muted">Google Maps URL</label>
+                                    <input type="url" name="google_map_url" class="form-control rounded-3" placeholder="https://maps.google.com/..." value="{{ old('google_map_url') }}">
+                                </div>
+
+                                <div class="col-12">
+                                    @include('partials.image-uploader', [
+                                        'id' => 'craft_create',
+                                        'label' => 'Cover Photo (Primary Card Banner)',
+                                        'currentImage' => old('image_url'),
+                                        'helperText' => 'Select a cover photo of the craft product from your computer (JPG, PNG, WebP up to 5MB).'
+                                    ])
+                                </div>
+                                <div class="col-12 mt-2 pt-3 border-top">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label small fw-bold text-dark mb-0">
+                                            <i class="bi bi-images text-primary me-1"></i> Additional Gallery Photos (Up to 10 Photos)
+                                        </label>
+                                        <span class="badge bg-light text-muted border small">Max 10 photos</span>
+                                    </div>
+                                    <div class="form-text text-muted small mb-2">
+                                        Select up to 10 photos for the detail view gallery. Visitors can browse these when they click explore.
+                                    </div>
+                                    <input type="file" name="gallery_images[]" id="craft_gallery_create" class="form-control rounded-3 craft-gallery-input" multiple accept="image/jpeg,image/png,image/webp">
+                                    <div id="craft_gallery_create_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured_new" value="1" checked>
+                                        <label class="form-check-label fw-semibold text-dark" for="is_featured_new">Feature on Homepage Crafts Section</label>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Highlight Badge Text</label>
-                            <input type="text" name="highlight" class="form-control rounded-3" placeholder="e.g. 100% Sustainable & Handcrafted" value="{{ old('highlight') }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Barangay Name</label>
-                            <input type="text" name="barangay" class="form-control rounded-3" placeholder="e.g. Bulacao" value="{{ old('barangay') }}">
-                        </div>
+                        <!-- Live Preview Column -->
+                        <div class="col-lg-5 align-self-start">
+                            <div class="sticky-top" style="top: 15px;">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill fw-semibold">
+                                        <i class="bi bi-eye-fill me-1"></i> Live Card Preview
+                                    </span>
+                                    <small class="text-muted">Public directory card</small>
+                                </div>
 
-                        <div class="col-12">
-                            <label class="form-label fw-semibold small text-muted">Detailed Description <span class="text-danger">*</span></label>
-                            <textarea name="description" rows="3" class="form-control rounded-3" placeholder="Describe the master artisan history, sustainable materials, and cultural value..." required>{{ old('description') }}</textarea>
-                        </div>
+                                <div class="card card-tourism p-3 shadow-sm border-0 bg-white" style="border-radius: 18px;">
+                                    <div class="position-relative mb-3" style="height: 180px; border-radius: 14px; overflow: hidden;">
+                                        <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80" 
+                                             alt="Live Preview" 
+                                             class="w-100 h-100 live-craft-img" 
+                                             style="object-fit: cover;">
+                                        <span class="badge position-absolute top-0 start-0 m-2 shadow-sm fw-bold px-3 py-1 rounded-pill live-craft-cat" style="background-color: #0d6efd; color: #ffffff;">
+                                            Arts &amp; Crafts
+                                        </span>
+                                    </div>
 
-                        <div class="col-12">
-                            <label class="form-label fw-semibold small text-muted">Products Offered (comma-separated)</label>
-                            <input type="text" name="products" class="form-control rounded-3" placeholder="e.g. Abaca Bags, Table Runners, Slippers" value="{{ old('products') }}">
-                            <small class="text-muted">Separate multiple items with a comma.</small>
-                        </div>
+                                    <div class="mb-1">
+                                        <span class="badge bg-light text-dark border small fw-semibold">
+                                            <i class="bi bi-patch-check-fill text-warning me-1"></i> <span class="live-craft-high">100% Sustainable &amp; Handcrafted</span>
+                                        </span>
+                                    </div>
+                                    <h5 class="fw-bold text-dark mb-2 live-craft-name">Guild / Maker / Association</h5>
+                                    <p class="text-muted small mb-3 live-craft-desc" style="line-height: 1.5;">
+                                        Describe the master artisan history, sustainable materials, and cultural value...
+                                    </p>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Address / Physical Landmark</label>
-                            <input type="text" name="address" class="form-control rounded-3" placeholder="e.g. Brgy. Bulacao, Gubat, Sorsogon" value="{{ old('address') }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Contact Info</label>
-                            <input type="text" name="contact" class="form-control rounded-3" placeholder="e.g. +63 917 555 4231" value="{{ old('contact') }}">
-                        </div>
+                                    <div class="mb-3">
+                                        <small class="fw-bold text-uppercase text-muted d-block mb-1" style="font-size: 0.7rem;">Signature Products:</small>
+                                        <div class="d-flex flex-wrap gap-1 live-craft-prods">
+                                            <span class="badge bg-white text-secondary border small">• Handcrafted Goods</span>
+                                        </div>
+                                    </div>
 
-                        <div class="col-12">
-                            <label class="form-label fw-semibold small text-muted">Google Maps URL</label>
-                            <input type="url" name="google_map_url" class="form-control rounded-3" placeholder="https://maps.google.com/..." value="{{ old('google_map_url') }}">
-                        </div>
-
-                        <div class="col-12">
-                            @include('partials.image-uploader', [
-                                'id' => 'craft_create',
-                                'label' => 'Craft Product Photo',
-                                'currentImage' => old('image_url'),
-                                'helperText' => 'Select a photo of the craft product from your computer (JPG, PNG, WebP up to 5MB).'
-                            ])
-                        </div>
-
-                        <div class="col-12">
-                            <div class="form-check form-switch mt-2">
-                                <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured_new" value="1" checked>
-                                <label class="form-check-label fw-semibold text-dark" for="is_featured_new">Feature on Homepage Crafts Section</label>
+                                    <div class="border-top pt-2 d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="bi bi-geo-alt-fill text-danger me-1"></i> <span class="live-craft-addr">Gubat, Sorsogon</span>
+                                        </small>
+                                        <span class="btn btn-outline-primary btn-sm rounded-pill px-2 py-0" style="font-size: 0.75rem;">Directions</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -425,4 +584,103 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function initCraftSync(modalSelector, uploaderId) {
+        const modal = document.querySelector(modalSelector);
+        if (!modal) return;
+        const nameInput = modal.querySelector('input[name="name"]');
+        const catSelect = modal.querySelector('select[name="category_slug"]');
+        const highInput = modal.querySelector('input[name="highlight"]');
+        const descInput = modal.querySelector('textarea[name="description"]');
+        const prodsInput = modal.querySelector('input[name="products"]');
+        const addrInput = modal.querySelector('input[name="address"]');
+
+        const prevName = modal.querySelector('.live-craft-name');
+        const prevCat = modal.querySelector('.live-craft-cat');
+        const prevHigh = modal.querySelector('.live-craft-high');
+        const prevDesc = modal.querySelector('.live-craft-desc');
+        const prevProds = modal.querySelector('.live-craft-prods');
+        const prevAddr = modal.querySelector('.live-craft-addr');
+        const prevImg = modal.querySelector('.live-craft-img');
+
+        function update() {
+            if (prevName && nameInput) prevName.textContent = nameInput.value.trim() || 'Guild / Maker Name';
+            if (prevCat && catSelect) {
+                const opt = catSelect.options[catSelect.selectedIndex];
+                prevCat.textContent = opt ? opt.text.trim() : 'Craft';
+            }
+            if (prevHigh && highInput) {
+                prevHigh.textContent = highInput.value.trim() || 'Handcrafted';
+            }
+            if (prevDesc && descInput) {
+                const t = descInput.value.trim();
+                prevDesc.textContent = t ? (t.length > 90 ? t.substring(0, 90) + '...' : t) : 'Master artisan history and cultural craft...';
+            }
+            if (prevAddr && addrInput) {
+                prevAddr.textContent = addrInput.value.trim() || 'Gubat, Sorsogon';
+            }
+            if (prevProds && prodsInput) {
+                const raw = prodsInput.value.trim();
+                if (!raw) {
+                    prevProds.innerHTML = '<span class="badge bg-light text-muted border small">• Handcrafted Goods</span>';
+                } else {
+                    const items = raw.split(',').map(s => s.trim()).filter(Boolean);
+                    prevProds.innerHTML = items.map(i => `<span class="badge bg-white text-secondary border small">• ${i}</span>`).join(' ');
+                }
+            }
+        }
+
+        [nameInput, catSelect, highInput, descInput, prodsInput, addrInput].forEach(el => {
+            if (el) {
+                el.addEventListener('input', update);
+                el.addEventListener('change', update);
+            }
+        });
+
+        window.addEventListener('tourist-image-updated', function(e) {
+            if (prevImg && e.detail && e.detail.src && e.detail.uploaderId === uploaderId) {
+                prevImg.src = e.detail.src;
+            }
+        });
+
+        update();
+    }
+
+    initCraftSync('#createCraftModal', 'craft_create');
+    @foreach($crafts as $craft)
+        initCraftSync('#editCraftModal{{ $craft->id }}', 'craft_edit_{{ $craft->id }}');
+    @endforeach
+
+    // Instant client-side thumbnail preview for craft gallery photos
+    document.addEventListener('change', function(e) {
+        if (e.target.matches('.craft-gallery-input')) {
+            const previewId = e.target.id + '_preview';
+            const previewContainer = document.getElementById(previewId);
+            if (!previewContainer) return;
+            previewContainer.replaceChildren();
+
+            const files = Array.from(e.target.files).slice(0, 10);
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        const wrap = document.createElement('div');
+                        wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+                        wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+                        const img = document.createElement('img');
+                        img.src = evt.target.result;
+                        img.className = 'w-100 h-100 rounded-2';
+                        img.style.objectFit = 'cover';
+                        wrap.appendChild(img);
+                        previewContainer.appendChild(wrap);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+});
+</script>
 @endsection

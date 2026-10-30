@@ -9,7 +9,15 @@
         <span class="dock-tooltip">Beach & Surfing</span>
     </div>
 
-    <!-- 2. Churches -->
+    <!-- 2. Resorts & Hotels -->
+    <div class="dock-item-wrapper position-relative my-1">
+        <button type="button" class="dock-btn dock-btn-resorts" data-target="#resorts-section" aria-label="Resorts & Hotels">
+            <i class="bi bi-buildings"></i>
+        </button>
+        <span class="dock-tooltip">Resorts &amp; Hotels</span>
+    </div>
+
+    <!-- 3. Churches -->
     <div class="dock-item-wrapper position-relative my-1">
         <button type="button" class="dock-btn dock-btn-church" data-target="#churches-section" aria-label="Churches">
             <i class="bi bi-bank"></i>
@@ -17,7 +25,7 @@
         <span class="dock-tooltip">Churches</span>
     </div>
 
-    <!-- 3. History -->
+    <!-- 4. History -->
     <div class="dock-item-wrapper position-relative my-1">
         <button type="button" class="dock-btn dock-btn-history" data-target="#history-section" aria-label="History">
             <i class="bi bi-hourglass-split"></i>
@@ -105,6 +113,18 @@
     color: #ffffff;
     border-color: #0284c7;
     box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+}
+
+.dock-btn-resorts {
+    background-color: #f0fdf4;
+    color: #0d9488;
+    border-color: rgba(13, 148, 136, 0.25);
+}
+.dock-btn-resorts:hover, .dock-btn-resorts.active-dock {
+    background-color: #0d9488;
+    color: #ffffff;
+    border-color: #0d9488;
+    box-shadow: 0 4px 14px rgba(13, 148, 136, 0.4);
 }
 
 .dock-btn-church {
@@ -233,6 +253,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Scrollspy to highlight active dock button
     const sections = [
         { selector: '#beach-surfing-section', btnClass: '.dock-btn-beach' },
+        { selector: '#resorts-section', btnClass: '.dock-btn-resorts' },
         { selector: '#churches-section', btnClass: '.dock-btn-church' },
         { selector: '#history-section', btnClass: '.dock-btn-history' },
         { selector: '#nature-ecotourism-section', btnClass: '.dock-btn-nature' },

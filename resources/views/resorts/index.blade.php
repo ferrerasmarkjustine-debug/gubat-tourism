@@ -327,11 +327,53 @@ document.addEventListener('DOMContentLoaded', function () {
                         ? $resort->accommodations->sum('total_units')
                         : 5;
                 @endphp
+                @php
+                    $resortAmenities = [];
+                    if (isset($resort->accommodations) && $resort->accommodations->isNotEmpty()) {
+                        $uniqueAmenities = $resort->accommodations->flatMap(fn($acc) => $acc->amenities ?? [])->unique('id')->take(6);
+                        foreach ($uniqueAmenities as $am) {
+                            $resortAmenities[] = ['name' => $am->name, 'icon' => $am->icon_class];
+                        }
+                    }
+                    if (empty($resortAmenities)) {
+                        $resortAmenities = [
+                            ['name' => 'Free WiFi', 'icon' => 'bi-wifi'],
+                            ['name' => 'Free Parking', 'icon' => 'bi-p-circle'],
+                            ['name' => 'Air Conditioning', 'icon' => 'bi-wind']
+                        ];
+                    }
+                    $coverPhoto = \Illuminate\Support\Str::startsWith($resort->image_url ?? '', ['http://', 'https://'])
+                        ? $resort->image_url
+                        : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg');
+                @endphp
                 <div class="col-lg-4 col-md-6 resort-card" data-category="{{ $resort->category }}">
-                    <div class="card card-tourism h-100">
-                        <div class="card-tourism-img-wrapper">
+                    <div class="card card-tourism h-100 resort-card-clickable"
+                         style="cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease;"
+                         data-id="{{ $resort->id }}"
+                         data-title="{{ $resort->name }}"
+                         data-category="{{ ucfirst($resort->category) }}"
+                         data-location="Brgy. {{ $resort->barangay->name ?? 'Rizal' }}, Gubat"
+                         data-desc="{{ $resort->description }}"
+                         data-rating="{{ number_format($resort->rating, 1) }}"
+                         data-reviews="{{ $resort->reviews_count }}"
+                         data-min-price="{{ number_format($minPrice) }}"
+                         data-max-guests="{{ $maxGuests }}"
+                         data-units="{{ $unitsCount }}"
+                         data-cover="{{ $coverPhoto }}"
+                         data-gallery="{{ json_encode($resort->gallery_images ?? []) }}"
+                         data-amenities="{{ json_encode($resortAmenities) }}"
+                         data-map="{{ $resort->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($resort->name . ' Gubat Sorsogon') }}"
+                         data-book="{{ route('booking.create', ['resort_id' => $resort->id]) }}">
+                        <div class="card-tourism-img-wrapper position-relative">
                             <span class="badge bg-success text-white card-badge">From ₱{{ number_format($minPrice) }} / night</span>
-                            <img src="{{ \Illuminate\Support\Str::startsWith($resort->image_url ?? '', ['http://', 'https://']) ? $resort->image_url : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg') . '?v=2' }}" alt="{{ $resort->name }}">
+                            @if(!empty($resort->gallery_images) && count($resort->gallery_images) > 0)
+                                <div class="position-absolute top-0 end-0 m-3" style="z-index: 3;">
+                                    <span class="badge bg-dark bg-opacity-75 text-white px-2 py-1 rounded-pill small shadow-sm">
+                                        <i class="bi bi-images me-1"></i> {{ count($resort->gallery_images) + 1 }} Photos
+                                    </span>
+                                </div>
+                            @endif
+                            <img src="{{ $coverPhoto . '?v=2' }}" alt="{{ $resort->name }}">
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -351,20 +393,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                             {{-- Amenity Icons --}}
                             <div class="d-flex gap-3 mb-4 text-primary fs-5 border-top border-bottom py-2">
-                                @if(isset($resort->accommodations) && $resort->accommodations->isNotEmpty())
-                                    @php
-                                        $uniqueAmenities = $resort->accommodations->flatMap(fn($acc) => $acc->amenities ?? [])->unique('id')->take(5);
-                                    @endphp
-                                    @forelse($uniqueAmenities as $amenity)
-                                        <span title="{{ $amenity->name }}"><i class="bi {{ $amenity->icon_class }}"></i></span>
-                                    @empty
-                                        <span title="WiFi"><i class="bi bi-wifi"></i></span>
-                                        <span title="Parking"><i class="bi bi-p-circle"></i></span>
-                                    @endforelse
-                                @else
+                                @forelse($resortAmenities as $amenity)
+                                    <span title="{{ $amenity['name'] }}"><i class="bi {{ $amenity['icon'] }}"></i></span>
+                                @empty
                                     <span title="WiFi"><i class="bi bi-wifi"></i></span>
                                     <span title="Parking"><i class="bi bi-p-circle"></i></span>
-                                @endif
+                                @endforelse
                             </div>
 
                             {{-- Rating --}}
@@ -382,14 +416,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             {{-- Action Buttons --}}
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <a href="{{ $resort->google_map_url }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2">
+                                    <a href="{{ $resort->google_map_url }}" target="_blank" onclick="event.stopPropagation();" class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2">
                                         <i class="bi bi-geo-alt me-1"></i> Location
                                     </a>
                                 </div>
                                 <div class="col-6">
-                                    <a href="{{ route('booking.create', ['resort_id' => $resort->id]) }}" class="btn btn-tourism-primary btn-sm w-100 rounded-pill py-2 text-center text-white fw-bold">
-                                        Book Now
-                                    </a>
+                                    <button type="button" class="btn btn-tourism-primary btn-sm w-100 rounded-pill py-2 text-center text-white fw-bold explore-resort-btn">
+                                        Explore <i class="bi bi-arrow-right-short ms-1"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -408,9 +442,115 @@ document.addEventListener('DOMContentLoaded', function () {
 </section>
 
 {{-- ================================================================
+     QUICK VIEW MODAL FOR RESORT DETAILS & MULTI-PHOTO GALLERY
+================================================================ --}}
+<div class="modal fade" id="resortQuickViewModal" tabindex="-1" aria-labelledby="resortModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content rounded-4 border-0 overflow-hidden shadow-lg">
+            {{-- Main Enlarged Photo Hero Area --}}
+            <div class="position-relative bg-dark" style="height: 380px; overflow: hidden;">
+                <img id="resortModalImg" src="" alt="Resort Photo" class="w-100 h-100" style="object-fit: cover; transition: opacity 0.25s ease;">
+
+                {{-- Close Button --}}
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 p-2 bg-dark bg-opacity-50 rounded-circle shadow" data-bs-dismiss="modal" aria-label="Close" style="z-index: 10;"></button>
+
+                {{-- Prev / Next Photo Overlay Controls --}}
+                <button type="button" id="resortModalPrevBtn" class="btn btn-dark bg-opacity-50 text-white rounded-circle position-absolute top-50 start-0 translate-middle-y ms-3 p-0 d-none align-items-center justify-content-center shadow" style="width: 44px; height: 44px; z-index: 10;" title="Previous Photo">
+                    <i class="bi bi-chevron-left fs-5"></i>
+                </button>
+                <button type="button" id="resortModalNextBtn" class="btn btn-dark bg-opacity-50 text-white rounded-circle position-absolute top-50 end-0 translate-middle-y me-3 p-0 d-none align-items-center justify-content-center shadow" style="width: 44px; height: 44px; z-index: 10;" title="Next Photo">
+                    <i class="bi bi-chevron-right fs-5"></i>
+                </button>
+
+                {{-- Photo Counter Badge --}}
+                <div class="position-absolute top-0 start-0 m-3" style="z-index: 10;">
+                    <span id="resortModalPhotoCounter" class="badge bg-dark bg-opacity-75 text-white px-3 py-2 rounded-pill small fw-semibold shadow-sm d-none">
+                        <i class="bi bi-camera-fill me-1"></i> <span id="resortModalCurrentIdx">1</span> / <span id="resortModalTotalCount">1</span>
+                    </span>
+                </div>
+
+                {{-- Title & Category Gradient Overlay --}}
+                <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); z-index: 5;">
+                    <span id="resortModalCategoryBadge" class="badge text-white px-3 py-1 rounded-pill mb-2 shadow-sm small"></span>
+                    <h2 id="resortModalTitle" class="text-white fw-bold mb-0 font-outfit fs-3"></h2>
+                </div>
+            </div>
+
+            {{-- Horizontal Mini-Tile Thumbnail Strip (Scrollable Left to Right) --}}
+            <div id="resortModalGalleryStripContainer" class="p-3 bg-light border-bottom d-none">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="small fw-bold text-dark">
+                        <i class="bi bi-images text-primary me-1"></i> Resort Photo Gallery <small class="text-muted fw-normal">(Click thumbnail to view)</small>
+                    </span>
+                    <small class="text-muted"><i class="bi bi-arrow-left-right me-1"></i>Scroll left / right</small>
+                </div>
+                <div id="resortModalGalleryThumbnails" class="d-flex gap-2" style="overflow-x: auto; scroll-behavior: smooth; padding-bottom: 6px;">
+                    {{-- Mini tiles dynamically populated here --}}
+                </div>
+            </div>
+
+            <div class="modal-body p-4 p-md-5">
+                {{-- Quick Stats Row --}}
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-3 border-bottom gap-2">
+                    <span class="text-muted small">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> <span id="resortModalLocation"></span>
+                    </span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-warning small"><i class="bi bi-star-fill"></i></span>
+                        <span id="resortModalRating" class="fw-bold text-dark small"></span>
+                        <span id="resortModalReviews" class="text-muted small"></span>
+                    </div>
+                </div>
+
+                {{-- Badges Row --}}
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <span class="badge bg-success text-white px-3 py-2 rounded-pill fw-bold" id="resortModalPrice"></span>
+                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill small" id="resortModalGuests"><i class="bi bi-people me-1"></i>Max Guests</span>
+                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill small" id="resortModalUnits"><i class="bi bi-house-door me-1"></i>Units</span>
+                </div>
+
+                {{-- Description --}}
+                <h6 class="fw-bold text-dark mb-2">About this Resort</h6>
+                <p id="resortModalDesc" class="text-secondary mb-4" style="line-height: 1.7; font-size: 0.95rem;"></p>
+
+                {{-- Amenities List --}}
+                <h6 class="fw-bold text-dark mb-2"><i class="bi bi-check-circle-fill text-primary me-1"></i> Amenities &amp; Features</h6>
+                <div id="resortModalAmenities" class="d-flex flex-wrap gap-2 mb-4">
+                    {{-- Dynamically populated amenities --}}
+                </div>
+
+                {{-- Action Footer --}}
+                <div class="p-3 bg-light rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div>
+                        <span class="fw-bold text-dark d-block small">Ready to Book?</span>
+                        <small class="text-muted">Reserve your room or cottage directly with the resort administration.</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <a id="resortModalMapBtn" href="#" target="_blank" class="btn btn-outline-secondary rounded-pill fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2" style="height: 42px; padding: 0 1.4rem; font-size: 0.9rem; border-width: 1.5px;">
+                            <i class="bi bi-geo-alt" style="font-size: 1rem; line-height: 1;"></i>
+                            <span>Open in Maps</span>
+                        </a>
+                        <a id="resortModalBookBtn" href="#" class="btn btn-tourism-primary rounded-pill fw-bold shadow-sm text-white d-inline-flex align-items-center justify-content-center gap-2" style="height: 42px; padding: 0 1.4rem; font-size: 0.9rem;">
+                            <i class="bi bi-calendar-check" style="font-size: 1rem; line-height: 1;"></i>
+                            <span>Book Accommodation</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ================================================================
      FILTER BUTTON STYLES & JAVASCRIPT
 ================================================================ --}}
 <style>
+/* Card Hover Effect */
+.resort-card-clickable:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.12) !important;
+}
+
 /* Filter by Category Buttons */
 .resort-filter-btn {
     background-color: #ffffff !important;
@@ -497,6 +637,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // -------------------------------------------------------------
+    // CATEGORY FILTER
+    // -------------------------------------------------------------
     const filterBtns = document.querySelectorAll('.resort-filter-btn');
     const cards      = document.querySelectorAll('.resort-card');
     const noResults  = document.getElementById('noResortsFound');
@@ -506,7 +649,6 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', function () {
             const filter = this.dataset.filter;
 
-            // Sync active class across all filter buttons
             filterBtns.forEach(function (b) {
                 b.classList.remove('active');
                 if (b.dataset.filter === filter) {
@@ -531,6 +673,237 @@ document.addEventListener('DOMContentLoaded', function () {
             if (noResults) {
                 noResults.classList.toggle('d-none', visibleCount > 0);
             }
+        });
+    });
+
+    // -------------------------------------------------------------
+    // QUICK VIEW MODAL & HORIZONTAL MINI-TILE GALLERY
+    // -------------------------------------------------------------
+    const resortModalEl = document.getElementById('resortQuickViewModal');
+    if (!resortModalEl) return;
+
+    const modalTitle         = document.getElementById('resortModalTitle');
+    const modalCategoryBadge = document.getElementById('resortModalCategoryBadge');
+    const modalImg           = document.getElementById('resortModalImg');
+    const modalLocation      = document.getElementById('resortModalLocation');
+    const modalRating        = document.getElementById('resortModalRating');
+    const modalReviews       = document.getElementById('resortModalReviews');
+    const modalPrice         = document.getElementById('resortModalPrice');
+    const modalGuests        = document.getElementById('resortModalGuests');
+    const modalUnits         = document.getElementById('resortModalUnits');
+    const modalDesc          = document.getElementById('resortModalDesc');
+    const modalAmenities     = document.getElementById('resortModalAmenities');
+    const modalMapBtn        = document.getElementById('resortModalMapBtn');
+    const modalBookBtn       = document.getElementById('resortModalBookBtn');
+
+    const prevBtn            = document.getElementById('resortModalPrevBtn');
+    const nextBtn            = document.getElementById('resortModalNextBtn');
+    const photoCounter       = document.getElementById('resortModalPhotoCounter');
+    const currentIdxEl       = document.getElementById('resortModalCurrentIdx');
+    const totalCountEl       = document.getElementById('resortModalTotalCount');
+
+    const stripContainer     = document.getElementById('resortModalGalleryStripContainer');
+    const thumbnailsBox      = document.getElementById('resortModalGalleryThumbnails');
+
+    let currentPhotoList = [];
+    let activePhotoIndex = 0;
+
+    function formatAssetUrl(url) {
+        if (!url) return '';
+        if (url.startsWith('http://') || url.startsWith('https://')) return url;
+        const clean = url.startsWith('/') ? url.slice(1) : url;
+        return '{{ asset("") }}' + clean;
+    }
+
+    function showPhotoAtIndex(index) {
+        if (!currentPhotoList.length) return;
+        if (index < 0) index = currentPhotoList.length - 1;
+        if (index >= currentPhotoList.length) index = 0;
+        activePhotoIndex = index;
+
+        modalImg.style.opacity = '0.35';
+        setTimeout(() => {
+            modalImg.src = currentPhotoList[activePhotoIndex];
+            modalImg.style.opacity = '1';
+        }, 120);
+
+        if (currentIdxEl) currentIdxEl.textContent = activePhotoIndex + 1;
+
+        if (thumbnailsBox) {
+            const thumbs = thumbnailsBox.querySelectorAll('.resort-mini-thumb');
+            thumbs.forEach((th, i) => {
+                if (i === activePhotoIndex) {
+                    th.classList.add('border-primary', 'shadow');
+                    th.classList.remove('border-transparent', 'opacity-75');
+                    th.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    th.classList.remove('border-primary', 'shadow');
+                    th.classList.add('border-transparent', 'opacity-75');
+                }
+            });
+        }
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            showPhotoAtIndex(activePhotoIndex - 1);
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            showPhotoAtIndex(activePhotoIndex + 1);
+        });
+    }
+
+    // Keyboard navigation when modal is open
+    document.addEventListener('keydown', function(e) {
+        if (!resortModalEl.classList.contains('show')) return;
+        if (e.key === 'ArrowLeft') {
+            showPhotoAtIndex(activePhotoIndex - 1);
+        } else if (e.key === 'ArrowRight') {
+            showPhotoAtIndex(activePhotoIndex + 1);
+        }
+    });
+
+    function openResortQuickView(card) {
+        const title    = card.getAttribute('data-title') || 'Resort';
+        const category = card.getAttribute('data-category') || 'Resort';
+        const location = card.getAttribute('data-location') || 'Gubat, Sorsogon';
+        const desc     = card.getAttribute('data-desc') || '';
+        const rating   = card.getAttribute('data-rating') || '5.0';
+        const reviews  = card.getAttribute('data-reviews') || '0';
+        const minPrice = card.getAttribute('data-min-price') || '0';
+        const maxGuests = card.getAttribute('data-max-guests') || '2';
+        const units    = card.getAttribute('data-units') || '1';
+        const cover    = card.getAttribute('data-cover') || '';
+        const mapUrl   = card.getAttribute('data-map') || '#';
+        const bookUrl  = card.getAttribute('data-book') || '#';
+
+        let gallery = [];
+        try {
+            const raw = card.getAttribute('data-gallery');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) gallery = parsed;
+            }
+        } catch(err) {
+            gallery = [];
+        }
+
+        let amenities = [];
+        try {
+            const rawAm = card.getAttribute('data-amenities');
+            if (rawAm) {
+                const parsedAm = JSON.parse(rawAm);
+                if (Array.isArray(parsedAm)) amenities = parsedAm;
+            }
+        } catch(err) {
+            amenities = [];
+        }
+
+        modalTitle.textContent    = title;
+        modalLocation.textContent = location;
+        modalDesc.textContent     = desc;
+        modalRating.textContent   = rating;
+        modalReviews.textContent  = `(${reviews} reviews)`;
+        modalPrice.textContent    = `From ₱${minPrice} / night`;
+        modalGuests.innerHTML     = `<i class="bi bi-people me-1"></i>Max ${maxGuests} Guests`;
+        modalUnits.innerHTML      = `<i class="bi bi-house-door me-1"></i>${units} Units`;
+
+        // Category badge color
+        modalCategoryBadge.textContent = category;
+        const catLower = category.toLowerCase();
+        let catClass = 'bg-primary';
+        if (catLower.includes('luxury')) catClass = 'bg-warning text-dark';
+        else if (catLower.includes('eco')) catClass = 'bg-success';
+        else if (catLower.includes('budget')) catClass = 'bg-secondary';
+        else if (catLower.includes('homestay')) catClass = 'bg-info text-dark';
+        modalCategoryBadge.className = `badge ${catClass} px-3 py-1 rounded-pill mb-2 shadow-sm small`;
+
+        // Map & Book links
+        modalMapBtn.href  = mapUrl;
+        modalBookBtn.href = bookUrl;
+
+        // Amenities
+        modalAmenities.replaceChildren();
+        if (amenities.length > 0) {
+            amenities.forEach(am => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-light text-dark border px-3 py-2 rounded-pill small';
+                badge.innerHTML = `<i class="bi ${am.icon || 'bi-check-circle'} text-primary me-1"></i> ${am.name}`;
+                modalAmenities.appendChild(badge);
+            });
+        } else {
+            modalAmenities.innerHTML = '<span class="text-muted small">Standard amenities included.</span>';
+        }
+
+        // Build photo list
+        currentPhotoList = [];
+        if (cover) currentPhotoList.push(cover);
+        gallery.forEach(item => {
+            const formatted = formatAssetUrl(item);
+            if (formatted && !currentPhotoList.includes(formatted)) {
+                currentPhotoList.push(formatted);
+            }
+        });
+        if (currentPhotoList.length === 0) {
+            currentPhotoList.push('{{ asset("images/resorts/gubat_bay_beach_resort.jpg") }}');
+        }
+
+        activePhotoIndex = 0;
+        modalImg.src = currentPhotoList[0];
+
+        // Thumbnails and counter
+        if (currentPhotoList.length > 1) {
+            if (photoCounter) photoCounter.classList.remove('d-none');
+            if (totalCountEl) totalCountEl.textContent = currentPhotoList.length;
+            if (currentIdxEl) currentIdxEl.textContent = '1';
+            if (prevBtn) { prevBtn.classList.remove('d-none'); prevBtn.classList.add('d-flex'); }
+            if (nextBtn) { nextBtn.classList.remove('d-none'); nextBtn.classList.add('d-flex'); }
+
+            if (stripContainer) stripContainer.classList.remove('d-none');
+            if (thumbnailsBox) {
+                thumbnailsBox.replaceChildren();
+                currentPhotoList.forEach((photoUrl, idx) => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'resort-mini-thumb rounded-3 border border-2 ' + (idx === 0 ? 'border-primary shadow' : 'border-transparent opacity-75');
+                    thumb.style.cssText = 'flex: 0 0 76px; height: 56px; overflow: hidden; cursor: pointer; transition: all 0.2s ease;';
+                    thumb.innerHTML = `<img src="${photoUrl}" alt="Photo ${idx + 1}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    thumb.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        showPhotoAtIndex(idx);
+                    });
+                    thumbnailsBox.appendChild(thumb);
+                });
+            }
+        } else {
+            if (photoCounter) photoCounter.classList.add('d-none');
+            if (prevBtn) { prevBtn.classList.add('d-none'); prevBtn.classList.remove('d-flex'); }
+            if (nextBtn) { nextBtn.classList.add('d-none'); nextBtn.classList.remove('d-flex'); }
+            if (stripContainer) stripContainer.classList.add('d-none');
+        }
+
+        const bsModal = bootstrap.Modal.getOrCreateInstance(resortModalEl);
+        bsModal.show();
+    }
+
+    // Attach click listeners to cards and explore buttons
+    document.querySelectorAll('.resort-card-clickable').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // If the user clicked an explicit link with href (like Location or Book direct), allow normal action
+            if (e.target.closest('a')) return;
+            openResortQuickView(this);
+        });
+    });
+
+    document.querySelectorAll('.explore-resort-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const card = this.closest('.resort-card-clickable');
+            if (card) openResortQuickView(card);
         });
     });
 });

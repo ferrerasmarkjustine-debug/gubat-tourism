@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Craft;
+use App\Traits\HandlesImageUpload;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -12,6 +13,8 @@ use Illuminate\View\View;
 
 class CraftController extends Controller
 {
+    use HandlesImageUpload;
+
     /**
      * Category mapping definitions.
      */
@@ -51,18 +54,20 @@ class CraftController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name'           => ['required', 'string', 'max:255'],
-            'category_slug'  => ['required', 'string', 'in:abaca,pottery,culinary,souvenirs'],
-            'description'    => ['required', 'string', 'max:2000'],
-            'highlight'      => ['nullable', 'string', 'max:255'],
-            'products'       => ['nullable', 'string', 'max:1000'],
-            'address'        => ['nullable', 'string', 'max:255'],
-            'barangay'       => ['nullable', 'string', 'max:100'],
-            'google_map_url' => ['nullable', 'url', 'max:500'],
-            'contact'        => ['nullable', 'string', 'max:100'],
-            'is_featured'    => ['nullable'],
-            'image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
-            'image_url'      => ['nullable', 'url', 'max:500'],
+            'name'             => ['required', 'string', 'max:255'],
+            'category_slug'    => ['required', 'string', 'in:abaca,pottery,culinary,souvenirs'],
+            'description'      => ['required', 'string', 'max:2000'],
+            'highlight'        => ['nullable', 'string', 'max:255'],
+            'products'         => ['nullable', 'string', 'max:1000'],
+            'address'          => ['nullable', 'string', 'max:255'],
+            'barangay'         => ['nullable', 'string', 'max:100'],
+            'google_map_url'   => ['nullable', 'url', 'max:500'],
+            'contact'          => ['nullable', 'string', 'max:100'],
+            'is_featured'      => ['nullable'],
+            'image'            => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'image_url'        => ['nullable', 'url', 'max:500'],
+            'gallery_images'   => ['nullable', 'array', 'max:10'],
+            'gallery_images.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
 
         $categoryConfig = $this->categories[$validated['category_slug']] ?? [
@@ -76,18 +81,8 @@ class CraftController extends Controller
             $productsArray = array_values(array_filter(array_map('trim', preg_split('/[\r\n,]+/', $validated['products']))));
         }
 
-        // Process image upload or URL
-        $finalImageUrl = $validated['image_url'] ?? null;
-        if ($request->hasFile('image')) {
-            $imageFile = $request->file('image');
-            $filename = 'craft_' . time() . '_' . Str::random(10) . '.' . $imageFile->getClientOriginalExtension();
-            $destinationPath = public_path('images/crafts');
-            if (!File::isDirectory($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true);
-            }
-            $imageFile->move($destinationPath, $filename);
-            $finalImageUrl = 'images/crafts/' . $filename;
-        }
+        $finalImageUrl = $this->handleImageUpload($request, 'crafts', null, 'image', 'image_url');
+        $galleryImages = $this->handleMultipleImagesUpload($request, 'crafts', [], 'gallery_images', 'retained_gallery_images', 10);
 
         Craft::create([
             'name'           => $validated['name'],
@@ -98,6 +93,7 @@ class CraftController extends Controller
             'highlight'      => $validated['highlight'] ?? null,
             'products'       => $productsArray,
             'image_url'      => $finalImageUrl,
+            'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
             'address'        => $validated['address'] ?? null,
             'barangay'       => $validated['barangay'] ?? null,
             'google_map_url' => $validated['google_map_url'] ?? null,
@@ -114,18 +110,21 @@ class CraftController extends Controller
     public function update(Request $request, Craft $craft): RedirectResponse
     {
         $validated = $request->validate([
-            'name'           => ['required', 'string', 'max:255'],
-            'category_slug'  => ['required', 'string', 'in:abaca,pottery,culinary,souvenirs'],
-            'description'    => ['required', 'string', 'max:2000'],
-            'highlight'      => ['nullable', 'string', 'max:255'],
-            'products'       => ['nullable', 'string', 'max:1000'],
-            'address'        => ['nullable', 'string', 'max:255'],
-            'barangay'       => ['nullable', 'string', 'max:100'],
-            'google_map_url' => ['nullable', 'url', 'max:500'],
-            'contact'        => ['nullable', 'string', 'max:100'],
-            'is_featured'    => ['nullable'],
-            'image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
-            'image_url'      => ['nullable', 'url', 'max:500'],
+            'name'                    => ['required', 'string', 'max:255'],
+            'category_slug'           => ['required', 'string', 'in:abaca,pottery,culinary,souvenirs'],
+            'description'             => ['required', 'string', 'max:2000'],
+            'highlight'               => ['nullable', 'string', 'max:255'],
+            'products'                => ['nullable', 'string', 'max:1000'],
+            'address'                 => ['nullable', 'string', 'max:255'],
+            'barangay'                => ['nullable', 'string', 'max:100'],
+            'google_map_url'          => ['nullable', 'url', 'max:500'],
+            'contact'                 => ['nullable', 'string', 'max:100'],
+            'is_featured'             => ['nullable'],
+            'image'                   => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'image_url'               => ['nullable', 'url', 'max:500'],
+            'gallery_images'          => ['nullable', 'array', 'max:10'],
+            'gallery_images.*'        => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'retained_gallery_images' => ['nullable', 'array'],
         ]);
 
         $categoryConfig = $this->categories[$validated['category_slug']] ?? [
@@ -139,29 +138,10 @@ class CraftController extends Controller
             $productsArray = array_values(array_filter(array_map('trim', preg_split('/[\r\n,]+/', $validated['products']))));
         }
 
-        // Process image upload
-        $finalImageUrl = $craft->image_url;
-        if ($request->hasFile('image')) {
-            $imageFile = $request->file('image');
-            $filename = 'craft_' . time() . '_' . Str::random(10) . '.' . $imageFile->getClientOriginalExtension();
-            $destinationPath = public_path('images/crafts');
-            if (!File::isDirectory($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true);
-            }
-            $imageFile->move($destinationPath, $filename);
+        $finalImageUrl = $this->handleImageUpload($request, 'crafts', $craft->image_url, 'image', 'image_url') ?? $craft->image_url;
 
-            // Clean up old local image if it exists in images/crafts
-            if ($craft->image_url && Str::startsWith($craft->image_url, 'images/crafts/')) {
-                $oldPath = public_path($craft->image_url);
-                if (File::exists($oldPath)) {
-                    File::delete($oldPath);
-                }
-            }
-
-            $finalImageUrl = 'images/crafts/' . $filename;
-        } elseif (!empty($validated['image_url'])) {
-            $finalImageUrl = $validated['image_url'];
-        }
+        $existingGallery = is_array($craft->gallery_images) ? $craft->gallery_images : [];
+        $galleryImages = $this->handleMultipleImagesUpload($request, 'crafts', $existingGallery, 'gallery_images', 'retained_gallery_images', 10);
 
         $craft->update([
             'name'           => $validated['name'],
@@ -172,6 +152,7 @@ class CraftController extends Controller
             'highlight'      => $validated['highlight'] ?? null,
             'products'       => $productsArray,
             'image_url'      => $finalImageUrl,
+            'gallery_images' => !empty($galleryImages) ? $galleryImages : null,
             'address'        => $validated['address'] ?? null,
             'barangay'       => $validated['barangay'] ?? null,
             'google_map_url' => $validated['google_map_url'] ?? null,

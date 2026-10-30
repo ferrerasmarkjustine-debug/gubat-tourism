@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Destination extends Model
 {
     protected $fillable = [
-        'municipality_id', 'name', 'description', 'category', 'image_url', 'rating', 'reviews_count', 'google_map_url', 'featured'
+        'municipality_id', 'name', 'description', 'category', 'image_url', 'gallery_images', 'rating', 'reviews_count', 'google_map_url', 'featured'
+    ];
+
+    protected $casts = [
+        'gallery_images' => 'array',
+        'featured' => 'boolean',
     ];
 
     public function municipality(): BelongsTo

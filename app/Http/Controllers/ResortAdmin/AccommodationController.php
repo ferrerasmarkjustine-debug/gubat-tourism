@@ -58,20 +58,24 @@ class AccommodationController extends Controller
         }
 
         $validated = $request->validate([
-            'name'            => ['required', 'string', 'max:255'],
-            'type'            => ['required', 'string', 'in:room,cottage,villa,dorm'],
-            'price_per_night' => ['required', 'numeric', 'min:0'],
-            'max_guests'      => ['required', 'integer', 'min:1', 'max:50'],
-            'total_units'     => ['required', 'integer', 'min:1', 'max:100'],
-            'description'     => ['nullable', 'string', 'max:2000'],
-            'image'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
-            'image_url'       => ['nullable', 'url', 'max:500'],
-            'amenities'       => ['nullable', 'array'],
-            'amenities.*'     => ['exists:amenities,id'],
+            'name'             => ['required', 'string', 'max:255'],
+            'type'             => ['required', 'string', 'in:room,cottage,villa,dorm'],
+            'price_per_night'  => ['required', 'numeric', 'min:0'],
+            'max_guests'       => ['required', 'integer', 'min:1', 'max:50'],
+            'total_units'      => ['required', 'integer', 'min:1', 'max:100'],
+            'description'      => ['nullable', 'string', 'max:2000'],
+            'image'            => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'image_url'        => ['nullable', 'url', 'max:500'],
+            'gallery_images'   => ['nullable', 'array', 'max:10'],
+            'gallery_images.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'amenities'        => ['nullable', 'array'],
+            'amenities.*'      => ['exists:amenities,id'],
         ]);
 
         $finalImageUrl = $this->handleImageUpload($request, 'accommodations')
             ?: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80';
+
+        $galleryImages = $this->handleMultipleImagesUpload($request, 'accommodations', [], 'gallery_images', 'retained_gallery_images', 10);
 
         $accommodation = Accommodation::create([
             'resort_id'        => $resort->id,
@@ -82,6 +86,7 @@ class AccommodationController extends Controller
             'total_units'      => $validated['total_units'],
             'description'      => $validated['description'] ?? null,
             'image_url'        => $finalImageUrl,
+            'gallery_images'   => !empty($galleryImages) ? $galleryImages : null,
             'status'           => 'pending', // Pending LGU Tourism Office Approval
             'rejection_reason' => null,
         ]);
@@ -127,20 +132,26 @@ class AccommodationController extends Controller
         }
 
         $validated = $request->validate([
-            'name'            => ['required', 'string', 'max:255'],
-            'type'            => ['required', 'string', 'in:room,cottage,villa,dorm'],
-            'price_per_night' => ['required', 'numeric', 'min:0'],
-            'max_guests'      => ['required', 'integer', 'min:1', 'max:50'],
-            'total_units'     => ['required', 'integer', 'min:1', 'max:100'],
-            'description'     => ['nullable', 'string', 'max:2000'],
-            'image'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
-            'image_url'       => ['nullable', 'url', 'max:500'],
-            'amenities'       => ['nullable', 'array'],
-            'amenities.*'     => ['exists:amenities,id'],
+            'name'                    => ['required', 'string', 'max:255'],
+            'type'                    => ['required', 'string', 'in:room,cottage,villa,dorm'],
+            'price_per_night'         => ['required', 'numeric', 'min:0'],
+            'max_guests'              => ['required', 'integer', 'min:1', 'max:50'],
+            'total_units'             => ['required', 'integer', 'min:1', 'max:100'],
+            'description'             => ['nullable', 'string', 'max:2000'],
+            'image'                   => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'image_url'               => ['nullable', 'url', 'max:500'],
+            'gallery_images'          => ['nullable', 'array', 'max:10'],
+            'gallery_images.*'        => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'retained_gallery_images' => ['nullable', 'array'],
+            'amenities'               => ['nullable', 'array'],
+            'amenities.*'             => ['exists:amenities,id'],
         ]);
 
         $finalImageUrl = $this->handleImageUpload($request, 'accommodations', $accommodation->image_url)
             ?: $accommodation->image_url;
+
+        $existingGallery = is_array($accommodation->gallery_images) ? $accommodation->gallery_images : [];
+        $galleryImages = $this->handleMultipleImagesUpload($request, 'accommodations', $existingGallery, 'gallery_images', 'retained_gallery_images', 10);
 
         $accommodation->update([
             'name'            => $validated['name'],
@@ -150,6 +161,7 @@ class AccommodationController extends Controller
             'total_units'     => $validated['total_units'],
             'description'     => $validated['description'] ?? null,
             'image_url'       => $finalImageUrl,
+            'gallery_images'  => !empty($galleryImages) ? $galleryImages : null,
         ]);
 
         $accommodation->amenities()->sync($validated['amenities'] ?? []);

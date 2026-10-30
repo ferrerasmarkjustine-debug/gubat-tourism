@@ -11,12 +11,13 @@ class Resort extends Model
 {
     protected $fillable = [
         'barangay_id', 'name', 'description', 'address', 'google_map_url',
-        'rating', 'reviews_count', 'category', 'image_url', 'is_lgu_approved', 'featured'
+        'rating', 'reviews_count', 'category', 'image_url', 'gallery_images', 'is_lgu_approved', 'featured'
     ];
 
     protected $casts = [
         'is_lgu_approved' => 'boolean',
         'featured' => 'boolean',
+        'gallery_images' => 'array',
         'rating' => 'decimal:2',
     ];
 

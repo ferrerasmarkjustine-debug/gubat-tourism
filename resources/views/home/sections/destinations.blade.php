@@ -13,16 +13,63 @@
 
         <div class="row g-4">
             @foreach($featuredResorts as $resort)
+                @php
+                    $minPrice = isset($resort->accommodations) && $resort->accommodations->isNotEmpty()
+                        ? $resort->accommodations->min('price_per_night')
+                        : 1200;
+                    $maxGuests = isset($resort->accommodations) && $resort->accommodations->isNotEmpty()
+                        ? $resort->accommodations->max('max_guests')
+                        : 4;
+                    $unitsCount = isset($resort->accommodations) && $resort->accommodations->isNotEmpty()
+                        ? $resort->accommodations->sum('total_units')
+                        : 5;
+                    $resortAmenities = [];
+                    if (isset($resort->accommodations) && $resort->accommodations->isNotEmpty()) {
+                        $uniqueAmenities = $resort->accommodations->flatMap(function($acc) {
+                            return $acc->amenities ?? [];
+                        })->unique('id')->take(5);
+                        foreach($uniqueAmenities as $am) {
+                            $resortAmenities[] = ['name' => $am->name, 'icon' => $am->icon_class];
+                        }
+                    }
+                    if (empty($resortAmenities)) {
+                        $resortAmenities = [
+                            ['name' => 'Free WiFi', 'icon' => 'bi-wifi'],
+                            ['name' => 'Free Parking', 'icon' => 'bi-p-circle']
+                        ];
+                    }
+                    $coverPhoto = str_starts_with($resort->image_url ?? '', 'http')
+                        ? $resort->image_url
+                        : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg');
+                @endphp
                 <div class="col-lg-4 col-md-6">
-                    <div class="card card-tourism h-100">
-                        <div class="card-tourism-img-wrapper">
-                            @php
-                                $minPrice = isset($resort->accommodations) && $resort->accommodations->isNotEmpty()
-                                    ? $resort->accommodations->min('price_per_night')
-                                    : 1200;
-                            @endphp
+                    <div class="card card-tourism h-100 home-resort-card-clickable"
+                         style="cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease;"
+                         data-id="{{ $resort->id }}"
+                         data-title="{{ $resort->name }}"
+                         data-category="{{ ucfirst($resort->category) }}"
+                         data-location="Brgy. {{ $resort->barangay->name ?? 'Rizal' }}, Gubat"
+                         data-desc="{{ $resort->description }}"
+                         data-rating="{{ number_format($resort->rating, 1) }}"
+                         data-reviews="{{ $resort->reviews_count }}"
+                         data-min-price="{{ number_format($minPrice) }}"
+                         data-max-guests="{{ $maxGuests }}"
+                         data-units="{{ $unitsCount }}"
+                         data-cover="{{ $coverPhoto }}"
+                         data-gallery="{{ json_encode($resort->gallery_images ?? []) }}"
+                         data-amenities="{{ json_encode($resortAmenities) }}"
+                         data-map="{{ $resort->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($resort->name . ' Gubat Sorsogon') }}"
+                         data-book="{{ route('booking.create', ['resort_id' => $resort->id]) }}">
+                        <div class="card-tourism-img-wrapper position-relative">
                             <span class="badge bg-success text-white card-badge">From ₱{{ number_format($minPrice) }} / night</span>
-                            <img src="{{ str_starts_with($resort->image_url ?? '', 'http') ? $resort->image_url : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg') . '?v=2' }}" alt="{{ $resort->name }}">
+                            @if(!empty($resort->gallery_images) && count($resort->gallery_images) > 0)
+                                <div class="position-absolute top-0 end-0 m-3" style="z-index: 3;">
+                                    <span class="badge bg-dark bg-opacity-75 text-white px-2 py-1 rounded-pill small shadow-sm">
+                                        <i class="bi bi-images me-1"></i> {{ count($resort->gallery_images) + 1 }} Photos
+                                    </span>
+                                </div>
+                            @endif
+                            <img src="{{ $coverPhoto . '?v=2' }}" alt="{{ $resort->name }}">
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -32,37 +79,19 @@
                             <p class="small text-muted mb-3">{{ $resort->description }}</p>
 
                             <!-- Capacity & Key Features -->
-                            @php
-                                $maxGuests = isset($resort->accommodations) && $resort->accommodations->isNotEmpty()
-                                    ? $resort->accommodations->max('max_guests')
-                                    : 4;
-                                $unitsCount = isset($resort->accommodations) && $resort->accommodations->isNotEmpty()
-                                    ? $resort->accommodations->sum('total_units')
-                                    : 5;
-                            @endphp
                             <div class="d-flex flex-wrap gap-2 mb-3">
                                 <span class="badge bg-secondary-subtle text-secondary small"><i class="bi bi-people me-1"></i> Max {{ $maxGuests }} Guests</span>
                                 <span class="badge bg-secondary-subtle text-secondary small"><i class="bi bi-house-door me-1"></i> {{ $unitsCount }} Units Available</span>
                             </div>
 
-                            <!-- Amenities Icons (Extracted from related accommodations) -->
+                            <!-- Amenities Icons -->
                             <div class="d-flex gap-3 mb-4 text-primary fs-5 border-top border-bottom py-2">
-                                @if(isset($resort->accommodations) && $resort->accommodations->isNotEmpty())
-                                    @php
-                                        $uniqueAmenities = $resort->accommodations->flatMap(function($acc) {
-                                            return $acc->amenities ?? [];
-                                        })->unique('id')->take(5);
-                                    @endphp
-                                    @forelse($uniqueAmenities as $amenity)
-                                        <span title="{{ $amenity->name }}"><i class="bi {{ $amenity->icon_class }}"></i></span>
-                                    @empty
-                                        <span title="Free High-speed WiFi"><i class="bi bi-wifi"></i></span>
-                                        <span title="Free Parking"><i class="bi bi-p-circle"></i></span>
-                                    @endforelse
-                                @else
+                                @forelse($resortAmenities as $amenity)
+                                    <span title="{{ $amenity['name'] }}"><i class="bi {{ $amenity['icon'] }}"></i></span>
+                                @empty
                                     <span title="Free High-speed WiFi"><i class="bi bi-wifi"></i></span>
                                     <span title="Free Parking"><i class="bi bi-p-circle"></i></span>
-                                @endif
+                                @endforelse
                             </div>
 
                             <!-- Ratings -->
@@ -86,14 +115,14 @@
                             <!-- Action buttons -->
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <a href="{{ $resort->google_map_url }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2">
+                                    <a href="{{ $resort->google_map_url }}" target="_blank" onclick="event.stopPropagation();" class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2">
                                         <i class="bi bi-geo-alt me-1"></i> Location
                                     </a>
                                 </div>
                                 <div class="col-6">
-                                    <a href="{{ route('booking.create', ['resort_id' => $resort->id]) }}" class="btn btn-tourism-primary btn-sm w-100 rounded-pill py-2 text-center text-white fw-bold">
-                                        Book Now
-                                    </a>
+                                    <button type="button" class="btn btn-tourism-primary btn-sm w-100 rounded-pill py-2 text-center text-white fw-bold view-resort-details-btn">
+                                        View Details
+                                    </button>
                                 </div>
                             </div>
                         </div>

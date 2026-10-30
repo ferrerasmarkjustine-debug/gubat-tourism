@@ -11,7 +11,12 @@ class Accommodation extends Model
 {
     protected $fillable = [
         'resort_id', 'name', 'type', 'price_per_night', 'max_guests',
-        'total_units', 'description', 'image_url', 'status', 'rejection_reason'
+        'total_units', 'description', 'image_url', 'gallery_images', 'status', 'rejection_reason'
+    ];
+
+    protected $casts = [
+        'gallery_images' => 'array',
+        'price_per_night' => 'decimal:2',
     ];
 
     public function scopeApproved($query)

@@ -98,12 +98,55 @@
             </div>
         </div>
 
+        @php
+            $spotlightBuenavista = $allDestinations->first(function($d) {
+                return str_contains(strtolower($d->name), 'buenavista');
+            });
+            $spotlightAgoho = $allDestinations->first(function($d) {
+                return str_contains(strtolower($d->name), 'agoho');
+            });
+
+            // Dynamic values for Spotlight 1
+            $bName = $spotlightBuenavista ? $spotlightBuenavista->name : 'Buenavista Tourism Hub & Beach';
+            $bDesc = $spotlightBuenavista && $spotlightBuenavista->description ? $spotlightBuenavista->description : 'A lively 5-kilometer powdery beach bordered by a palm-lined baywalk promenade. Savor fresh coastal delicacies like alimango and kuracha crab, paired with authentic Bicolano hinagom and timitim.';
+            $bImg = $spotlightBuenavista && $spotlightBuenavista->image_url 
+                ? (\Illuminate\Support\Str::startsWith($spotlightBuenavista->image_url, ['http://', 'https://']) ? $spotlightBuenavista->image_url : asset($spotlightBuenavista->image_url))
+                : asset('images/destinations/buenavista_tourism_hub.jpg');
+            $bGallery = $spotlightBuenavista && !empty($spotlightBuenavista->gallery_images) ? $spotlightBuenavista->gallery_images : [];
+            $bMap = $spotlightBuenavista && $spotlightBuenavista->google_map_url ? $spotlightBuenavista->google_map_url : 'https://maps.google.com/?q=Buenavista+Beach+Gubat+Sorsogon';
+            $bCat = $spotlightBuenavista && $spotlightBuenavista->category ? $spotlightBuenavista->category : 'Beach & Food Hub';
+
+            // Dynamic values for Spotlight 2
+            $aName = $spotlightAgoho ? $spotlightAgoho->name : 'Agoho Forest Reserve';
+            $aDesc = $spotlightAgoho && $spotlightAgoho->description ? $spotlightAgoho->description : 'A breathtaking coastal pine cathedral of towering 20-meter agoho trees that kiss the Pacific tide. Features footbridges, hanging canopy walks, picnic huts, and tranquil camping in pure nature.';
+            $aImg = $spotlightAgoho && $spotlightAgoho->image_url 
+                ? (\Illuminate\Support\Str::startsWith($spotlightAgoho->image_url, ['http://', 'https://']) ? $spotlightAgoho->image_url : asset($spotlightAgoho->image_url))
+                : asset('images/destinations/agoho_forest_reserve.jpg');
+            $aGallery = $spotlightAgoho && !empty($spotlightAgoho->gallery_images) ? $spotlightAgoho->gallery_images : [];
+            $aMap = $spotlightAgoho && $spotlightAgoho->google_map_url ? $spotlightAgoho->google_map_url : 'https://maps.google.com/?q=Agoho+Forest+Ariman+Gubat+Sorsogon';
+            $aCat = $spotlightAgoho && $spotlightAgoho->category ? $spotlightAgoho->category : 'Nature & Forest Reserve';
+        @endphp
+
         <div class="row g-4">
             {{-- Spotlight 1: Buenavista Tourism Hub & Beach --}}
             <div class="col-lg-6">
-                <div class="card border-0 shadow rounded-4 overflow-hidden h-100 position-relative text-white" style="background: #0f172a; min-height: 320px;">
-                    <img src="{{ asset('images/destinations/buenavista_tourism_hub.jpg') }}" 
-                         alt="Buenavista Tourism Hub and Beach" 
+                <div class="card border-0 shadow rounded-4 overflow-hidden h-100 position-relative text-white destination-card-clickable" 
+                     style="background: #0f172a; min-height: 320px; cursor: pointer;"
+                     data-bs-toggle="modal"
+                     data-bs-target="#spotQuickViewModal"
+                     data-title="{{ $bName }}"
+                     data-category="{{ $bCat }}"
+                     data-badge-bg="#d97706"
+                     data-badge-icon="bi-tsunami"
+                     data-desc="{{ $bDesc }}"
+                     data-img="{{ $bImg }}"
+                     data-gallery="{{ json_encode($bGallery) }}"
+                     data-location="Brgy. Buenavista, Gubat"
+                     data-rating="{{ number_format($spotlightBuenavista->rating ?? 4.9, 1) }}"
+                     data-reviews="{{ $spotlightBuenavista->reviews_count ?? 310 }}"
+                     data-map="{{ $bMap }}">
+                    <img src="{{ $bImg }}" 
+                         alt="{{ $bName }}" 
                          class="position-absolute top-0 start-0 w-100 h-100" 
                          style="object-fit:cover; opacity:0.45; transition: transform 0.6s ease;"
                          onmouseover="this.style.transform='scale(1.05)'" 
@@ -111,21 +154,24 @@
                     <div class="card-body p-4 p-md-5 d-flex flex-column position-relative justify-content-end" style="z-index:2;">
                         <div class="mb-2">
                             <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1">
-                                <i class="bi bi-tsunami me-1"></i> Beach & Food Hub
+                                <i class="bi bi-tsunami me-1"></i> {{ $bCat }}
                             </span>
                             <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-1 ms-1">
                                 <i class="bi bi-geo-alt-fill me-1"></i> Brgy. Buenavista
                             </span>
                         </div>
-                        <h4 class="fw-bold text-white mb-2 font-outfit">Buenavista Tourism Hub & Beach</h4>
+                        <h4 class="fw-bold text-white mb-2 font-outfit">{{ $bName }}</h4>
                         <p class="text-white-50 small mb-3">
-                            A lively 5-kilometer powdery beach bordered by a palm-lined baywalk promenade. Savor fresh coastal delicacies like <em>alimango</em> and <em>kuracha</em> crab, paired with authentic Bicolano <em>hinagom</em> and <em>timitim</em>.
+                            {{ \Illuminate\Support\Str::limit($bDesc, 180) }}
                         </p>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
-                            <a href="https://maps.google.com/?q=Buenavista+Beach+Gubat+Sorsogon" target="_blank" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark">
+                            <button type="button" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark btn-quick-view shadow-sm">
+                                <i class="bi bi-zoom-in me-1"></i> Explore & View Photos
+                            </button>
+                            <a href="{{ $bMap }}" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold" onclick="event.stopPropagation();">
                                 <i class="bi bi-map me-1"></i> Open in Maps
                             </a>
-                            <span class="text-white-50 small">Surfing Season: Oct – Mar</span>
+                            <span class="text-white-50 small ms-auto d-none d-md-inline">Click card to enlarge</span>
                         </div>
                     </div>
                 </div>
@@ -133,9 +179,23 @@
 
             {{-- Spotlight 2: Agoho Forest Reserve --}}
             <div class="col-lg-6">
-                <div class="card border-0 shadow rounded-4 overflow-hidden h-100 position-relative text-white" style="background: #064e3b; min-height: 320px;">
-                    <img src="{{ asset('images/destinations/agoho_forest_reserve.jpg') }}" 
-                         alt="Agoho Forest Reserve" 
+                <div class="card border-0 shadow rounded-4 overflow-hidden h-100 position-relative text-white destination-card-clickable" 
+                     style="background: #064e3b; min-height: 320px; cursor: pointer;"
+                     data-bs-toggle="modal"
+                     data-bs-target="#spotQuickViewModal"
+                     data-title="{{ $aName }}"
+                     data-category="{{ $aCat }}"
+                     data-badge-bg="#16a34a"
+                     data-badge-icon="bi-tree-fill"
+                     data-desc="{{ $aDesc }}"
+                     data-img="{{ $aImg }}"
+                     data-gallery="{{ json_encode($aGallery) }}"
+                     data-location="Ariman Road, Gubat"
+                     data-rating="{{ number_format($spotlightAgoho->rating ?? 4.8, 1) }}"
+                     data-reviews="{{ $spotlightAgoho->reviews_count ?? 195 }}"
+                     data-map="{{ $aMap }}">
+                    <img src="{{ $aImg }}" 
+                         alt="{{ $aName }}" 
                          class="position-absolute top-0 start-0 w-100 h-100" 
                          style="object-fit:cover; opacity:0.42; transition: transform 0.6s ease;"
                          onmouseover="this.style.transform='scale(1.05)'" 
@@ -143,21 +203,24 @@
                     <div class="card-body p-4 p-md-5 d-flex flex-column position-relative justify-content-end" style="z-index:2;">
                         <div class="mb-2">
                             <span class="badge bg-success text-white fw-bold rounded-pill px-3 py-1">
-                                <i class="bi bi-tree-fill me-1"></i> Coastal Cathedral
+                                <i class="bi bi-tree-fill me-1"></i> {{ $aCat }}
                             </span>
                             <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-1 ms-1">
                                 <i class="bi bi-geo-alt-fill me-1"></i> Ariman Road
                             </span>
                         </div>
-                        <h4 class="fw-bold text-white mb-2 font-outfit">Agoho Forest Reserve</h4>
+                        <h4 class="fw-bold text-white mb-2 font-outfit">{{ $aName }}</h4>
                         <p class="text-white-50 small mb-3">
-                            A breathtaking coastal pine cathedral of towering 20-meter agoho trees that kiss the Pacific tide. Features footbridges, hanging canopy walks, picnic huts, and tranquil camping in pure nature.
+                            {{ \Illuminate\Support\Str::limit($aDesc, 180) }}
                         </p>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
-                            <a href="https://maps.google.com/?q=Agoho+Forest+Ariman+Gubat+Sorsogon" target="_blank" class="btn btn-light btn-sm rounded-pill px-3 fw-bold text-dark">
+                            <button type="button" class="btn btn-success btn-sm rounded-pill px-3 fw-bold text-white btn-quick-view shadow-sm">
+                                <i class="bi bi-zoom-in me-1"></i> Explore & View Photos
+                            </button>
+                            <a href="{{ $aMap }}" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold" onclick="event.stopPropagation();">
                                 <i class="bi bi-map me-1"></i> Open in Maps
                             </a>
-                            <span class="text-white-50 small">20-Meter Tree Canopy &bull; Direct Ocean Access</span>
+                            <span class="text-white-50 small ms-auto d-none d-md-inline">Click card to enlarge</span>
                         </div>
                     </div>
                 </div>
@@ -268,7 +331,21 @@
                      data-desc="{{ strtolower($dest->description) }}"
                      data-category="{{ strtolower($dest->category) }}"
                      data-barangay="{{ strtolower($dest->barangay->name ?? '') }}">
-                    <div class="card card-tourism h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                    <div class="card card-tourism h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white destination-card-clickable"
+                         style="cursor: pointer;"
+                         data-bs-toggle="modal"
+                         data-bs-target="#spotQuickViewModal"
+                         data-title="{{ $dest->name }}"
+                         data-category="{{ $dest->category }}"
+                         data-badge-bg="{{ $badgeBg }}"
+                         data-badge-icon="{{ $badgeIcon }}"
+                         data-desc="{{ $dest->description }}"
+                         data-img="{{ $imgUrl }}"
+                         data-gallery="{{ json_encode($dest->gallery_images ?? []) }}"
+                         data-location="{{ $dest->barangay->name ?? 'Gubat' }}, {{ $dest->municipality->name ?? 'Sorsogon' }}"
+                         data-rating="{{ number_format($dest->rating ?? 4.8, 1) }}"
+                         data-reviews="{{ $dest->reviews_count ?? 50 }}"
+                         data-map="{{ $dest->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($dest->name . ' Gubat Sorsogon') }}">
                         <div class="card-tourism-img-wrapper position-relative overflow-hidden" style="height: 230px;">
                             {{-- Category Badge --}}
                             <span class="badge text-white card-badge shadow-sm px-3 py-2" style="background-color: {{ $badgeBg }}; font-size: 0.75rem;">
@@ -278,6 +355,12 @@
                             @if($dest->featured)
                                 <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-2 py-1 rounded-pill small fw-bold shadow-sm" style="z-index: 2;">
                                     <i class="bi bi-star-fill text-dark me-1"></i> Featured
+                                </span>
+                            @endif
+
+                            @if(!empty($dest->gallery_images) && count($dest->gallery_images) > 0)
+                                <span class="badge bg-dark bg-opacity-75 text-white position-absolute bottom-0 end-0 m-3 px-2 py-1 rounded-pill small shadow-sm" style="z-index: 2;">
+                                    <i class="bi bi-images me-1"></i> {{ count($dest->gallery_images) + 1 }} Photos
                                 </span>
                             @endif
 
@@ -323,13 +406,14 @@
                                 <div class="col-6">
                                     <a href="{{ $dest->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($dest->name . ' Gubat Sorsogon') }}" 
                                        target="_blank" 
-                                       class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2 text-truncate">
+                                       class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2 text-truncate"
+                                       onclick="event.stopPropagation();">
                                         <i class="bi bi-map me-1"></i> Maps
                                     </a>
                                 </div>
                                 <div class="col-6">
                                     <button type="button" 
-                                            class="btn btn-primary btn-sm w-100 rounded-pill py-2 text-center text-truncate btn-quick-view fw-semibold"
+                                            class="btn btn-primary btn-sm w-100 rounded-pill py-2 text-center text-truncate btn-quick-view fw-semibold shadow-sm"
                                             data-bs-toggle="modal"
                                             data-bs-target="#spotQuickViewModal"
                                             style="background: var(--primary-color, #0F4C81); border:none;"
@@ -339,6 +423,7 @@
                                             data-badge-icon="{{ $badgeIcon }}"
                                             data-desc="{{ $dest->description }}"
                                             data-img="{{ $imgUrl }}"
+                                            data-gallery="{{ json_encode($dest->gallery_images ?? []) }}"
                                             data-location="{{ $dest->barangay->name ?? 'Gubat' }}, {{ $dest->municipality->name ?? 'Sorsogon' }}"
                                             data-rating="{{ number_format($dest->rating ?? 4.8, 1) }}"
                                             data-reviews="{{ $dest->reviews_count ?? 50 }}"
@@ -370,17 +455,54 @@
 {{-- ================================================================
      QUICK VIEW MODAL FOR DETAILED HISTORY & STORY
 ================================================================ --}}
+{{-- ================================================================
+     QUICK VIEW MODAL FOR DETAILED HISTORY, MULTI-PHOTOS & STORY
+================================================================ --}}
 <div class="modal fade" id="spotQuickViewModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content rounded-4 border-0 overflow-hidden shadow-lg">
-            <div class="position-relative" style="height: 280px; background: #0F4C81;">
-                <img id="modalImg" src="" alt="" class="w-100 h-100" style="object-fit: cover;">
-                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 p-2 bg-dark bg-opacity-50 rounded-circle" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);">
+            {{-- Main Enlarged Photo Hero Area --}}
+            <div class="position-relative bg-dark" style="height: 380px; overflow: hidden;">
+                <img id="modalImg" src="" alt="Destination Photo" class="w-100 h-100" style="object-fit: cover; transition: opacity 0.25s ease;">
+                
+                {{-- Close Button --}}
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 p-2 bg-dark bg-opacity-50 rounded-circle shadow" data-bs-dismiss="modal" aria-label="Close" style="z-index: 10;"></button>
+                
+                {{-- Prev / Next Photo Overlay Controls --}}
+                <button type="button" id="modalPrevPhotoBtn" class="btn btn-dark bg-opacity-50 text-white rounded-circle position-absolute top-50 start-0 translate-middle-y ms-3 p-0 d-none align-items-center justify-content-center shadow" style="width: 44px; height: 44px; z-index: 10;" title="Previous Photo">
+                    <i class="bi bi-chevron-left fs-5"></i>
+                </button>
+                <button type="button" id="modalNextPhotoBtn" class="btn btn-dark bg-opacity-50 text-white rounded-circle position-absolute top-50 end-0 translate-middle-y me-3 p-0 d-none align-items-center justify-content-center shadow" style="width: 44px; height: 44px; z-index: 10;" title="Next Photo">
+                    <i class="bi bi-chevron-right fs-5"></i>
+                </button>
+
+                {{-- Photo Counter Badge --}}
+                <div class="position-absolute top-0 start-0 m-3" style="z-index: 10;">
+                    <span id="modalPhotoCounter" class="badge bg-dark bg-opacity-75 text-white px-3 py-2 rounded-pill small fw-semibold shadow-sm d-none">
+                        <i class="bi bi-camera-fill me-1"></i> <span id="modalCurrentPhotoIndex">1</span> / <span id="modalTotalPhotosCount">1</span>
+                    </span>
+                </div>
+
+                {{-- Title & Category Gradient Overlay --}}
+                <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); z-index: 5;">
                     <span id="modalCategoryBadge" class="badge text-white px-3 py-1 rounded-pill mb-2 shadow-sm small"></span>
-                    <h3 id="modalTitle" class="text-white fw-bold mb-0 font-outfit"></h3>
+                    <h2 id="modalTitle" class="text-white fw-bold mb-0 font-outfit fs-3"></h2>
                 </div>
             </div>
+
+            {{-- Horizontal Mini-Tile Thumbnail Strip (Scrollable Left to Right) --}}
+            <div id="modalGalleryStripContainer" class="p-3 bg-light border-bottom d-none">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="small fw-bold text-dark">
+                        <i class="bi bi-images text-primary me-1"></i> Photo Gallery <small class="text-muted fw-normal">(Click thumbnail to view)</small>
+                    </span>
+                    <small class="text-muted"><i class="bi bi-arrow-left-right me-1"></i>Scroll left / right</small>
+                </div>
+                <div id="modalGalleryThumbnails" class="d-flex gap-2" style="overflow-x: auto; scroll-behavior: smooth; padding-bottom: 6px;">
+                    {{-- Mini tiles dynamically populated here --}}
+                </div>
+            </div>
+
             <div class="modal-body p-4 p-md-5">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-3 border-bottom gap-2">
                     <span class="text-muted small">
@@ -398,13 +520,14 @@
                 <h6 class="fw-bold text-dark mb-2">About this Destination</h6>
                 <p id="modalDesc" class="text-secondary mb-4" style="line-height: 1.7; font-size: 0.95rem;"></p>
 
-                <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                <div class="p-3 bg-light rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
                     <div>
                         <span class="fw-bold text-dark d-block small">Plan Your Visit</span>
                         <small class="text-muted">Coordinate with local tourism desks in Gubat for guiding services & transportation.</small>
                     </div>
-                    <a id="modalMapBtn" href="#" target="_blank" class="btn btn-primary rounded-pill px-4 fw-bold btn-sm shadow-sm">
-                        <i class="bi bi-compass me-1"></i> Open in Google Maps
+                    <a id="modalMapBtn" href="#" target="_blank" class="btn btn-primary rounded-pill fw-bold shadow-sm d-inline-flex align-items-center justify-content-center gap-2" style="height: 42px; padding: 0 1.4rem; font-size: 0.9rem;">
+                        <i class="bi bi-compass" style="font-size: 1rem; line-height: 1;"></i>
+                        <span>Open in Google Maps</span>
                     </a>
                 </div>
             </div>
@@ -516,20 +639,165 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Quick View Modal Population
-    document.querySelectorAll('.btn-quick-view').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.getElementById('modalTitle').textContent = this.getAttribute('data-title');
-            document.getElementById('modalDesc').textContent = this.getAttribute('data-desc');
-            document.getElementById('modalImg').src = this.getAttribute('data-img');
-            document.getElementById('modalLocation').textContent = this.getAttribute('data-location');
-            document.getElementById('modalRating').textContent = this.getAttribute('data-rating');
-            document.getElementById('modalReviews').textContent = '(' + this.getAttribute('data-reviews') + ' reviews)';
-            document.getElementById('modalMapBtn').href = this.getAttribute('data-map');
+    // Active photo state for modal gallery
+    let modalPhotosList = [];
+    let modalActivePhotoIdx = 0;
 
-            const badge = document.getElementById('modalCategoryBadge');
-            badge.textContent = this.getAttribute('data-category');
-            badge.style.backgroundColor = this.getAttribute('data-badge-bg');
+    const modalMainImg = document.getElementById('modalImg');
+    const modalPrevBtn = document.getElementById('modalPrevPhotoBtn');
+    const modalNextBtn = document.getElementById('modalNextPhotoBtn');
+    const modalCounterBadge = document.getElementById('modalPhotoCounter');
+    const modalCurrentIdxSpan = document.getElementById('modalCurrentPhotoIndex');
+    const modalTotalCountSpan = document.getElementById('modalTotalPhotosCount');
+    const modalGalleryStrip = document.getElementById('modalGalleryStripContainer');
+    const modalGalleryThumbs = document.getElementById('modalGalleryThumbnails');
+
+    function displayModalPhoto(index) {
+        if (!modalPhotosList.length) return;
+        modalActivePhotoIdx = (index + modalPhotosList.length) % modalPhotosList.length;
+        modalMainImg.style.opacity = '0.4';
+        setTimeout(() => {
+            modalMainImg.src = modalPhotosList[modalActivePhotoIdx];
+            modalMainImg.style.opacity = '1';
+        }, 120);
+
+        if (modalCurrentIdxSpan) modalCurrentIdxSpan.textContent = modalActivePhotoIdx + 1;
+
+        // Update active thumbnail borders
+        if (modalGalleryThumbs) {
+            Array.from(modalGalleryThumbs.children).forEach((thumb, idx) => {
+                if (idx === modalActivePhotoIdx) {
+                    thumb.style.borderColor = '#0F4C81';
+                    thumb.style.boxShadow = '0 0 0 2px rgba(15, 76, 129, 0.4)';
+                    thumb.style.transform = 'scale(1.05)';
+                    thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    thumb.style.borderColor = 'transparent';
+                    thumb.style.boxShadow = 'none';
+                    thumb.style.transform = 'scale(1)';
+                }
+            });
+        }
+    }
+
+    if (modalPrevBtn) {
+        modalPrevBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            displayModalPhoto(modalActivePhotoIdx - 1);
+        });
+    }
+
+    if (modalNextBtn) {
+        modalNextBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            displayModalPhoto(modalActivePhotoIdx + 1);
+        });
+    }
+
+    // Keyboard arrow keys navigation when modal is open
+    document.addEventListener('keydown', function (e) {
+        const modalEl = document.getElementById('spotQuickViewModal');
+        if (modalEl && modalEl.classList.contains('show') && modalPhotosList.length > 1) {
+            if (e.key === 'ArrowLeft') {
+                displayModalPhoto(modalActivePhotoIdx - 1);
+            } else if (e.key === 'ArrowRight') {
+                displayModalPhoto(modalActivePhotoIdx + 1);
+            }
+        }
+    });
+
+    // Populate modal when clicking either the card itself OR the "Explore" button
+    function openDestinationModal(target) {
+        const title = target.getAttribute('data-title');
+        const desc = target.getAttribute('data-desc');
+        const coverImg = target.getAttribute('data-img');
+        const loc = target.getAttribute('data-location');
+        const rating = target.getAttribute('data-rating');
+        const reviews = target.getAttribute('data-reviews');
+        const mapUrl = target.getAttribute('data-map');
+        const cat = target.getAttribute('data-category');
+        const badgeBg = target.getAttribute('data-badge-bg');
+
+        let rawGallery = target.getAttribute('data-gallery');
+        let galleryImgs = [];
+        try {
+            if (rawGallery) galleryImgs = JSON.parse(rawGallery);
+        } catch (err) {
+            galleryImgs = [];
+        }
+
+        // Build unique photo list: Cover photo + gallery photos
+        modalPhotosList = [];
+        if (coverImg) modalPhotosList.push(coverImg);
+        if (Array.isArray(galleryImgs)) {
+            galleryImgs.forEach(g => {
+                if (g && !modalPhotosList.includes(g)) {
+                    modalPhotosList.push(g.startsWith('http') ? g : ('/' + g.replace(/^\//, '')));
+                }
+            });
+        }
+
+        document.getElementById('modalTitle').textContent = title || '';
+        document.getElementById('modalDesc').textContent = desc || '';
+        document.getElementById('modalLocation').textContent = loc || '';
+        document.getElementById('modalRating').textContent = rating || '5.0';
+        document.getElementById('modalReviews').textContent = '(' + (reviews || '50') + ' reviews)';
+        document.getElementById('modalMapBtn').href = mapUrl || '#';
+
+        const badge = document.getElementById('modalCategoryBadge');
+        if (badge) {
+            badge.textContent = cat || 'Tourism Spot';
+            badge.style.backgroundColor = badgeBg || '#0F4C81';
+        }
+
+        // Populate thumbnails strip if more than 1 photo exists
+        if (modalGalleryThumbs) {
+            modalGalleryThumbs.replaceChildren();
+        }
+
+        if (modalPhotosList.length > 1) {
+            if (modalGalleryStrip) modalGalleryStrip.classList.remove('d-none');
+            if (modalPrevBtn) modalPrevBtn.classList.replace('d-none', 'd-flex');
+            if (modalNextBtn) modalNextBtn.classList.replace('d-none', 'd-flex');
+            if (modalCounterBadge) modalCounterBadge.classList.remove('d-none');
+            if (modalTotalCountSpan) modalTotalCountSpan.textContent = modalPhotosList.length;
+
+            modalPhotosList.forEach((pUrl, pIdx) => {
+                const thumbWrap = document.createElement('div');
+                thumbWrap.className = 'border rounded-3 p-1 bg-white shadow-sm flex-shrink-0';
+                thumbWrap.style.cssText = 'width: 85px; height: 60px; overflow: hidden; cursor: pointer; transition: all 0.2s ease; border-width: 2px;';
+                
+                const thumbImg = document.createElement('img');
+                thumbImg.src = pUrl;
+                thumbImg.className = 'w-100 h-100 rounded-2';
+                thumbImg.style.objectFit = 'cover';
+                thumbWrap.appendChild(thumbImg);
+
+                thumbWrap.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    displayModalPhoto(pIdx);
+                });
+
+                modalGalleryThumbs.appendChild(thumbWrap);
+            });
+        } else {
+            if (modalGalleryStrip) modalGalleryStrip.classList.add('d-none');
+            if (modalPrevBtn) modalPrevBtn.classList.replace('d-flex', 'd-none');
+            if (modalNextBtn) modalNextBtn.classList.replace('d-flex', 'd-none');
+            if (modalCounterBadge) modalCounterBadge.classList.add('d-none');
+        }
+
+        displayModalPhoto(0);
+    }
+
+    // Attach click listeners to cards and explore buttons
+    document.querySelectorAll('.destination-card-clickable, .btn-quick-view').forEach(function (el) {
+        el.addEventListener('click', function () {
+            // If the element clicked is the Explore button inside a card, prefer its data or parent card's data
+            const targetData = this.hasAttribute('data-title') ? this : this.closest('.destination-card-clickable');
+            if (targetData) {
+                openDestinationModal(targetData);
+            }
         });
     });
 
