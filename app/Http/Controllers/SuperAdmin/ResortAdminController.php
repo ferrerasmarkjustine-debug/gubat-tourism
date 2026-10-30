@@ -63,13 +63,17 @@ class ResortAdminController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'phone_number' => ['nullable', 'string', 'max:25', 'regex:/^((\+63)|0)?\s?9\d{2}[\s\-]?\d{3}[\s\-]?\d{4}$/'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'resort_id' => ['required', 'exists:resorts,id'],
+        ], [
+            'phone_number.regex' => 'Please enter a valid Philippine cellphone number (e.g. 0917 123 4567 or +63 917 123 4567).',
         ]);
 
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'] ?? null,
             'password' => Hash::make($validated['password']),
             'role' => 'resort_admin',
             'resort_id' => $validated['resort_id'],
@@ -106,13 +110,17 @@ class ResortAdminController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone_number' => ['nullable', 'string', 'max:25', 'regex:/^((\+63)|0)?\s?9\d{2}[\s\-]?\d{3}[\s\-]?\d{4}$/'],
             'resort_id' => ['required', 'exists:resorts,id'],
             'is_active' => ['required', 'boolean'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ], [
+            'phone_number.regex' => 'Please enter a valid Philippine cellphone number (e.g. 0917 123 4567 or +63 917 123 4567).',
         ]);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+        $user->phone_number = $validated['phone_number'] ?? null;
         $user->resort_id = $validated['resort_id'];
         $user->is_active = (bool) $validated['is_active'];
 

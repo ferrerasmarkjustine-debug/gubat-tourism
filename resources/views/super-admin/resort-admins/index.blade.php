@@ -80,7 +80,7 @@
                     <thead class="table-light">
                         <tr>
                             <th class="ps-4">Full Name</th>
-                            <th>Email Address</th>
+                            <th>Contact Details</th>
                             <th>Assigned Resort</th>
                             <th>Status</th>
                             <th>Date Created</th>
@@ -102,7 +102,20 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="text-dark">{{ $admin->email }}</span>
+                                    <div class="text-dark fw-semibold small">{{ $admin->email }}</div>
+                                    @if($admin->phone_number)
+                                        <div class="mt-1">
+                                            <a href="tel:{{ $admin->phone_number }}" class="text-decoration-none small text-success fw-medium d-inline-flex align-items-center">
+                                                <i class="bi bi-telephone-fill me-1"></i> {{ $admin->phone_number }}
+                                            </a>
+                                        </div>
+                                    @else
+                                        <div class="mt-1">
+                                            <span class="badge bg-warning bg-opacity-10 text-dark border border-warning" style="font-size: 0.72rem;">
+                                                <i class="bi bi-phone me-1"></i> No phone set
+                                            </span>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>
                                     @if($admin->resort)

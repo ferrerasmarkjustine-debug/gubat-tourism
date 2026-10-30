@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ResortAdmin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -50,5 +51,24 @@ class DashboardController extends Controller
             'availableUnitsToday',
             'fullyBookedRooms'
         ));
+    }
+
+    /**
+     * Update the logged in resort admin's cellphone number.
+     */
+    public function updatePhone(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'phone_number' => ['required', 'string', 'max:25', 'regex:/^((\+63)|0)?\s?9\d{2}[\s\-]?\d{3}[\s\-]?\d{4}$/'],
+        ], [
+            'phone_number.required' => 'Please provide your cellphone number.',
+            'phone_number.regex' => 'Please enter a valid Philippine cellphone number (e.g. 0917 123 4567 or +63 917 123 4567).',
+        ]);
+
+        $user = $request->user();
+        $user->phone_number = trim($validated['phone_number']);
+        $user->save();
+
+        return back()->with('success', 'Your cellphone number has been saved successfully!');
     }
 }

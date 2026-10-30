@@ -63,6 +63,7 @@ Route::middleware(['auth', 'resort_admin'])->prefix('resort-admin')->name('resor
     Route::post('/accommodations', [ResortAdminAccommodationController::class, 'store'])->name('accommodations.store');
     Route::get('/accommodations/{accommodation}/edit', [ResortAdminAccommodationController::class, 'edit'])->name('accommodations.edit');
     Route::put('/accommodations/{accommodation}', [ResortAdminAccommodationController::class, 'update'])->name('accommodations.update');
+    Route::post('/phone-number', [ResortAdminDashboardController::class, 'updatePhone'])->name('phone.update');
 });
 
 

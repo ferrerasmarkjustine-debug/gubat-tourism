@@ -99,6 +99,29 @@
                                 @enderror
                             </div>
 
+                            <!-- Cellphone Number -->
+                            <div class="mb-3">
+                                <label for="phone_number" class="form-label fw-semibold text-dark d-flex align-items-center justify-content-between">
+                                    <span>Cellphone Number</span>
+                                    <span class="badge bg-secondary-subtle text-secondary small fw-normal">Optional</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted fw-semibold">
+                                        🇵🇭 +63
+                                    </span>
+                                    <input type="tel" 
+                                           id="phone_number" 
+                                           name="phone_number" 
+                                           class="form-control @error('phone_number') is-invalid @enderror" 
+                                           placeholder="e.g. 0917 123 4567" 
+                                           value="{{ old('phone_number') }}">
+                                </div>
+                                <div class="form-text small">Philippine mobile number for tourism office alerts and direct communication.</div>
+                                @error('phone_number')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <!-- Assigned Resort -->
                             <div class="mb-4">
                                 <label for="resort_id" class="form-label fw-semibold text-dark">

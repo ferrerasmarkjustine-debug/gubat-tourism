@@ -4,6 +4,33 @@
 <div class="bg-light pb-5">
 
     <div class="container">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4 d-flex align-items-center" role="alert">
+                <i class="bi bi-check-circle-fill fs-5 me-2 text-success"></i>
+                <div>{{ session('success') }}</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if(empty($user->phone_number))
+            <div class="alert alert-warning border-0 rounded-4 shadow-sm p-3 mb-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle bg-warning bg-opacity-25 p-2 text-dark flex-shrink-0">
+                        <i class="bi bi-telephone-plus-fill fs-4 text-warning"></i>
+                    </div>
+                    <div>
+                        <strong class="text-dark d-block">Add Your Philippine Cellphone Number</strong>
+                        <span class="text-muted small">Please provide your mobile number so the LGU Tourism Office and guests can reach you regarding bookings and municipal advisories.</span>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-warning rounded-pill px-4 fw-semibold text-dark text-nowrap shadow-sm" data-bs-toggle="modal" data-bs-target="#updatePhoneModal">
+                        <i class="bi bi-plus-circle me-1"></i> Add Mobile Number
+                    </button>
+                </div>
+            </div>
+        @endif
+
         @if(!$resort)
             <div class="alert alert-warning rounded-4 shadow-sm p-4 text-center">
                 <i class="bi bi-exclamation-triangle fs-1 text-warning d-block mb-2"></i>
@@ -38,6 +65,15 @@
                                     <i class="bi bi-shield-check text-success me-1"></i>
                                     <span class="text-success fw-semibold">{{ $resort->is_lgu_approved ? 'LGU Accredited' : 'Pending Review' }}</span>
                                 </span>
+                                @if($user->phone_number)
+                                    <span class="d-flex align-items-center text-dark">
+                                        <i class="bi bi-telephone-fill text-success me-2"></i>
+                                        Mobile: <strong class="ms-1">{{ $user->phone_number }}</strong>
+                                        <button type="button" class="btn btn-link btn-sm text-muted p-0 ms-2 text-decoration-none" data-bs-toggle="modal" data-bs-target="#updatePhoneModal" title="Edit mobile number">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    </span>
+                                @endif
                             </div>
                         </div>
                         <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
@@ -198,6 +234,51 @@
                 </div>
             </div>
         @endif
+    </div>
+</div>
+
+<!-- Modal: Update Cellphone Number -->
+<div class="modal fade" id="updatePhoneModal" tabindex="-1" aria-labelledby="updatePhoneModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom px-4 pt-4 pb-3">
+                <h5 class="modal-title fw-bold text-dark d-flex align-items-center" id="updatePhoneModalLabel">
+                    <i class="bi bi-telephone-fill text-primary me-2"></i> {{ empty($user->phone_number) ? 'Add Cellphone Number' : 'Update Cellphone Number' }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ route('resort.phone.update') }}">
+                @csrf
+                <div class="modal-body px-4 py-3">
+                    <p class="text-muted small mb-3">
+                        Enter your active Philippine mobile number. This will be used for urgent municipal tourism notices and guest booking verifications.
+                    </p>
+                    <div class="mb-3">
+                        <label for="phone_input" class="form-label small fw-bold text-muted">Philippine Mobile Number <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted fw-semibold">🇵🇭 +63</span>
+                            <input type="tel" 
+                                   id="phone_input" 
+                                   name="phone_number" 
+                                   class="form-control @error('phone_number') is-invalid @enderror" 
+                                   placeholder="e.g. 0917 123 4567" 
+                                   value="{{ old('phone_number', $user->phone_number) }}" 
+                                   required>
+                        </div>
+                        <div class="form-text small text-muted">Accepts 11-digit numbers (09XXXXXXXXX) or +63 9XXXXXXXXX.</div>
+                        @error('phone_number')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="modal-footer border-top px-4 py-3 bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Save Cellphone Number
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection
