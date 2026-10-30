@@ -40,36 +40,28 @@
             </div>
         @endif
 
-        <!-- Filter & Search Toolbar -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-            <div class="card-body p-3">
-                <form method="GET" action="{{ route('admin.resort-admins.index') }}" class="row g-2 align-items-center">
-                    <div class="col-md-5">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0 text-muted">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, email, or resort..." value="{{ request('search') }}">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <select name="status" class="form-select">
-                            <option value="">All Statuses</option>
-                            <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active Only</option>
-                            <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Deactivated Only</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-outline-primary rounded-pill px-3">
-                            <i class="bi bi-funnel me-1"></i> Filter
-                        </button>
-                        @if(request()->hasAny(['search', 'status']))
-                            <a href="{{ route('admin.resort-admins.index') }}" class="btn btn-outline-secondary rounded-pill px-3">
-                                Reset
-                            </a>
-                        @endif
-                    </div>
-                </form>
+        <!-- Page-Specific Live Table Search & Quick Filter Toolbar -->
+        <div class="card border-0 shadow-sm rounded-4 mb-3 bg-white p-3">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+                <div class="position-relative flex-grow-1" style="max-width: 520px;">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input type="text" id="adminSearchInput" class="form-control rounded-pill ps-5 pe-5 py-2 border bg-light bg-opacity-50"
+                           placeholder="Search resort admins by name, email, phone, or assigned resort..." autocomplete="off">
+                    <button type="button" id="adminSearchClear" class="btn btn-sm btn-link text-muted position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-decoration-none" style="display: none;" title="Clear search">
+                        <i class="bi bi-x-circle-fill fs-5"></i>
+                    </button>
+                </div>
+                <div class="small text-muted" id="adminSearchCounter">
+                    Showing <strong class="text-dark">{{ count($resortAdmins) }}</strong> of <strong class="text-dark">{{ count($resortAdmins) }}</strong> records
+                </div>
+            </div>
+
+            <!-- Quick Filter Pills -->
+            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-3 pt-2 border-top">
+                <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Filters:</span>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold admin-filter-pill active btn-primary text-white" data-filter="all">All</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted admin-filter-pill" data-filter="active">Active Accounts</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted admin-filter-pill" data-filter="inactive">Deactivated</button>
             </div>
         </div>
 
@@ -87,25 +79,28 @@
                             <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="resortAdminsTableBody">
                         @forelse($resortAdmins as $admin)
-                            <tr>
+                            <tr class="admin-row"
+                                data-search="{{ strtolower($admin->name . ' ' . $admin->email . ' ' . ($admin->phone_number ?? '') . ' ' . ($admin->resort ? $admin->resort->name : 'unassigned') . ' ' . ($admin->is_active ? 'active' : 'inactive')) }}"
+                                data-category="{{ $admin->is_active ? 'active' : 'inactive' }}"
+                                data-status="{{ $admin->is_active ? 'active' : 'inactive' }}">
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center">
                                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2 fw-bold" style="width: 38px; height: 38px; font-size: 0.95rem;">
                                             {{ strtoupper(substr($admin->name, 0, 1)) }}
                                         </div>
                                         <div>
-                                            <div class="fw-semibold text-dark">{{ $admin->name }}</div>
+                                            <div class="fw-semibold text-dark admin-highlight-target">{{ $admin->name }}</div>
                                             <small class="text-muted">Resort Admin</small>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="text-dark fw-semibold small">{{ $admin->email }}</div>
+                                    <div class="text-dark fw-semibold small admin-highlight-target">{{ $admin->email }}</div>
                                     @if($admin->phone_number)
                                         <div class="mt-1">
-                                            <a href="tel:{{ $admin->phone_number }}" class="text-decoration-none small text-success fw-medium d-inline-flex align-items-center">
+                                            <a href="tel:{{ $admin->phone_number }}" class="text-decoration-none small text-success fw-medium d-inline-flex align-items-center admin-highlight-target">
                                                 <i class="bi bi-telephone-fill me-1"></i> {{ $admin->phone_number }}
                                             </a>
                                         </div>
@@ -120,7 +115,7 @@
                                 <td>
                                     @if($admin->resort)
                                         <div class="d-flex align-items-center">
-                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-1 rounded-pill">
+                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-1 rounded-pill admin-highlight-target">
                                                 <i class="bi bi-building me-1"></i> {{ $admin->resort->name }}
                                             </span>
                                         </div>
@@ -176,6 +171,18 @@
                                 </td>
                             </tr>
                         @endforelse
+
+                        {{-- Friendly Live Search Empty State --}}
+                        <tr id="adminSearchEmptyRow" class="empty-state-row" style="display: none;">
+                            <td colspan="6" class="text-center py-5 bg-white">
+                                <i class="bi bi-search text-muted display-6 d-block mb-2"></i>
+                                <h6 class="fw-bold text-dark">No records found matching <span class="empty-state-term text-primary"></span></h6>
+                                <p class="text-muted small mb-3">Try adjusting your search terms or clearing the active filters.</p>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="resetSearch_adminSearchInput()">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Search
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -188,4 +195,19 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initLiveTableFilter({
+        inputId: 'adminSearchInput',
+        clearBtnId: 'adminSearchClear',
+        counterId: 'adminSearchCounter',
+        emptyStateId: 'adminSearchEmptyRow',
+        containerId: 'resortAdminsTableBody',
+        rowSelector: 'tr.admin-row',
+        pillSelector: '.admin-filter-pill',
+        highlightSelector: '.admin-highlight-target'
+    });
+});
+</script>
 @endsection

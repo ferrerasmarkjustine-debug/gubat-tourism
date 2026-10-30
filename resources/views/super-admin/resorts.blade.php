@@ -34,6 +34,34 @@
             </div>
         </div>
 
+        <!-- Page-Specific Live Table Search & Quick Filter Toolbar -->
+        <div class="card border-0 shadow-sm rounded-4 mb-3 bg-white p-3">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+                <div class="position-relative flex-grow-1" style="max-width: 520px;">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input type="text" id="resortSearchInput" class="form-control rounded-pill ps-5 pe-5 py-2 border bg-light bg-opacity-50"
+                           placeholder="Search resorts by name, barangay, category, address, or admin..." autocomplete="off">
+                    <button type="button" id="resortSearchClear" class="btn btn-sm btn-link text-muted position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-decoration-none" style="display: none;" title="Clear search">
+                        <i class="bi bi-x-circle-fill fs-5"></i>
+                    </button>
+                </div>
+                <div class="small text-muted" id="resortSearchCounter">
+                    Showing <strong class="text-dark">{{ count($resorts) }}</strong> of <strong class="text-dark">{{ count($resorts) }}</strong> records
+                </div>
+            </div>
+
+            <!-- Quick Filter Pills -->
+            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-3 pt-2 border-top">
+                <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Filters:</span>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold resort-filter-pill active btn-primary text-white" data-filter="all">All</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="luxury">Luxury</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="eco">Eco-Lodge</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="budget">Budget</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="accredited">Accredited</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="pending">Pending</button>
+            </div>
+        </div>
+
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -48,9 +76,12 @@
                             <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="resortsTableBody">
                         @forelse($resorts as $resort)
-                            <tr>
+                            <tr class="resort-row"
+                                data-search="{{ strtolower($resort->name . ' ' . ($resort->barangay ? $resort->barangay->name : 'gubat') . ' ' . $resort->category . ' ' . $resort->address . ' ' . $resort->admins->pluck('name')->implode(' ') . ' ' . ($resort->is_lgu_approved ? 'accredited' : 'pending')) }}"
+                                data-category="{{ strtolower($resort->category) }}"
+                                data-status="{{ $resort->is_lgu_approved ? 'accredited' : 'pending' }}">
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center gap-3">
                                         <img src="{{ \Illuminate\Support\Str::startsWith($resort->image_url ?? '', ['http://', 'https://']) ? $resort->image_url : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg') }}"
@@ -58,8 +89,8 @@
                                              class="rounded-3 shadow-sm"
                                              style="width: 50px; height: 50px; object-fit: cover;">
                                         <div>
-                                            <div class="fw-bold text-dark">{{ $resort->name }}</div>
-                                            <small class="text-muted">{{ $resort->address ?? 'Gubat, Sorsogon' }}</small>
+                                            <div class="fw-bold text-dark resort-highlight-target">{{ $resort->name }}</div>
+                                            <small class="text-muted resort-highlight-target">{{ $resort->address ?? 'Gubat, Sorsogon' }}</small>
                                             @if(!empty($resort->gallery_images) && count($resort->gallery_images) > 0)
                                                 <span class="badge bg-secondary-subtle text-secondary small ms-1">
                                                     <i class="bi bi-images me-1"></i>{{ count($resort->gallery_images) }} gallery photos
@@ -69,11 +100,11 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-info bg-opacity-10 text-info border border-info px-3 py-1 rounded-pill">
+                                    <span class="badge bg-info bg-opacity-10 text-info border border-info px-3 py-1 rounded-pill resort-highlight-target">
                                         {{ ucfirst($resort->category) }}
                                     </span>
                                 </td>
-                                <td>{{ $resort->barangay ? $resort->barangay->name : 'Gubat Proper' }}</td>
+                                <td class="resort-highlight-target">{{ $resort->barangay ? $resort->barangay->name : 'Gubat Proper' }}</td>
                                 <td>
                                     @if($resort->is_lgu_approved)
                                         <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-1 rounded-pill">
@@ -95,10 +126,10 @@
                                     @if($resort->admins->isNotEmpty())
                                         @foreach($resort->admins as $admin)
                                             <div class="d-flex align-items-center mb-1">
-                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1 rounded-pill me-1">
+                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-2 py-1 rounded-pill me-1 resort-highlight-target">
                                                     <i class="bi bi-person-check me-1"></i> {{ $admin->name }}
                                                 </span>
-                                                <small class="text-muted">({{ $admin->email }})</small>
+                                                <small class="text-muted resort-highlight-target">({{ $admin->email }})</small>
                                             </div>
                                         @endforeach
                                     @else
@@ -270,6 +301,18 @@
                                 <td colspan="7" class="text-center py-4 text-muted">No resorts found.</td>
                             </tr>
                         @endforelse
+
+                        {{-- Friendly Live Search Empty State --}}
+                        <tr id="resortSearchEmptyRow" class="empty-state-row" style="display: none;">
+                            <td colspan="7" class="text-center py-5 bg-white">
+                                <i class="bi bi-search text-muted display-6 d-block mb-2"></i>
+                                <h6 class="fw-bold text-dark">No records found matching <span class="empty-state-term text-primary"></span></h6>
+                                <p class="text-muted small mb-3">Try adjusting your search terms or clearing the active filters.</p>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="resetSearch_resortSearchInput()">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Search
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -310,6 +353,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+    });
+
+    // Initialize Level A live table search for Resorts
+    initLiveTableFilter({
+        inputId: 'resortSearchInput',
+        clearBtnId: 'resortSearchClear',
+        counterId: 'resortSearchCounter',
+        emptyStateId: 'resortSearchEmptyRow',
+        containerId: 'resortsTableBody',
+        rowSelector: 'tr.resort-row',
+        pillSelector: '.resort-filter-pill',
+        highlightSelector: '.resort-highlight-target'
     });
 });
 </script>

@@ -43,6 +43,34 @@
             </div>
         @endif
 
+        <!-- Page-Specific Live Table Search & Quick Filter Toolbar -->
+        <div class="card border-0 shadow-sm rounded-4 mb-3 bg-white p-3">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+                <div class="position-relative flex-grow-1" style="max-width: 520px;">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input type="text" id="destSearchInput" class="form-control rounded-pill ps-5 pe-5 py-2 border bg-light bg-opacity-50"
+                           placeholder="Search destinations by name, category, municipality, or description..." autocomplete="off">
+                    <button type="button" id="destSearchClear" class="btn btn-sm btn-link text-muted position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-decoration-none" style="display: none;" title="Clear search">
+                        <i class="bi bi-x-circle-fill fs-5"></i>
+                    </button>
+                </div>
+                <div class="small text-muted" id="destSearchCounter">
+                    Showing <strong class="text-dark">{{ count($destinations) }}</strong> of <strong class="text-dark">{{ count($destinations) }}</strong> records
+                </div>
+            </div>
+
+            <!-- Quick Filter Pills -->
+            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-3 pt-2 border-top">
+                <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Filters:</span>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold dest-filter-pill active btn-primary text-white" data-filter="all">All</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="beach">Beach</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="eco">Ecotourism</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="historical">Historical</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="cultural">Cultural</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="featured">Featured</button>
+            </div>
+        </div>
+
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -56,19 +84,22 @@
                             <th class="text-end pe-4" style="min-width: 220px;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="destinationsTableBody">
                         @forelse($destinations as $dest)
-                            <tr>
+                            <tr class="dest-row"
+                                data-search="{{ strtolower($dest->name . ' ' . $dest->category . ' ' . ($dest->municipality ? $dest->municipality->name : 'gubat') . ' ' . $dest->barangay_name . ' ' . $dest->description . ' ' . ($dest->featured ? 'featured' : 'standard')) }}"
+                                data-category="{{ strtolower($dest->category) }}"
+                                data-status="{{ $dest->featured ? 'featured' : 'standard' }}">
                                 <td class="ps-4">
-                                    <div class="fw-bold text-dark">{{ $dest->name }}</div>
-                                    <small class="text-muted">{{ Str::limit($dest->description, 60) }}</small>
+                                    <div class="fw-bold text-dark dest-highlight-target">{{ $dest->name }}</div>
+                                    <small class="text-muted dest-highlight-target">{{ Str::limit($dest->description, 60) }}</small>
                                 </td>
                                 <td>
-                                    <span class="badge bg-secondary bg-opacity-10 text-dark border px-3 py-1 rounded-pill">
+                                    <span class="badge bg-secondary bg-opacity-10 text-dark border px-3 py-1 rounded-pill dest-highlight-target">
                                         {{ $dest->category }}
                                     </span>
                                 </td>
-                                <td>{{ $dest->municipality ? $dest->municipality->name : 'Gubat' }}</td>
+                                <td class="dest-highlight-target">{{ $dest->municipality ? $dest->municipality->name : 'Gubat' }}</td>
                                 <td>
                                     <span class="text-warning fw-semibold">
                                         <i class="bi bi-star-fill text-warning me-1"></i>{{ number_format($dest->rating, 1) }}
@@ -122,6 +153,18 @@
                                 <td colspan="6" class="text-center py-4 text-muted">No destinations recorded.</td>
                             </tr>
                         @endforelse
+
+                        {{-- Friendly Live Search Empty State --}}
+                        <tr id="destSearchEmptyRow" class="empty-state-row" style="display: none;">
+                            <td colspan="6" class="text-center py-5 bg-white">
+                                <i class="bi bi-search text-muted display-6 d-block mb-2"></i>
+                                <h6 class="fw-bold text-dark">No records found matching <span class="empty-state-term text-primary"></span></h6>
+                                <p class="text-muted small mb-3">Try adjusting your search terms or clearing the active filters.</p>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="resetSearch_destSearchInput()">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Search
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -521,6 +564,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
+    });
+
+    // Initialize Level A live table search for Destinations
+    initLiveTableFilter({
+        inputId: 'destSearchInput',
+        clearBtnId: 'destSearchClear',
+        counterId: 'destSearchCounter',
+        emptyStateId: 'destSearchEmptyRow',
+        containerId: 'destinationsTableBody',
+        rowSelector: 'tr.dest-row',
+        pillSelector: '.dest-filter-pill',
+        highlightSelector: '.dest-highlight-target'
     });
 });
 </script>

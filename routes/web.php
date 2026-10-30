@@ -75,6 +75,7 @@ Route::middleware(['auth', 'resort_admin'])->prefix('resort-admin')->name('resor
 
 Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/global-search', [SuperAdminDashboardController::class, 'globalSearch'])->name('global-search');
 
     // Resorts Management
     Route::get('/resorts', [SuperAdminResortController::class, 'index'])->name('resorts');

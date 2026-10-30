@@ -107,6 +107,34 @@
             </div>
         </div>
 
+        <!-- Page-Specific Live Table Search & Quick Filter Toolbar -->
+        <div class="card border-0 shadow-sm rounded-4 mb-3 bg-white p-3">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+                <div class="position-relative flex-grow-1" style="max-width: 520px;">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                    <input type="text" id="craftSearchInput" class="form-control rounded-pill ps-5 pe-5 py-2 border bg-light bg-opacity-50"
+                           placeholder="Search crafts by guild name, category, barangay, or products..." autocomplete="off">
+                    <button type="button" id="craftSearchClear" class="btn btn-sm btn-link text-muted position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-decoration-none" style="display: none;" title="Clear search">
+                        <i class="bi bi-x-circle-fill fs-5"></i>
+                    </button>
+                </div>
+                <div class="small text-muted" id="craftSearchCounter">
+                    Showing <strong class="text-dark">{{ $crafts->count() }}</strong> of <strong class="text-dark">{{ $crafts->count() }}</strong> records
+                </div>
+            </div>
+
+            <!-- Quick Filter Pills -->
+            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-3 pt-2 border-top">
+                <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Filters:</span>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold craft-filter-pill active btn-primary text-white" data-filter="all">All</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted craft-filter-pill" data-filter="abaca">Abaca</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted craft-filter-pill" data-filter="pottery">Pottery</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted craft-filter-pill" data-filter="culinary">Delicacies</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted craft-filter-pill" data-filter="souvenir">Souvenirs</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted craft-filter-pill" data-filter="featured">Featured</button>
+            </div>
+        </div>
+
         {{-- Crafts Table Card --}}
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
             <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
@@ -126,9 +154,12 @@
                             <th class="text-end pe-4" style="min-width: 150px;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="craftsTableBody">
                         @forelse($crafts as $craft)
-                            <tr>
+                            <tr class="craft-row"
+                                data-search="{{ strtolower($craft->name . ' ' . $craft->category_name . ' ' . $craft->category_slug . ' ' . ($craft->barangay ?? 'gubat') . ' ' . $craft->address . ' ' . (is_array($craft->products) ? implode(' ', $craft->products) : '') . ' ' . ($craft->is_featured ? 'featured' : 'standard')) }}"
+                                data-category="{{ strtolower($craft->category_slug . ' ' . $craft->category_name) }}"
+                                data-status="{{ $craft->is_featured ? 'featured' : 'standard' }}">
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center gap-3">
                                         <div style="width: 60px; height: 60px; border-radius: 12px; overflow: hidden; background-color: #f1f3f5; flex-shrink: 0;" class="border shadow-sm">
@@ -141,9 +172,9 @@
                                             @endif
                                         </div>
                                         <div>
-                                            <div class="fw-bold text-dark fs-6">{{ $craft->name }}</div>
+                                            <div class="fw-bold text-dark fs-6 craft-highlight-target">{{ $craft->name }}</div>
                                             @if($craft->highlight)
-                                                <span class="badge bg-light text-dark border small py-1 px-2 rounded-pill">
+                                                <span class="badge bg-light text-dark border small py-1 px-2 rounded-pill craft-highlight-target">
                                                     <i class="bi bi-star-fill text-warning me-1"></i>{{ $craft->highlight }}
                                                 </span>
                                             @endif
@@ -156,13 +187,13 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge text-white px-3 py-2 rounded-pill fw-semibold shadow-sm" style="background-color: {{ $craft->badge_color ?? '#8D6E63' }}; font-size: 0.8rem;">
+                                    <span class="badge text-white px-3 py-2 rounded-pill fw-semibold shadow-sm craft-highlight-target" style="background-color: {{ $craft->badge_color ?? '#8D6E63' }}; font-size: 0.8rem;">
                                         {{ $craft->category_name }}
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="small fw-semibold text-dark">Brgy. {{ $craft->barangay ?? 'Gubat' }}</div>
-                                    <div class="small text-muted">{{ $craft->address }}</div>
+                                    <div class="small fw-semibold text-dark craft-highlight-target">Brgy. {{ $craft->barangay ?? 'Gubat' }}</div>
+                                    <div class="small text-muted craft-highlight-target">{{ $craft->address }}</div>
                                     @if($craft->google_map_url)
                                         <a href="{{ $craft->google_map_url }}" target="_blank" class="small text-primary text-decoration-none">
                                             <i class="bi bi-geo-alt me-1"></i>Map Pin
@@ -424,6 +455,18 @@
                                 </td>
                             </tr>
                         @endforelse
+
+                        {{-- Friendly Live Search Empty State --}}
+                        <tr id="craftSearchEmptyRow" class="empty-state-row" style="display: none;">
+                            <td colspan="6" class="text-center py-5 bg-white">
+                                <i class="bi bi-search text-muted display-6 d-block mb-2"></i>
+                                <h6 class="fw-bold text-dark">No records found matching <span class="empty-state-term text-primary"></span></h6>
+                                <p class="text-muted small mb-3">Try adjusting your search terms or clearing the active filters.</p>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="resetSearch_craftSearchInput()">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Search
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -680,6 +723,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
+    });
+
+    // Initialize Level A live table search for Crafts
+    initLiveTableFilter({
+        inputId: 'craftSearchInput',
+        clearBtnId: 'craftSearchClear',
+        counterId: 'craftSearchCounter',
+        emptyStateId: 'craftSearchEmptyRow',
+        containerId: 'craftsTableBody',
+        rowSelector: 'tr.craft-row',
+        pillSelector: '.craft-filter-pill',
+        highlightSelector: '.craft-highlight-target'
     });
 });
 </script>
