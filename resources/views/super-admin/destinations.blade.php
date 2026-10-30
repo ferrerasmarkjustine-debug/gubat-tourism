@@ -17,7 +17,10 @@
                 <h2 class="fw-bold mb-1" style="color: var(--primary-color);">Destinations Management</h2>
                 <p class="text-muted mb-0">Manage municipal destinations, surf camps, and historical spots across Gubat.</p>
             </div>
-            <div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-success rounded-pill px-4 shadow-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#createDestinationModal">
+                    <i class="bi bi-plus-circle me-1"></i> Add Destination
+                </button>
                 <a href="{{ route('destinations') }}" class="btn btn-outline-primary rounded-pill px-4">
                     <i class="bi bi-eye me-1"></i> Public Destinations
                 </a>
@@ -124,10 +127,81 @@
             </div>
 
             @if($destinations->hasPages())
-                <div class="card-footer bg-white border-top py-3 px-4">
-                    {{ $destinations->links() }}
+                <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-center">
+                    {{ $destinations->links('pagination::bootstrap-5') }}
                 </div>
             @endif
+        </div>
+    </div>
+</div>
+
+{{-- Create Destination Modal --}}
+<div class="modal fade" id="createDestinationModal" tabindex="-1" aria-labelledby="createDestinationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom px-4 pt-4 pb-3">
+                <h5 class="modal-title fw-bold text-dark d-flex align-items-center" id="createDestinationModalLabel">
+                    <i class="bi bi-geo-alt-fill text-success me-2"></i> Add New Tourist Destination
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ route('admin.destinations.store') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body px-4 py-3">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted">Destination Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control rounded-3" placeholder="e.g. Dancalan Beach Eco-Park" value="{{ old('name') }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
+                            <input type="text" name="category" list="categoryOptionsNew" class="form-control rounded-3" placeholder="Select or type..." value="{{ old('category') }}" required>
+                            <datalist id="categoryOptionsNew">
+                                <option value="Surf Haven">
+                                <option value="Public Beach">
+                                <option value="Heritage Landmark">
+                                <option value="Century-Old Church">
+                                <option value="Traditional Pottery">
+                                <option value="Livelihood Center">
+                                <option value="Historical Heritage">
+                                <option value="Eco-Tourism Site">
+                                <option value="Nature Reserve">
+                            </datalist>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted">Description</label>
+                            <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Describe the destination highlights, activities, views, and visitor attractions...">{{ old('description') }}</textarea>
+                        </div>
+                        <div class="col-12">
+                            @include('partials.image-uploader', [
+                                'id' => 'dest_create',
+                                'label' => 'Destination Photo',
+                                'currentImage' => old('image_url'),
+                                'helperText' => 'Select a photo of this destination from your computer (JPG, PNG, WebP up to 5MB).'
+                            ])
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted">Google Maps Pin URL</label>
+                            <input type="url" name="google_map_url" class="form-control rounded-3" value="{{ old('google_map_url') }}" placeholder="https://maps.google.com/...">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" name="featured" id="featuredCheckNew" value="1" {{ old('featured') ? 'checked' : '' }}>
+                                <label class="form-check-label fw-semibold text-dark" for="featuredCheckNew">
+                                    Feature this destination
+                                </label>
+                                <div class="form-text text-muted small">Featured destinations appear prominently on the public homepage and featured spots section.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top px-4 py-3 bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm">
+                        <i class="bi bi-check-lg me-1"></i> Save Destination
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

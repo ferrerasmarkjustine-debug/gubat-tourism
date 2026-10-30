@@ -27,6 +27,39 @@ class DestinationController extends Controller
     }
 
     /**
+     * Store a newly created destination.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name'           => ['required', 'string', 'max:255'],
+            'category'       => ['required', 'string', 'max:100'],
+            'description'    => ['nullable', 'string', 'max:2000'],
+            'image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'image_url'      => ['nullable', 'string', 'max:500'],
+            'google_map_url' => ['nullable', 'url', 'max:500'],
+            'featured'       => ['nullable'],
+        ]);
+
+        $finalImageUrl = $this->handleImageUpload($request, 'destinations')
+            ?: 'images/destinations/rizal_beach.jpg';
+
+        $destination = Destination::create([
+            'municipality_id' => 1, // Default to Gubat
+            'name'            => $validated['name'],
+            'category'        => $validated['category'],
+            'description'     => $validated['description'] ?? null,
+            'image_url'       => $finalImageUrl,
+            'rating'          => 5.0,
+            'reviews_count'   => 0,
+            'google_map_url'  => $validated['google_map_url'] ?? null,
+            'featured'        => $request->has('featured'),
+        ]);
+
+        return back()->with('success', "New destination '{$destination->name}' has been added successfully!");
+    }
+
+    /**
      * Update the specified destination.
      */
     public function update(Request $request, Destination $destination): RedirectResponse

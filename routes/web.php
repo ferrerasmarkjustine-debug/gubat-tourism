@@ -87,7 +87,9 @@ Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.'
 
     // Destinations management
     Route::get('/destinations', [SuperAdminDestinationController::class, 'index'])->name('destinations');
+    Route::post('/destinations', [SuperAdminDestinationController::class, 'store'])->name('destinations.store');
     Route::put('/destinations/{destination}', [SuperAdminDestinationController::class, 'update'])->name('destinations.update');
+    Route::delete('/destinations/{destination}', [SuperAdminDestinationController::class, 'destroy'])->name('destinations.destroy');
     Route::patch('/destinations/{destination}/toggle-featured', [SuperAdminDestinationController::class, 'toggleFeatured'])->name('destinations.toggle-featured');
 
     // Reservations overview
