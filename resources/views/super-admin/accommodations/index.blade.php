@@ -91,7 +91,7 @@
                         <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 bg-white">
                             <div class="row g-0 h-100">
                                 <div class="col-md-5 position-relative">
-                                    <img src="{{ $acc->image_url ?: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80' }}"
+                                    <img src="{{ $acc->image_url ? (str_starts_with($acc->image_url, 'http') ? $acc->image_url : asset($acc->image_url)) : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80' }}"
                                          alt="{{ $acc->name }}"
                                          class="w-100 h-100"
                                          style="object-fit: cover; min-height: 220px;">

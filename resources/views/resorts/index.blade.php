@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="card card-tourism h-100">
                         <div class="card-tourism-img-wrapper">
                             <span class="badge bg-success text-white card-badge">From ₱{{ number_format($minPrice) }} / night</span>
-                            <img src="{{ asset($resort->image_url) }}" alt="{{ $resort->name }}">
+                            <img src="{{ \Illuminate\Support\Str::startsWith($resort->image_url ?? '', ['http://', 'https://']) ? $resort->image_url : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg') . '?v=2' }}" alt="{{ $resort->name }}">
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-center mb-2">

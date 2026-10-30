@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Resort;
 use App\Models\Barangay;
 use App\Models\User;
+use App\Traits\HandlesImageUpload;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class ResortController extends Controller
 {
+    use HandlesImageUpload;
+
     /**
      * Display the LGU Admin Resorts page.
      */
@@ -49,11 +52,15 @@ class ResortController extends Controller
             'category'        => ['required', 'string', 'in:luxury,eco,homestay,budget'],
             'address'         => ['nullable', 'string', 'max:255'],
             'description'     => ['nullable', 'string', 'max:2000'],
+            'image'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'image_url'       => ['nullable', 'url', 'max:500'],
             'google_map_url'  => ['nullable', 'url', 'max:500'],
             'is_lgu_approved' => ['nullable', 'boolean'],
             'admin_user_id'   => ['nullable', 'exists:users,id'],
         ]);
+
+        $finalImageUrl = $this->handleImageUpload($request, 'resorts')
+            ?: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80';
 
         $resort = Resort::create([
             'name'            => $validated['name'],
@@ -61,7 +68,7 @@ class ResortController extends Controller
             'category'        => $validated['category'],
             'address'         => $validated['address'] ?? null,
             'description'     => $validated['description'] ?? null,
-            'image_url'       => $validated['image_url'] ?: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80',
+            'image_url'       => $finalImageUrl,
             'google_map_url'  => $validated['google_map_url'] ?? null,
             'is_lgu_approved' => $request->boolean('is_lgu_approved', true),
             'rating'          => 5.0,

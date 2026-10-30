@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Announcement;
 use App\Models\Event;
 use App\Models\Municipality;
+use App\Traits\HandlesImageUpload;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class EventController extends Controller
 {
+    use HandlesImageUpload;
+
     /**
      * Display the Events and Announcements management page.
      */
@@ -40,10 +43,13 @@ class EventController extends Controller
             'location'        => ['required', 'string', 'max:255'],
             'description'     => ['nullable', 'string', 'max:2000'],
             'municipality_id' => ['nullable', 'exists:municipalities,id'],
+            'image'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'image_url'       => ['nullable', 'string', 'max:500'],
         ]);
 
         $validated['municipality_id'] = $validated['municipality_id'] ?? 1; // Default to Gubat
+        $validated['image_url'] = $this->handleImageUpload($request, 'events');
+        unset($validated['image']);
 
         Event::create($validated);
 
@@ -61,10 +67,13 @@ class EventController extends Controller
             'location'        => ['required', 'string', 'max:255'],
             'description'     => ['nullable', 'string', 'max:2000'],
             'municipality_id' => ['nullable', 'exists:municipalities,id'],
+            'image'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'image_url'       => ['nullable', 'string', 'max:500'],
         ]);
 
         $validated['municipality_id'] = $validated['municipality_id'] ?? $event->municipality_id ?? 1;
+        $validated['image_url'] = $this->handleImageUpload($request, 'events', $event->image_url) ?? $event->image_url;
+        unset($validated['image']);
 
         $event->update($validated);
 
@@ -92,10 +101,13 @@ class EventController extends Controller
             'category'     => ['required', 'string', 'max:100'],
             'content'      => ['required', 'string', 'max:2000'],
             'published_at' => ['nullable', 'date'],
+            'image'        => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'image_url'    => ['nullable', 'string', 'max:500'],
         ]);
 
         $validated['published_at'] = $validated['published_at'] ? \Carbon\Carbon::parse($validated['published_at']) : now();
+        $validated['image_url'] = $this->handleImageUpload($request, 'announcements');
+        unset($validated['image']);
 
         Announcement::create($validated);
 
@@ -112,10 +124,13 @@ class EventController extends Controller
             'category'     => ['required', 'string', 'max:100'],
             'content'      => ['required', 'string', 'max:2000'],
             'published_at' => ['nullable', 'date'],
+            'image'        => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'image_url'    => ['nullable', 'string', 'max:500'],
         ]);
 
         $validated['published_at'] = $validated['published_at'] ? \Carbon\Carbon::parse($validated['published_at']) : $announcement->published_at;
+        $validated['image_url'] = $this->handleImageUpload($request, 'announcements', $announcement->image_url) ?? $announcement->image_url;
+        unset($validated['image']);
 
         $announcement->update($validated);
 

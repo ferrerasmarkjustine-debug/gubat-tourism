@@ -53,7 +53,7 @@
                         <span><strong>LGU Approval Workflow:</strong> Your submission will be set to <em>Pending Review</em> and will automatically be published to the public portal upon LGU Tourism verification.</span>
                     </div>
 
-                    <form method="POST" action="{{ route('resort.accommodations.store') }}">
+                    <form method="POST" action="{{ route('resort.accommodations.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <!-- Accommodation Name -->
@@ -156,18 +156,12 @@
                             @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
-                        <!-- Image URL -->
-                        <div class="mb-3">
-                            <label for="image_url" class="form-label fw-semibold text-dark">Cover Photo URL</label>
-                            <input type="url"
-                                   class="form-control @error('image_url') is-invalid @enderror"
-                                   id="image_url"
-                                   name="image_url"
-                                   value="{{ old('image_url') }}"
-                                   placeholder="https://images.unsplash.com/...">
-                            <div class="form-text">Leave blank to use a default curated room photo.</div>
-                            @error('image_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
+                        <!-- Image Uploader (Local File or URL) -->
+                        @include('partials.image-uploader', [
+                            'label' => 'Accommodation Cover Photo',
+                            'currentImage' => old('image_url'),
+                            'helperText' => 'Select a photo of this room/cottage from your computer (JPG, PNG, WebP up to 5MB).'
+                        ])
 
                         <!-- Amenities Multi-Select -->
                         <div class="mb-4">

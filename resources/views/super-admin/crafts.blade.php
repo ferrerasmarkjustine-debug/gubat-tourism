@@ -261,24 +261,18 @@
                                                         <input type="text" name="contact" class="form-control rounded-3" placeholder="e.g. +63 917 555 4231" value="{{ old('contact', $craft->contact) }}">
                                                     </div>
 
-                                                    <div class="col-md-6">
+                                                    <div class="col-12">
                                                         <label class="form-label fw-semibold small text-muted">Google Maps URL</label>
                                                         <input type="url" name="google_map_url" class="form-control rounded-3" placeholder="https://maps.google.com/..." value="{{ old('google_map_url', $craft->google_map_url) }}">
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label fw-semibold small text-muted">Image URL (Optional)</label>
-                                                        <input type="url" name="image_url" class="form-control rounded-3" placeholder="https://..." value="{{ old('image_url', $craft->image_url) }}">
-                                                    </div>
 
                                                     <div class="col-12">
-                                                        <label class="form-label fw-semibold small text-muted">Upload New Photo (Replaces current photo)</label>
-                                                        <input type="file" name="image" class="form-control rounded-3" accept="image/jpeg,image/png,image/jpg,image/webp">
-                                                        @if($craft->image_url)
-                                                            <div class="mt-2 small text-muted d-flex align-items-center gap-2">
-                                                                <span>Current photo:</span>
-                                                                <img src="{{ asset($craft->image_url) }}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px;">
-                                                            </div>
-                                                        @endif
+                                                        @include('partials.image-uploader', [
+                                                            'id' => 'craft_edit_' . $craft->id,
+                                                            'label' => 'Craft Product Photo',
+                                                            'currentImage' => old('image_url', $craft->image_url),
+                                                            'helperText' => 'Select a photo from your computer to replace the current craft picture (JPG, PNG, WebP up to 5MB).'
+                                                        ])
                                                     </div>
 
                                                     <div class="col-12">
@@ -401,18 +395,18 @@
                             <input type="text" name="contact" class="form-control rounded-3" placeholder="e.g. +63 917 555 4231" value="{{ old('contact') }}">
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <label class="form-label fw-semibold small text-muted">Google Maps URL</label>
                             <input type="url" name="google_map_url" class="form-control rounded-3" placeholder="https://maps.google.com/..." value="{{ old('google_map_url') }}">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold small text-muted">Image URL (Optional)</label>
-                            <input type="url" name="image_url" class="form-control rounded-3" placeholder="https://images.unsplash.com/..." value="{{ old('image_url') }}">
-                        </div>
 
                         <div class="col-12">
-                            <label class="form-label fw-semibold small text-muted">Upload Photo File (JPEG, PNG, WEBP max 3MB)</label>
-                            <input type="file" name="image" class="form-control rounded-3" accept="image/jpeg,image/png,image/jpg,image/webp">
+                            @include('partials.image-uploader', [
+                                'id' => 'craft_create',
+                                'label' => 'Craft Product Photo',
+                                'currentImage' => old('image_url'),
+                                'helperText' => 'Select a photo of the craft product from your computer (JPG, PNG, WebP up to 5MB).'
+                            ])
                         </div>
 
                         <div class="col-12">

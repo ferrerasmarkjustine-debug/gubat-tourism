@@ -1,8 +1,8 @@
 import './bootstrap';
 
 // Bootstrap
-import 'bootstrap';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
 
 // Flatpickr
 import flatpickr from 'flatpickr';

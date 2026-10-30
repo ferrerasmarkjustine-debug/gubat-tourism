@@ -543,5 +543,9 @@ class DatabaseSeeder extends Seeder
         foreach ($tips as $tip) {
             WeatherTip::create($tip);
         }
+
+        // 14. Seed Directory Spots & Crafts
+        $this->call(GubatDirectorySeeder::class);
+        $this->call(CraftSeeder::class);
     }
 }

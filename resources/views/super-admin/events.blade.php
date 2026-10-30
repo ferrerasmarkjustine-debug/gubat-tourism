@@ -206,7 +206,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{{ route('admin.events.store') }}">
+            <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body px-4 py-3">
                     <div class="row g-3">
@@ -234,6 +234,13 @@
                             <label class="form-label small fw-bold text-muted">Description</label>
                             <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Provide full details about activities, schedule, and attractions..."></textarea>
                         </div>
+                        <div class="col-12">
+                            @include('partials.image-uploader', [
+                                'id' => 'event_create',
+                                'label' => 'Event Banner / Poster Photo',
+                                'helperText' => 'Select an event poster or photo from your computer (JPG, PNG, WebP up to 5MB).'
+                            ])
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-top px-4 py-3 bg-light rounded-bottom-4">
@@ -260,7 +267,7 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('admin.events.update', $event) }}">
+                <form method="POST" action="{{ route('admin.events.update', $event) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-body px-4 py-3">
@@ -292,6 +299,14 @@
                                 <label class="form-label small fw-bold text-muted">Description</label>
                                 <textarea name="description" class="form-control rounded-3" rows="3">{{ old('description', $event->description) }}</textarea>
                             </div>
+                            <div class="col-12">
+                                @include('partials.image-uploader', [
+                                    'id' => 'event_edit_' . $event->id,
+                                    'label' => 'Event Banner / Poster Photo',
+                                    'currentImage' => old('image_url', $event->image_url),
+                                    'helperText' => 'Upload a new event photo to replace the current banner (JPG, PNG, WebP up to 5MB).'
+                                ])
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer border-top px-4 py-3 bg-light rounded-bottom-4">
@@ -318,7 +333,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{{ route('admin.announcements.store') }}">
+            <form method="POST" action="{{ route('admin.announcements.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body px-4 py-3">
                     <div class="row g-3">
@@ -344,6 +359,13 @@
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted">Announcement Content <span class="text-danger">*</span></label>
                             <textarea name="content" class="form-control rounded-3" rows="4" placeholder="Enter complete policy notice, rules, or advisory details..." required></textarea>
+                        </div>
+                        <div class="col-12">
+                            @include('partials.image-uploader', [
+                                'id' => 'announcement_create',
+                                'label' => 'Announcement Photo / Infographic',
+                                'helperText' => 'Select an advisory infographic or picture from your computer (JPG, PNG, WebP up to 5MB).'
+                            ])
                         </div>
                     </div>
                 </div>
@@ -371,7 +393,7 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('admin.announcements.update', $announcement) }}">
+                <form method="POST" action="{{ route('admin.announcements.update', $announcement) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-body px-4 py-3">
@@ -394,6 +416,14 @@
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted">Announcement Content <span class="text-danger">*</span></label>
                                 <textarea name="content" class="form-control rounded-3" rows="4" required>{{ old('content', $announcement->content) }}</textarea>
+                            </div>
+                            <div class="col-12">
+                                @include('partials.image-uploader', [
+                                    'id' => 'announcement_edit_' . $announcement->id,
+                                    'label' => 'Announcement Photo / Infographic',
+                                    'currentImage' => old('image_url', $announcement->image_url),
+                                    'helperText' => 'Upload a new infographic or photo to replace the current one (JPG, PNG, WebP up to 5MB).'
+                                ])
                             </div>
                         </div>
                     </div>

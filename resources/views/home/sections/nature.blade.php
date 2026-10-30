@@ -21,7 +21,7 @@
                     <div class="card card-tourism h-100 p-2">
                         <div class="row g-0 align-items-center h-100">
                             <div class="col-md-5 h-100" style="min-height: 200px;">
-                                <img src="{{ $spot->image_url }}" class="img-fluid rounded-start h-100 w-100" style="object-fit: cover; min-height: 200px;" alt="{{ $spot->name }}">
+                                <img src="{{ str_starts_with($spot->image_url ?? '', 'http') ? $spot->image_url : asset($spot->image_url ?? 'images/destinations/rizal_beach.jpg') }}" class="img-fluid rounded-start h-100 w-100" style="object-fit: cover; min-height: 200px;" alt="{{ $spot->name }}">
                             </div>
                             <div class="col-md-7">
                                 <div class="card-body p-4">

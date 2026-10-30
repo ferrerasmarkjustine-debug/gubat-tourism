@@ -48,7 +48,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('resort.accommodations.update', $accommodation->id) }}">
+                    <form method="POST" action="{{ route('resort.accommodations.update', $accommodation->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -148,17 +148,12 @@
                             @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
-                        <!-- Image URL -->
-                        <div class="mb-3">
-                            <label for="image_url" class="form-label fw-semibold text-dark">Cover Photo URL</label>
-                            <input type="url"
-                                   class="form-control @error('image_url') is-invalid @enderror"
-                                   id="image_url"
-                                   name="image_url"
-                                   value="{{ old('image_url', $accommodation->image_url) }}"
-                                   placeholder="https://images.unsplash.com/...">
-                            @error('image_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
+                        <!-- Image Uploader (Local File or URL) -->
+                        @include('partials.image-uploader', [
+                            'label' => 'Accommodation Cover Photo',
+                            'currentImage' => old('image_url', $accommodation->image_url),
+                            'helperText' => 'Upload a new photo from your computer to replace the current photo (JPG, PNG, WebP up to 5MB).'
+                        ])
 
                         <!-- Amenities Multi-Select -->
                         <div class="mb-4">

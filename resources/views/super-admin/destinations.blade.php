@@ -143,7 +143,7 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="{{ route('admin.destinations.update', $dest) }}">
+                <form method="POST" action="{{ route('admin.destinations.update', $dest) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-body px-4 py-3">
@@ -169,11 +169,15 @@
                                 <label class="form-label small fw-bold text-muted">Description</label>
                                 <textarea name="description" class="form-control rounded-3" rows="3">{{ old('description', $dest->description) }}</textarea>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted">Image URL (Cover Photo)</label>
-                                <input type="text" name="image_url" class="form-control rounded-3" value="{{ old('image_url', $dest->image_url) }}" placeholder="e.g. images/destinations/beach.jpg">
+                            <div class="col-12">
+                                @include('partials.image-uploader', [
+                                    'id' => 'dest_' . $dest->id,
+                                    'label' => 'Destination Photo',
+                                    'currentImage' => old('image_url', $dest->image_url),
+                                    'helperText' => 'Upload a photo of this tourist destination from your computer (JPG, PNG, WebP up to 5MB).'
+                                ])
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-12">
                                 <label class="form-label small fw-bold text-muted">Google Maps URL</label>
                                 <input type="url" name="google_map_url" class="form-control rounded-3" value="{{ old('google_map_url', $dest->google_map_url) }}" placeholder="https://maps.google.com/...">
                             </div>

@@ -22,8 +22,9 @@ class HomeController extends Controller
     public function index(): View
     {
         try {
+            $allDestinations = Destination::with('municipality')->get();
             $featuredDestinations = Destination::where('featured', true)->with('municipality')->get();
-            $featuredResorts = Resort::where('featured', true)->with('barangay')->get();
+            $featuredResorts = Resort::where('featured', true)->with(['barangay', 'accommodations.amenities'])->get();
             $heritageSpots = Destination::where('featured', false)->with('municipality')->get();
             $events = Event::orderBy('event_date', 'asc')->with('municipality')->get();
             $announcements = Announcement::orderBy('published_at', 'desc')->take(3)->get();
@@ -53,14 +54,23 @@ class HomeController extends Controller
                 $weatherTips = $this->getFallbackWeatherTips();
             }
 
-            $churchSpots = $heritageSpots->filter(function($s) {
+            $sourceDestinations = $allDestinations->isNotEmpty() ? $allDestinations : $heritageSpots;
+
+            $churchSpots = $sourceDestinations->filter(function($s) {
                 $c = strtolower($s->category ?? '');
-                return str_contains($c, 'church') || str_contains($c, 'chapel') || str_contains($c, 'parish');
-            });
-            $historySpots = $heritageSpots->filter(function($s) {
+                return str_contains($c, 'church') || str_contains($c, 'chapel') || str_contains($c, 'parish') || str_contains($c, 'grotto') || str_contains($c, 'shrine') || str_contains($c, 'pilgrimage') || str_contains($c, 'religious');
+            })->values();
+
+            $historySpots = $sourceDestinations->filter(function($s) {
                 $c = strtolower($s->category ?? '');
-                return str_contains($c, 'heritage') || str_contains($c, 'history') || str_contains($c, 'landmark') || str_contains($c, 'ancestral');
-            });
+                return str_contains($c, 'heritage') || str_contains($c, 'history') || str_contains($c, 'landmark') || str_contains($c, 'ancestral') || str_contains($c, 'park') || str_contains($c, 'boulevard') || str_contains($c, 'promenade');
+            })->values();
+
+            $natureSpots = $sourceDestinations->filter(function($s) {
+                $c = strtolower($s->category ?? '');
+                return str_contains($c, 'nature') || str_contains($c, 'forest') || str_contains($c, 'cave') || str_contains($c, 'ecotourism') || str_contains($c, 'boardwalk') || str_contains($c, 'spring') || str_contains($c, 'farm');
+            })->values();
+
             $featuredCrafts = Craft::where('is_featured', true)->get();
             if ($featuredCrafts->isEmpty()) {
                 $featuredCrafts = Craft::take(3)->get();
@@ -70,7 +80,10 @@ class HomeController extends Controller
             } else {
                 $craftSpots = $this->getFallbackCrafts();
             }
-            $natureSpots = $this->getFallbackNature();
+
+            if ($natureSpots->isEmpty()) {
+                $natureSpots = $this->getFallbackNature();
+            }
 
             if ($churchSpots->isEmpty()) {
                 $churchSpots = $this->getFallbackChurches();

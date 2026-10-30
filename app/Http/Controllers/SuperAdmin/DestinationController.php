@@ -4,12 +4,15 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Destination;
+use App\Traits\HandlesImageUpload;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DestinationController extends Controller
 {
+    use HandlesImageUpload;
+
     /**
      * Display the LGU Admin Destinations page.
      */
@@ -32,16 +35,20 @@ class DestinationController extends Controller
             'name'           => ['required', 'string', 'max:255'],
             'category'       => ['required', 'string', 'max:100'],
             'description'    => ['nullable', 'string', 'max:2000'],
+            'image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'image_url'      => ['nullable', 'string', 'max:500'],
             'google_map_url' => ['nullable', 'url', 'max:500'],
             'featured'       => ['nullable'],
         ]);
 
+        $finalImageUrl = $this->handleImageUpload($request, 'destinations', $destination->image_url)
+            ?? $destination->image_url;
+
         $destination->update([
             'name'           => $validated['name'],
             'category'       => $validated['category'],
             'description'    => $validated['description'] ?? null,
-            'image_url'      => $validated['image_url'] ?? null,
+            'image_url'      => $finalImageUrl,
             'google_map_url' => $validated['google_map_url'] ?? null,
             'featured'       => $request->has('featured'),
         ]);

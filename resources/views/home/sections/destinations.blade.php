@@ -22,7 +22,7 @@
                                     : 1200;
                             @endphp
                             <span class="badge bg-success text-white card-badge">From ₱{{ number_format($minPrice) }} / night</span>
-                            <img src="{{ $resort->image_url }}" alt="{{ $resort->name }}">
+                            <img src="{{ str_starts_with($resort->image_url ?? '', 'http') ? $resort->image_url : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg') . '?v=2' }}" alt="{{ $resort->name }}">
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-center mb-2">

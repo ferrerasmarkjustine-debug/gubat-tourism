@@ -48,7 +48,7 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 d-flex flex-column">
                         <div class="position-relative">
-                            <img src="{{ $acc->image_url ?: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80' }}"
+                            <img src="{{ $acc->image_url ? (str_starts_with($acc->image_url, 'http') ? $acc->image_url : asset($acc->image_url)) : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80' }}"
                                  alt="{{ $acc->name }}"
                                  class="card-img-top"
                                  style="height: 200px; object-fit: cover;">
@@ -161,7 +161,7 @@
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content rounded-4 border-0 shadow overflow-hidden">
                             <div class="position-relative">
-                                <img src="{{ $acc->image_url ?: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80' }}"
+                                <img src="{{ $acc->image_url ? (str_starts_with($acc->image_url, 'http') ? $acc->image_url : asset($acc->image_url)) : 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80' }}"
                                      alt="{{ $acc->name }}"
                                      class="w-100"
                                      style="height: 250px; object-fit: cover;">

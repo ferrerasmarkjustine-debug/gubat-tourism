@@ -21,7 +21,7 @@
                             <span class="badge bg-warning text-dark card-badge">
                                 <i class="bi bi-tsunami me-1"></i> {{ $dest->category }}
                             </span>
-                            <img src="{{ $dest->image_url }}" alt="{{ $dest->name }}">
+                            <img src="{{ str_starts_with($dest->image_url ?? '', 'http') ? $dest->image_url : asset($dest->image_url ?? 'images/destinations/rizal_beach.jpg') . '?v=2' }}" alt="{{ $dest->name }}">
                         </div>
                         <div class="card-body p-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-center mb-2">

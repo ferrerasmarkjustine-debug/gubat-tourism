@@ -15,21 +15,22 @@ class DestinationsController extends Controller
     public function index(): View
     {
         try {
+            $allDestinations      = Destination::with('municipality')->orderBy('featured', 'desc')->get();
             $featuredDestinations = Destination::where('featured', true)->with('municipality')->get();
             $heritageSpots        = Destination::where('featured', false)->with('municipality')->get();
 
-            if ($featuredDestinations->isEmpty()) {
+            if ($allDestinations->isEmpty()) {
                 $featuredDestinations = $this->getFallbackDestinations();
-            }
-            if ($heritageSpots->isEmpty()) {
-                $heritageSpots = $this->getFallbackHeritage();
+                $heritageSpots        = $this->getFallbackHeritage();
+                $allDestinations      = $featuredDestinations->concat($heritageSpots);
             }
         } catch (Exception $e) {
             $featuredDestinations = $this->getFallbackDestinations();
             $heritageSpots        = $this->getFallbackHeritage();
+            $allDestinations      = $featuredDestinations->concat($heritageSpots);
         }
 
-        return view('destinations.index', compact('featuredDestinations', 'heritageSpots'));
+        return view('destinations.index', compact('allDestinations', 'featuredDestinations', 'heritageSpots'));
     }
 
     private function getFallbackDestinations()

@@ -49,7 +49,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('admin.resorts.store') }}">
+                        <form method="POST" action="{{ route('admin.resorts.store') }}" enctype="multipart/form-data">
                             @csrf
 
                             <!-- Resort Name -->
@@ -129,18 +129,12 @@
                                 @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <!-- Image URL -->
-                            <div class="mb-3">
-                                <label for="image_url" class="form-label fw-semibold text-dark">Cover Image URL</label>
-                                <input type="url"
-                                       class="form-control @error('image_url') is-invalid @enderror"
-                                       id="image_url"
-                                       name="image_url"
-                                       value="{{ old('image_url') }}"
-                                       placeholder="https://images.unsplash.com/...">
-                                <div class="form-text">Leave blank to use a default curated Gubat beach cover photo.</div>
-                                @error('image_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
+                            <!-- Cover Image Uploader (Local File or URL) -->
+                            @include('partials.image-uploader', [
+                                'label' => 'Resort Cover Photo',
+                                'currentImage' => old('image_url'),
+                                'helperText' => 'Select a photo of the resort from your computer (JPG, PNG, WebP up to 5MB).'
+                            ])
 
                             <!-- Google Map URL -->
                             <div class="mb-3">
