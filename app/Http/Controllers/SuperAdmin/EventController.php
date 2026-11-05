@@ -45,10 +45,13 @@ class EventController extends Controller
             'municipality_id' => ['nullable', 'exists:municipalities,id'],
             'image'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'image_url'       => ['nullable', 'string', 'max:500'],
+            'gallery_images'  => ['nullable', 'array', 'max:10'],
+            'gallery_images.*'=> ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
         ]);
 
         $validated['municipality_id'] = $validated['municipality_id'] ?? 1; // Default to Gubat
         $validated['image_url'] = $this->handleImageUpload($request, 'events');
+        $validated['gallery_images'] = $this->handleMultipleImagesUpload($request, 'events', [], 'gallery_images', 'retained_gallery_images', 10);
         unset($validated['image']);
 
         Event::create($validated);
@@ -69,11 +72,19 @@ class EventController extends Controller
             'municipality_id' => ['nullable', 'exists:municipalities,id'],
             'image'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
             'image_url'       => ['nullable', 'string', 'max:500'],
+            'gallery_images'  => ['nullable', 'array', 'max:10'],
+            'gallery_images.*'=> ['image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'retained_gallery_images'   => ['nullable', 'array'],
+            'retained_gallery_images.*' => ['string'],
         ]);
 
         $validated['municipality_id'] = $validated['municipality_id'] ?? $event->municipality_id ?? 1;
         $validated['image_url'] = $this->handleImageUpload($request, 'events', $event->image_url) ?? $event->image_url;
-        unset($validated['image']);
+
+        $existingGallery = is_array($event->gallery_images) ? $event->gallery_images : [];
+        $validated['gallery_images'] = $this->handleMultipleImagesUpload($request, 'events', $existingGallery, 'gallery_images', 'retained_gallery_images', 10);
+
+        unset($validated['image'], $validated['retained_gallery_images']);
 
         $event->update($validated);
 

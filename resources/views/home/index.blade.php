@@ -5,10 +5,7 @@
     <!-- 1. Hero Banner -->
     @include('home.sections.hero')
 
-    <!-- 2. Smart Search Component -->
-    @include('home.sections.search-budget')
-
-    <!-- 3. Explore Categories -->
+    <!-- 2. Explore Categories -->
     @include('home.sections.categories')
 
     <!-- 4. Featured Destinations (Beach & Surfing) -->
@@ -49,5 +46,9 @@
 
     <!-- Enlarged Quick View Modal for Homepage Cards -->
     @include('home.partials.quick-view-modal')
+
+    <!-- LGU Admin Homepage In-Place Controls & Quick Modals -->
+    @include('home.partials.admin-bar')
+    @include('home.partials.admin-quick-modals')
 
 @endsection

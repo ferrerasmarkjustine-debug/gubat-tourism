@@ -99,54 +99,81 @@
         </div>
 
         @php
-            $spotlightBuenavista = $allDestinations->first(function($d) {
-                return str_contains(strtolower($d->name), 'buenavista');
-            });
-            $spotlightAgoho = $allDestinations->first(function($d) {
-                return str_contains(strtolower($d->name), 'agoho');
-            });
+            $spot1 = isset($spotlightDestinations) && $spotlightDestinations->isNotEmpty() ? $spotlightDestinations->get(0) : null;
+            $spot2 = isset($spotlightDestinations) && $spotlightDestinations->count() > 1 ? $spotlightDestinations->get(1) : null;
 
-            // Dynamic values for Spotlight 1
-            $bName = $spotlightBuenavista ? $spotlightBuenavista->name : 'Buenavista Tourism Hub & Beach';
-            $bDesc = $spotlightBuenavista && $spotlightBuenavista->description ? $spotlightBuenavista->description : 'A lively 5-kilometer powdery beach bordered by a palm-lined baywalk promenade. Savor fresh coastal delicacies like alimango and kuracha crab, paired with authentic Bicolano hinagom and timitim.';
-            $bImg = $spotlightBuenavista && $spotlightBuenavista->image_url 
-                ? (\Illuminate\Support\Str::startsWith($spotlightBuenavista->image_url, ['http://', 'https://']) ? $spotlightBuenavista->image_url : asset($spotlightBuenavista->image_url))
-                : asset('images/destinations/buenavista_tourism_hub.jpg');
-            $bGallery = $spotlightBuenavista && !empty($spotlightBuenavista->gallery_images) ? $spotlightBuenavista->gallery_images : [];
-            $bMap = $spotlightBuenavista && $spotlightBuenavista->google_map_url ? $spotlightBuenavista->google_map_url : 'https://maps.google.com/?q=Buenavista+Beach+Gubat+Sorsogon';
-            $bCat = $spotlightBuenavista && $spotlightBuenavista->category ? $spotlightBuenavista->category : 'Beach & Food Hub';
+            // Helper for dynamic spotlight data
+            $formatSpot = function($spot, $fallbackName, $fallbackCat, $fallbackDesc, $fallbackImg, $fallbackLoc, $fallbackMap, $fallbackRating, $fallbackReviews) {
+                if (!$spot) {
+                    return [
+                        'name' => $fallbackName,
+                        'cat' => $fallbackCat,
+                        'desc' => $fallbackDesc,
+                        'img' => asset($fallbackImg),
+                        'gallery' => [],
+                        'loc' => $fallbackLoc,
+                        'map' => $fallbackMap,
+                        'rating' => $fallbackRating,
+                        'reviews' => $fallbackReviews,
+                    ];
+                }
 
-            // Dynamic values for Spotlight 2
-            $aName = $spotlightAgoho ? $spotlightAgoho->name : 'Agoho Forest Reserve';
-            $aDesc = $spotlightAgoho && $spotlightAgoho->description ? $spotlightAgoho->description : 'A breathtaking coastal pine cathedral of towering 20-meter agoho trees that kiss the Pacific tide. Features footbridges, hanging canopy walks, picnic huts, and tranquil camping in pure nature.';
-            $aImg = $spotlightAgoho && $spotlightAgoho->image_url 
-                ? (\Illuminate\Support\Str::startsWith($spotlightAgoho->image_url, ['http://', 'https://']) ? $spotlightAgoho->image_url : asset($spotlightAgoho->image_url))
-                : asset('images/destinations/agoho_forest_reserve.jpg');
-            $aGallery = $spotlightAgoho && !empty($spotlightAgoho->gallery_images) ? $spotlightAgoho->gallery_images : [];
-            $aMap = $spotlightAgoho && $spotlightAgoho->google_map_url ? $spotlightAgoho->google_map_url : 'https://maps.google.com/?q=Agoho+Forest+Ariman+Gubat+Sorsogon';
-            $aCat = $spotlightAgoho && $spotlightAgoho->category ? $spotlightAgoho->category : 'Nature & Forest Reserve';
+                $img = $spot->image_url;
+                if ($img) {
+                    $img = \Illuminate\Support\Str::startsWith($img, ['http://', 'https://']) ? $img : asset($img);
+                } else {
+                    $img = asset($fallbackImg);
+                }
+
+                $loc = 'Gubat, Sorsogon';
+                if (!empty($spot->barangay_name)) {
+                    $loc = 'Brgy. ' . $spot->barangay_name . ', Gubat';
+                } elseif ($spot->municipality) {
+                    $loc = $spot->municipality->name . ', Sorsogon';
+                }
+
+                return [
+                    'name' => $spot->name,
+                    'cat' => $spot->category ?? $fallbackCat,
+                    'desc' => $spot->description ?? $fallbackDesc,
+                    'img' => $img,
+                    'gallery' => is_array($spot->gallery_images) ? $spot->gallery_images : [],
+                    'loc' => $loc,
+                    'map' => $spot->google_map_url ?? $fallbackMap,
+                    'rating' => number_format($spot->rating ?? $fallbackRating, 1),
+                    'reviews' => $spot->reviews_count ?? $fallbackReviews,
+                ];
+            };
+
+            $data1 = $formatSpot($spot1, 'Buenavista Tourism Hub & Beach', 'Beach & Food Hub', 
+                'A lively 5-kilometer powdery beach bordered by a palm-lined baywalk promenade. Savor fresh coastal delicacies like alimango and kuracha crab, paired with authentic Bicolano hinagom and timitim.',
+                'images/destinations/buenavista_tourism_hub.jpg', 'Brgy. Buenavista, Gubat', 'https://maps.google.com/?q=Buenavista+Beach+Gubat+Sorsogon', 4.9, 310);
+
+            $data2 = $formatSpot($spot2, 'Agoho Forest Reserve', 'Nature & Forest Reserve',
+                'A breathtaking coastal pine cathedral of towering 20-meter agoho trees that kiss the Pacific tide. Features footbridges, hanging canopy walks, picnic huts, and tranquil camping in pure nature.',
+                'images/destinations/agoho_forest_reserve.jpg', 'Ariman Road, Gubat', 'https://maps.google.com/?q=Agoho+Forest+Ariman+Gubat+Sorsogon', 4.8, 195);
         @endphp
 
         <div class="row g-4">
-            {{-- Spotlight 1: Buenavista Tourism Hub & Beach --}}
+            {{-- Spotlight 1: Navy & Amber Theme --}}
             <div class="col-lg-6">
                 <div class="card border-0 shadow rounded-4 overflow-hidden h-100 position-relative text-white destination-card-clickable" 
                      style="background: #0f172a; min-height: 320px; cursor: pointer;"
                      data-bs-toggle="modal"
                      data-bs-target="#spotQuickViewModal"
-                     data-title="{{ $bName }}"
-                     data-category="{{ $bCat }}"
+                     data-title="{{ $data1['name'] }}"
+                     data-category="{{ $data1['cat'] }}"
                      data-badge-bg="#d97706"
-                     data-badge-icon="bi-tsunami"
-                     data-desc="{{ $bDesc }}"
-                     data-img="{{ $bImg }}"
-                     data-gallery="{{ json_encode($bGallery) }}"
-                     data-location="Brgy. Buenavista, Gubat"
-                     data-rating="{{ number_format($spotlightBuenavista->rating ?? 4.9, 1) }}"
-                     data-reviews="{{ $spotlightBuenavista->reviews_count ?? 310 }}"
-                     data-map="{{ $bMap }}">
-                    <img src="{{ $bImg }}" 
-                         alt="{{ $bName }}" 
+                     data-badge-icon="bi-stars"
+                     data-desc="{{ $data1['desc'] }}"
+                     data-img="{{ $data1['img'] }}"
+                     data-gallery="{{ json_encode($data1['gallery']) }}"
+                     data-location="{{ $data1['loc'] }}"
+                     data-rating="{{ $data1['rating'] }}"
+                     data-reviews="{{ $data1['reviews'] }}"
+                     data-map="{{ $data1['map'] }}">
+                    <img src="{{ $data1['img'] }}" 
+                         alt="{{ $data1['name'] }}" 
                          class="position-absolute top-0 start-0 w-100 h-100" 
                          style="object-fit:cover; opacity:0.45; transition: transform 0.6s ease;"
                          onmouseover="this.style.transform='scale(1.05)'" 
@@ -154,21 +181,21 @@
                     <div class="card-body p-4 p-md-5 d-flex flex-column position-relative justify-content-end" style="z-index:2;">
                         <div class="mb-2">
                             <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1">
-                                <i class="bi bi-tsunami me-1"></i> {{ $bCat }}
+                                <i class="bi bi-stars me-1"></i> {{ $data1['cat'] }}
                             </span>
                             <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-1 ms-1">
-                                <i class="bi bi-geo-alt-fill me-1"></i> Brgy. Buenavista
+                                <i class="bi bi-geo-alt-fill me-1"></i> {{ $data1['loc'] }}
                             </span>
                         </div>
-                        <h4 class="fw-bold text-white mb-2 font-outfit">{{ $bName }}</h4>
+                        <h4 class="fw-bold text-white mb-2 font-outfit">{{ $data1['name'] }}</h4>
                         <p class="text-white-50 small mb-3">
-                            {{ \Illuminate\Support\Str::limit($bDesc, 180) }}
+                            {{ \Illuminate\Support\Str::limit($data1['desc'], 180) }}
                         </p>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
                             <button type="button" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark btn-quick-view shadow-sm">
                                 <i class="bi bi-zoom-in me-1"></i> Explore & View Photos
                             </button>
-                            <a href="{{ $bMap }}" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold" onclick="event.stopPropagation();">
+                            <a href="{{ $data1['map'] }}" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold" onclick="event.stopPropagation();">
                                 <i class="bi bi-map me-1"></i> Open in Maps
                             </a>
                             <span class="text-white-50 small ms-auto d-none d-md-inline">Click card to enlarge</span>
@@ -177,25 +204,25 @@
                 </div>
             </div>
 
-            {{-- Spotlight 2: Agoho Forest Reserve --}}
+            {{-- Spotlight 2: Emerald Forest Theme --}}
             <div class="col-lg-6">
                 <div class="card border-0 shadow rounded-4 overflow-hidden h-100 position-relative text-white destination-card-clickable" 
                      style="background: #064e3b; min-height: 320px; cursor: pointer;"
                      data-bs-toggle="modal"
                      data-bs-target="#spotQuickViewModal"
-                     data-title="{{ $aName }}"
-                     data-category="{{ $aCat }}"
+                     data-title="{{ $data2['name'] }}"
+                     data-category="{{ $data2['cat'] }}"
                      data-badge-bg="#16a34a"
-                     data-badge-icon="bi-tree-fill"
-                     data-desc="{{ $aDesc }}"
-                     data-img="{{ $aImg }}"
-                     data-gallery="{{ json_encode($aGallery) }}"
-                     data-location="Ariman Road, Gubat"
-                     data-rating="{{ number_format($spotlightAgoho->rating ?? 4.8, 1) }}"
-                     data-reviews="{{ $spotlightAgoho->reviews_count ?? 195 }}"
-                     data-map="{{ $aMap }}">
-                    <img src="{{ $aImg }}" 
-                         alt="{{ $aName }}" 
+                     data-badge-icon="bi-stars"
+                     data-desc="{{ $data2['desc'] }}"
+                     data-img="{{ $data2['img'] }}"
+                     data-gallery="{{ json_encode($data2['gallery']) }}"
+                     data-location="{{ $data2['loc'] }}"
+                     data-rating="{{ $data2['rating'] }}"
+                     data-reviews="{{ $data2['reviews'] }}"
+                     data-map="{{ $data2['map'] }}">
+                    <img src="{{ $data2['img'] }}" 
+                         alt="{{ $data2['name'] }}" 
                          class="position-absolute top-0 start-0 w-100 h-100" 
                          style="object-fit:cover; opacity:0.42; transition: transform 0.6s ease;"
                          onmouseover="this.style.transform='scale(1.05)'" 
@@ -203,21 +230,21 @@
                     <div class="card-body p-4 p-md-5 d-flex flex-column position-relative justify-content-end" style="z-index:2;">
                         <div class="mb-2">
                             <span class="badge bg-success text-white fw-bold rounded-pill px-3 py-1">
-                                <i class="bi bi-tree-fill me-1"></i> {{ $aCat }}
+                                <i class="bi bi-stars me-1"></i> {{ $data2['cat'] }}
                             </span>
                             <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-1 ms-1">
-                                <i class="bi bi-geo-alt-fill me-1"></i> Ariman Road
+                                <i class="bi bi-geo-alt-fill me-1"></i> {{ $data2['loc'] }}
                             </span>
                         </div>
-                        <h4 class="fw-bold text-white mb-2 font-outfit">{{ $aName }}</h4>
+                        <h4 class="fw-bold text-white mb-2 font-outfit">{{ $data2['name'] }}</h4>
                         <p class="text-white-50 small mb-3">
-                            {{ \Illuminate\Support\Str::limit($aDesc, 180) }}
+                            {{ \Illuminate\Support\Str::limit($data2['desc'], 180) }}
                         </p>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
                             <button type="button" class="btn btn-success btn-sm rounded-pill px-3 fw-bold text-white btn-quick-view shadow-sm">
                                 <i class="bi bi-zoom-in me-1"></i> Explore & View Photos
                             </button>
-                            <a href="{{ $aMap }}" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold" onclick="event.stopPropagation();">
+                            <a href="{{ $data2['map'] }}" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold" onclick="event.stopPropagation();">
                                 <i class="bi bi-map me-1"></i> Open in Maps
                             </a>
                             <span class="text-white-50 small ms-auto d-none d-md-inline">Click card to enlarge</span>

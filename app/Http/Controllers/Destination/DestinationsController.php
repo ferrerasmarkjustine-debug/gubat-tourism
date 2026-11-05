@@ -30,7 +30,29 @@ class DestinationsController extends Controller
             $allDestinations      = $featuredDestinations->concat($heritageSpots);
         }
 
-        return view('destinations.index', compact('allDestinations', 'featuredDestinations', 'heritageSpots'));
+        // Fetch up to 2 admin-pinned signature spotlight destinations
+        $spotlightDestinations = Destination::where('is_spotlight', true)
+            ->with(['municipality', 'barangay'])
+            ->take(2)
+            ->get();
+
+        // Fallback gracefully to ensure two highlights always show
+        if ($spotlightDestinations->count() < 2) {
+            $existingIds = $spotlightDestinations->pluck('id')->filter()->toArray();
+            $supplement = $allDestinations->whereNotIn('id', $existingIds)->filter(function($d) {
+                $name = strtolower($d->name ?? '');
+                return str_contains($name, 'buenavista') || str_contains($name, 'agoho');
+            });
+
+            $spotlightDestinations = $spotlightDestinations->concat($supplement->take(2 - $spotlightDestinations->count()));
+
+            if ($spotlightDestinations->count() < 2) {
+                $moreFallback = $allDestinations->whereNotIn('id', $spotlightDestinations->pluck('id')->filter()->toArray());
+                $spotlightDestinations = $spotlightDestinations->concat($moreFallback->take(2 - $spotlightDestinations->count()));
+            }
+        }
+
+        return view('destinations.index', compact('allDestinations', 'featuredDestinations', 'heritageSpots', 'spotlightDestinations'));
     }
 
     private function getFallbackDestinations()

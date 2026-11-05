@@ -83,6 +83,7 @@ Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.'
     Route::post('/resorts', [SuperAdminResortController::class, 'store'])->name('resorts.store');
     Route::put('/resorts/{resort}', [SuperAdminResortController::class, 'update'])->name('resorts.update');
     Route::delete('/resorts/{resort}', [SuperAdminResortController::class, 'destroy'])->name('resorts.destroy');
+    Route::patch('/resorts/{resort}/toggle-featured', [SuperAdminResortController::class, 'toggleFeatured'])->name('resorts.toggle-featured');
 
     // Accommodations Approval Workflow
     Route::get('/accommodations', [AccommodationApprovalController::class, 'index'])->name('accommodations.index');
@@ -95,6 +96,7 @@ Route::middleware(['auth', 'super_admin'])->prefix('super-admin')->name('admin.'
     Route::put('/destinations/{destination}', [SuperAdminDestinationController::class, 'update'])->name('destinations.update');
     Route::delete('/destinations/{destination}', [SuperAdminDestinationController::class, 'destroy'])->name('destinations.destroy');
     Route::patch('/destinations/{destination}/toggle-featured', [SuperAdminDestinationController::class, 'toggleFeatured'])->name('destinations.toggle-featured');
+    Route::patch('/destinations/{destination}/toggle-spotlight', [SuperAdminDestinationController::class, 'toggleSpotlight'])->name('destinations.toggle-spotlight');
 
     // Reservations overview
     Route::get('/reservations', [SuperAdminReservationController::class, 'index'])->name('reservations');

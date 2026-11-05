@@ -186,12 +186,21 @@ class CraftController extends Controller
     /**
      * Toggle featured status on homepage.
      */
-    public function toggleFeatured(Craft $craft): RedirectResponse
+    public function toggleFeatured(Request $request, Craft $craft)
     {
         $craft->is_featured = !$craft->is_featured;
         $craft->save();
 
         $status = $craft->is_featured ? 'featured on homepage' : 'removed from homepage';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success'     => true,
+                'is_featured' => $craft->is_featured,
+                'message'     => "'{$craft->name}' is now {$status}.",
+            ]);
+        }
+
         return back()->with('success', "'{$craft->name}' is now {$status}.");
     }
 }

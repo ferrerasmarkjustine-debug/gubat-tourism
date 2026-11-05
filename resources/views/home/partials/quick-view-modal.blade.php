@@ -100,7 +100,9 @@
 <style>
 /* Card Hover Effects on Homepage */
 .home-spot-card-clickable:hover,
-.home-resort-card-clickable:hover {
+.home-resort-card-clickable:hover,
+.home-craft-card-clickable:hover,
+.home-event-card-clickable:hover {
     transform: translateY(-5px);
     box-shadow: 0 14px 28px rgba(0,0,0,0.12) !important;
 }
@@ -229,6 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modalRating.textContent   = rating;
         modalReviews.textContent  = `(${reviews} reviews)`;
 
+        modalCategoryBadge.style.backgroundColor = '';
         modalCategoryBadge.textContent = category;
         modalCategoryBadge.className = 'badge bg-warning text-dark px-3 py-1 rounded-pill mb-2 shadow-sm small';
 
@@ -289,6 +292,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modalReviews.textContent  = `(${reviews} reviews)`;
 
         // Category Badge
+        modalCategoryBadge.style.backgroundColor = '';
         modalCategoryBadge.textContent = category;
         const catLower = category.toLowerCase();
         let catClass = 'bg-primary';
@@ -330,6 +334,135 @@ document.addEventListener('DOMContentLoaded', function () {
         footerSub.textContent = 'Reserve your room or cottage directly with the resort administration.';
 
         setupGallery(cover, gallery, '{{ asset("images/resorts/gubat_bay_beach_resort.jpg") }}');
+
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+
+    // 3. OPEN CRAFT QUICK VIEW
+    function openCraftQuickView(card) {
+        const title      = card.getAttribute('data-title') || 'Local Craft';
+        const category   = card.getAttribute('data-category') || 'Crafts';
+        const badgeColor = card.getAttribute('data-badge-color') || '#8D6E63';
+        const highlight  = card.getAttribute('data-highlight') || 'Handcrafted';
+        const location   = card.getAttribute('data-location') || 'Gubat, Sorsogon';
+        const desc       = card.getAttribute('data-desc') || '';
+        const cover      = card.getAttribute('data-cover') || '';
+        const mapUrl     = card.getAttribute('data-map') || '#';
+
+        let gallery = [];
+        try {
+            const raw = card.getAttribute('data-gallery');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) gallery = parsed;
+            }
+        } catch(err) { gallery = []; }
+
+        let products = [];
+        try {
+            const rawP = card.getAttribute('data-products');
+            if (rawP) {
+                const parsedP = JSON.parse(rawP);
+                if (Array.isArray(parsedP)) products = parsedP;
+            }
+        } catch(err) { products = []; }
+
+        modalTitle.textContent    = title;
+        modalLocation.textContent = location;
+        modalDescHeading.textContent = 'About this Artisan & Guild';
+        modalDesc.textContent     = desc;
+        modalRating.textContent   = '5.0';
+        modalReviews.textContent  = '(Artisan Guild)';
+
+        modalCategoryBadge.textContent = category;
+        modalCategoryBadge.className = 'badge px-3 py-1 rounded-pill mb-2 shadow-sm small text-white';
+        modalCategoryBadge.style.backgroundColor = badgeColor;
+
+        if (resortBadges) resortBadges.classList.add('d-none');
+
+        if (amenitiesContainer && modalAmenities) {
+            modalAmenities.replaceChildren();
+            const highBadge = document.createElement('span');
+            highBadge.className = 'badge bg-warning bg-opacity-25 text-dark border px-3 py-2 rounded-pill small fw-bold';
+            highBadge.innerHTML = `<i class="bi bi-patch-check-fill text-warning me-1"></i> ${highlight}`;
+            modalAmenities.appendChild(highBadge);
+
+            if (products.length > 0) {
+                amenitiesContainer.classList.remove('d-none');
+                products.forEach(p => {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge bg-light text-dark border px-3 py-2 rounded-pill small';
+                    badge.innerHTML = `<i class="bi bi-tag-fill text-primary me-1"></i> ${p}`;
+                    modalAmenities.appendChild(badge);
+                });
+            } else {
+                amenitiesContainer.classList.remove('d-none');
+            }
+        }
+
+        modalMapBtn.href = mapUrl;
+        modalActionBtn.href = '{{ route("crafts") }}';
+        modalActionBtn.innerHTML = '<i class="bi bi-tools" style="font-size: 1rem; line-height: 1;"></i> <span>Explore All Crafts</span>';
+        footerHeading.textContent = 'Support Local Makers';
+        footerSub.textContent = 'Visit artisan workshops and discover authentic handcrafted souvenirs in Gubat.';
+
+        setupGallery(cover, gallery, '{{ asset("images/crafts/craft_1793363252_ybYdopUBMG.jpg") }}');
+
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+
+    // 4. OPEN EVENT QUICK VIEW
+    function openEventQuickView(card) {
+        const title    = card.getAttribute('data-title') || 'Tourism Event';
+        const dateStr  = card.getAttribute('data-date') || '';
+        const location = card.getAttribute('data-location') || 'Gubat, Sorsogon';
+        const desc     = card.getAttribute('data-desc') || '';
+        const cover    = card.getAttribute('data-cover') || '';
+        const mapUrl   = card.getAttribute('data-map') || '#';
+
+        let gallery = [];
+        try {
+            const raw = card.getAttribute('data-gallery');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) gallery = parsed;
+            }
+        } catch(err) { gallery = []; }
+
+        modalTitle.textContent    = title;
+        modalLocation.textContent = location;
+        modalDescHeading.textContent = 'Event Details & Highlights';
+        modalDesc.textContent     = desc;
+        modalRating.textContent   = dateStr;
+        modalReviews.textContent  = '(Festival / Event)';
+
+        modalCategoryBadge.textContent = 'Festival & Cultural Event';
+        modalCategoryBadge.className = 'badge bg-danger text-white px-3 py-1 rounded-pill mb-2 shadow-sm small';
+        modalCategoryBadge.style.backgroundColor = '';
+
+        if (resortBadges) resortBadges.classList.add('d-none');
+
+        if (amenitiesContainer && modalAmenities) {
+            modalAmenities.replaceChildren();
+            amenitiesContainer.classList.remove('d-none');
+            const dateBadge = document.createElement('span');
+            dateBadge.className = 'badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill small fw-bold';
+            dateBadge.innerHTML = `<i class="bi bi-calendar-event me-1"></i> ${dateStr}`;
+            modalAmenities.appendChild(dateBadge);
+
+            const locBadge = document.createElement('span');
+            locBadge.className = 'badge bg-light text-dark border px-3 py-2 rounded-pill small';
+            locBadge.innerHTML = `<i class="bi bi-geo-alt-fill text-danger me-1"></i> Venue: ${location}`;
+            modalAmenities.appendChild(locBadge);
+        }
+
+        modalMapBtn.href = mapUrl;
+        modalActionBtn.href = '#events-section';
+        modalActionBtn.innerHTML = '<i class="bi bi-calendar-check" style="font-size: 1rem; line-height: 1;"></i> <span>View All Events</span>';
+        footerHeading.textContent = 'Join the Celebration';
+        footerSub.textContent = 'Celebrate colorful festivals, cultural showcases, and sporting tourneys in Gubat.';
+
+        setupGallery(cover, gallery, '{{ asset("images/destinations/rizal_beach.jpg") }}');
 
         bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
@@ -409,6 +542,38 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
             const card = this.closest('.home-resort-card-clickable');
             if (card) openResortQuickView(card);
+        });
+    });
+
+    // Attach click listeners to Crafts cards & buttons
+    document.querySelectorAll('.home-craft-card-clickable').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (e.target.closest('a')) return;
+            openCraftQuickView(this);
+        });
+    });
+
+    document.querySelectorAll('.view-craft-details-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const card = this.closest('.home-craft-card-clickable');
+            if (card) openCraftQuickView(card);
+        });
+    });
+
+    // Attach click listeners to Events cards & buttons
+    document.querySelectorAll('.home-event-card-clickable').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (e.target.closest('a')) return;
+            openEventQuickView(this);
+        });
+    });
+
+    document.querySelectorAll('.view-event-details-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const card = this.closest('.home-event-card-clickable');
+            if (card) openEventQuickView(card);
         });
     });
 });

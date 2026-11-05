@@ -20,7 +20,7 @@ class ResortController extends Controller
      */
     public function index(): View
     {
-        $resorts = Resort::with(['barangay', 'accommodations', 'admins'])
+        $resorts = Resort::with(['barangay', 'accommodations.amenities', 'admins'])
             ->orderBy('name')
             ->paginate(20);
         $barangays = Barangay::orderBy('name')->get();
@@ -152,5 +152,27 @@ class ResortController extends Controller
         $resort->delete();
 
         return redirect()->route('admin.resorts')->with('success', "Resort '{$name}' has been deleted.");
+    }
+
+    /**
+     * Toggle featured status of a resort on the homepage.
+     */
+    public function toggleFeatured(Request $request, Resort $resort)
+    {
+        $resort->update([
+            'featured' => !$resort->featured,
+        ]);
+
+        $status = $resort->featured ? 'marked as Featured on homepage' : 'removed from homepage';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success'  => true,
+                'featured' => $resort->featured,
+                'message'  => "Resort '{$resort->name}' has been {$status}.",
+            ]);
+        }
+
+        return back()->with('success', "Resort '{$resort->name}' has been {$status}.");
     }
 }

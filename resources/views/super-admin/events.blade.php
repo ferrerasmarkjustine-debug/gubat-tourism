@@ -113,6 +113,13 @@
                                         <td class="ps-4">
                                             <div class="fw-bold text-dark event-highlight-target">{{ $event->title }}</div>
                                             <small class="text-muted event-highlight-target">{{ Str::limit($event->description, 70) }}</small>
+                                            @if(!empty($event->gallery_images) && count($event->gallery_images) > 0)
+                                                <div class="mt-1">
+                                                    <span class="badge bg-light text-secondary border small">
+                                                        <i class="bi bi-images text-primary me-1"></i> {{ count($event->gallery_images) + ($event->image_url ? 1 : 0) }} photos
+                                                    </span>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
@@ -283,9 +290,22 @@
                                 <div class="col-12">
                                     @include('partials.image-uploader', [
                                         'id' => 'event_create',
-                                        'label' => 'Event Banner / Poster Photo (Optional)',
+                                        'label' => 'Event Banner / Poster Photo (Primary Cover)',
                                         'helperText' => 'Select an event poster or photo from your computer (JPG, PNG, WebP up to 5MB).'
                                     ])
+                                </div>
+                                <div class="col-12 pt-3 border-top">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label small fw-bold text-dark mb-0">
+                                            <i class="bi bi-images text-primary me-1"></i> Additional Event Photos (Up to 10 Photos)
+                                        </label>
+                                        <span class="badge bg-light text-muted border small">Max 10 photos</span>
+                                    </div>
+                                    <div class="form-text text-muted small mb-2">
+                                        Upload event highlights, performances, and crowd moments for the photo gallery.
+                                    </div>
+                                    <input type="file" name="gallery_images[]" id="event_gallery_create" class="form-control rounded-3 event-gallery-input" multiple accept="image/jpeg,image/png,image/webp">
+                                    <div id="event_gallery_create_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
                                 </div>
                             </div>
                         </div>
@@ -392,10 +412,46 @@
                                     <div class="col-12">
                                         @include('partials.image-uploader', [
                                             'id' => 'event_edit_' . $event->id,
-                                            'label' => 'Event Banner / Poster Photo (Optional)',
+                                            'label' => 'Event Banner / Poster Photo (Primary Cover)',
                                             'currentImage' => old('image_url', $event->image_url),
                                             'helperText' => 'Upload a new event photo to replace current banner (JPG, PNG, WebP up to 5MB).'
                                         ])
+                                    </div>
+                                    <div class="col-12 pt-3 border-top">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label small fw-bold text-dark mb-0">
+                                                <i class="bi bi-images text-primary me-1"></i> Additional Event Photos (Up to 10 Photos)
+                                            </label>
+                                            <span class="badge bg-light text-muted border small">Max 10 photos</span>
+                                        </div>
+                                        <div class="form-text text-muted small mb-2">
+                                            Upload additional event photos for the enlarged gallery view. Click the red button to remove any photo.
+                                        </div>
+
+                                        @if(!empty($event->gallery_images) && is_array($event->gallery_images) && count($event->gallery_images) > 0)
+                                            <div class="p-2 bg-light rounded-3 mb-2 border">
+                                                <div class="small fw-semibold text-muted mb-2">
+                                                    Current Photos ({{ count($event->gallery_images) }}/10 photos):
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @foreach($event->gallery_images as $gIdx => $gPath)
+                                                        @php
+                                                            $gSrc = \Illuminate\Support\Str::startsWith($gPath, ['http://', 'https://']) ? $gPath : asset($gPath);
+                                                        @endphp
+                                                        <div class="position-relative border rounded-3 p-1 bg-white shadow-sm" style="width: 75px; height: 75px;">
+                                                            <img src="{{ $gSrc }}" class="w-100 h-100 rounded-2" style="object-fit: cover;">
+                                                            <input type="hidden" name="retained_gallery_images[]" value="{{ $gPath }}">
+                                                            <button type="button" class="btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 11px; line-height: 1;" title="Remove this photo" onclick="this.parentElement.remove();">
+                                                                <i class="bi bi-x"></i>
+                                                            </button>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <input type="file" name="gallery_images[]" id="event_gallery_edit_{{ $event->id }}" class="form-control rounded-3 event-gallery-input" multiple accept="image/jpeg,image/png,image/webp">
+                                        <div id="event_gallery_edit_{{ $event->id }}_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
                                     </div>
                                 </div>
                             </div>
@@ -763,6 +819,35 @@ document.addEventListener('DOMContentLoaded', function () {
     @foreach($announcements as $announcement)
         initAnnSync('#editAnnouncementModal-{{ $announcement->id }}', 'announcement_edit_{{ $announcement->id }}');
     @endforeach
+
+    // Instant client-side thumbnail preview for multiple event gallery photos
+    document.querySelectorAll('.event-gallery-input').forEach(input => {
+        const previewId = input.id + '_preview';
+        const previewBox = document.getElementById(previewId);
+        if (previewBox) {
+            input.addEventListener('change', function(e) {
+                previewBox.replaceChildren();
+                const files = Array.from(e.target.files).slice(0, 10);
+                files.forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            const wrap = document.createElement('div');
+                            wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+                            wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+                            const img = document.createElement('img');
+                            img.src = evt.target.result;
+                            img.className = 'w-100 h-100 rounded-2';
+                            img.style.objectFit = 'cover';
+                            wrap.appendChild(img);
+                            previewBox.appendChild(wrap);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+        }
+    });
 
     // Initialize Level A live table search for Events
     initLiveTableFilter({

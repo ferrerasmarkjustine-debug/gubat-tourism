@@ -23,7 +23,7 @@
                    Discover the beauty of Gubat, Sorsogon, where stunning coastlines, vibrant local culture, historical landmarks, and unforgettable adventures await.
                 </p>
                 <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
-                    <a href="#search-widget" class="btn btn-warning btn-lg rounded-pill px-4 py-3 fw-bold text-dark d-flex align-items-center shadow">
+                    <a href="#resorts-section" class="btn btn-warning btn-lg rounded-pill px-4 py-3 fw-bold text-dark d-flex align-items-center shadow">
                         <i class="bi bi-calendar-check me-2"></i> Book Accommodation
                     </a>
                     <a href="#weather-section" class="btn btn-light btn-lg rounded-pill px-4 py-3 fw-bold d-flex align-items-center shadow-sm" style="background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.4); color: #0a2540;">

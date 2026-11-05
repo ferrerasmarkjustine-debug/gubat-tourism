@@ -43,6 +43,82 @@
             </div>
         @endif
 
+        <!-- Signature Highlights (Spotlights) Showcase Panel -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+            <div class="card-body p-4 text-white">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 pb-3 border-bottom border-light border-opacity-10 gap-2">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold text-uppercase" style="font-size:0.75rem;">
+                                <i class="bi bi-stars me-1"></i> Public Directory Hero Spotlights
+                            </span>
+                            <span class="badge bg-white text-dark rounded-pill px-2.5 py-1 small fw-bold" style="color: #000000 !important;">
+                                {{ isset($spotlightDestinations) ? $spotlightDestinations->count() : 0 }}/2 Pinned
+                            </span>
+                        </div>
+                        <h4 class="fw-bold text-white mb-0 font-outfit">Signature Highlights of Gubat</h4>
+                        <p class="text-white-50 small mb-0 mt-1">
+                            These 2 premier attractions are pinned to the widescreen panoramic hero section at the top of the public <a href="{{ route('destinations') }}" target="_blank" class="text-warning text-decoration-none fw-semibold">Attractions Directory <i class="bi bi-box-arrow-up-right small"></i></a>.
+                        </p>
+                    </div>
+                    <div>
+                        <span class="text-white-50 small d-block text-md-end">
+                            Use the <strong class="text-warning"><i class="bi bi-stars"></i> Pin</strong> button in the table below to feature any attraction.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    @for($slot = 0; $slot < 2; $slot++)
+                        @php
+                            $spotItem = isset($spotlightDestinations) ? $spotlightDestinations->get($slot) : null;
+                        @endphp
+                        <div class="col-md-6">
+                            @if($spotItem)
+                                <div class="card border-0 rounded-4 overflow-hidden position-relative h-100 shadow-sm text-white" style="background: {{ $slot === 0 ? '#1e1b4b' : '#064e3b' }}; min-height: 120px;">
+                                    @php
+                                        $sImg = $spotItem->image_url 
+                                            ? (\Illuminate\Support\Str::startsWith($spotItem->image_url, ['http://', 'https://']) ? $spotItem->image_url : asset($spotItem->image_url))
+                                            : asset('images/destinations/buenavista_tourism_hub.jpg');
+                                    @endphp
+                                    <img src="{{ $sImg }}" alt="{{ $spotItem->name }}" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover; opacity: 0.35;">
+                                    <div class="card-body p-3 p-lg-4 position-relative d-flex flex-column justify-content-between h-100" style="z-index: 2;">
+                                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                            <div>
+                                                <span class="badge {{ $slot === 0 ? 'bg-warning text-dark' : 'bg-success text-white' }} rounded-pill px-2.5 py-1 small fw-bold">
+                                                    <i class="bi bi-stars me-1"></i> Spotlight #{{ $slot + 1 }}
+                                                </span>
+                                                <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-2 py-1 small ms-1">
+                                                    {{ $spotItem->category }}
+                                                </span>
+                                            </div>
+                                            <form method="POST" action="{{ route('admin.destinations.toggle-spotlight', $spotItem) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-sm btn-outline-light rounded-pill px-2.5 py-1 small" title="Unpin from Signature Spotlight">
+                                                    <i class="bi bi-x-circle me-1"></i> Unpin
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold text-white mb-1 font-outfit">{{ $spotItem->name }}</h5>
+                                            <p class="text-white-50 small mb-0">{{ Str::limit($spotItem->description, 80) }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="border border-2 border-dashed border-light border-opacity-25 rounded-4 p-4 h-100 d-flex flex-column align-items-center justify-content-center text-center text-white-50" style="min-height: 120px; background: rgba(255,255,255,0.03);">
+                                    <i class="bi bi-plus-circle-dotted fs-3 text-warning mb-2"></i>
+                                    <div class="fw-semibold text-white">Spotlight Slot #{{ $slot + 1 }} Empty</div>
+                                    <div class="small text-white-50 mt-1">Click the <strong class="text-warning">Pin</strong> button on any destination row below to feature it.</div>
+                                </div>
+                            @endif
+                        </div>
+                    @endfor
+                </div>
+            </div>
+        </div>
+
         <!-- Page-Specific Live Table Search & Quick Filter Toolbar -->
         <div class="card border-0 shadow-sm rounded-4 mb-3 bg-white p-3">
             <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
@@ -59,15 +135,29 @@
                 </div>
             </div>
 
-            <!-- Quick Filter Pills -->
+            <!-- Quick Filter Pills (Mapped to Homepage Sections) -->
             <div class="d-flex align-items-center gap-1.5 flex-wrap mt-3 pt-2 border-top">
-                <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Filters:</span>
+                <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Homepage Sections:</span>
                 <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold dest-filter-pill active btn-primary text-white" data-filter="all">All</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="beach">Beach</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="eco">Ecotourism</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="historical">Historical</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="cultural">Cultural</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="featured">Featured</button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="beach">
+                    <i class="bi bi-water me-1 text-primary"></i>Beach & Surfing
+                </button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="church">
+                    <i class="bi bi-bank me-1 text-warning"></i>Churches
+                </button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="heritage">
+                    <i class="bi bi-hourglass-split me-1" style="color:#92400e;"></i>History & Heritage
+                </button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="nature">
+                    <i class="bi bi-tree-fill me-1 text-success"></i>Nature & Eco
+                </button>
+                <span class="border-start mx-1" style="height:18px;"></span>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="featured">
+                    <i class="bi bi-star-fill me-1 text-success"></i>Featured
+                </button>
+                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="spotlight">
+                    <i class="bi bi-stars me-1 text-warning"></i>Spotlight
+                </button>
             </div>
         </div>
 
@@ -76,34 +166,74 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Destination Name</th>
+                            <th class="ps-4" style="min-width: 300px;">Destination</th>
                             <th>Category</th>
-                            <th>Municipality</th>
-                            <th>Rating</th>
+                            <th>Homepage Section</th>
                             <th>Featured</th>
-                            <th class="text-end pe-4" style="min-width: 220px;">Actions</th>
+                            <th>Spotlight</th>
+                            <th class="text-end pe-4" style="min-width: 280px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="destinationsTableBody">
                         @forelse($destinations as $dest)
+                            @php
+                                $catFilterLower = strtolower($dest->category ?? '');
+                                $sectionFilter = 'beach';
+                                if (str_contains($catFilterLower, 'church') || str_contains($catFilterLower, 'chapel') || str_contains($catFilterLower, 'parish') || str_contains($catFilterLower, 'grotto') || str_contains($catFilterLower, 'shrine') || str_contains($catFilterLower, 'religious')) {
+                                    $sectionFilter = 'church';
+                                } elseif (str_contains($catFilterLower, 'heritage') || str_contains($catFilterLower, 'history') || str_contains($catFilterLower, 'landmark') || str_contains($catFilterLower, 'ancestral') || str_contains($catFilterLower, 'civic')) {
+                                    $sectionFilter = 'heritage';
+                                } elseif (str_contains($catFilterLower, 'nature') || str_contains($catFilterLower, 'forest') || str_contains($catFilterLower, 'cave') || str_contains($catFilterLower, 'eco') || str_contains($catFilterLower, 'boardwalk') || str_contains($catFilterLower, 'spring') || str_contains($catFilterLower, 'farm') || str_contains($catFilterLower, 'marine') || str_contains($catFilterLower, 'mangrove')) {
+                                    $sectionFilter = 'nature';
+                                }
+                            @endphp
                             <tr class="dest-row"
-                                data-search="{{ strtolower($dest->name . ' ' . $dest->category . ' ' . ($dest->municipality ? $dest->municipality->name : 'gubat') . ' ' . $dest->barangay_name . ' ' . $dest->description . ' ' . ($dest->featured ? 'featured' : 'standard')) }}"
-                                data-category="{{ strtolower($dest->category) }}"
-                                data-status="{{ $dest->featured ? 'featured' : 'standard' }}">
+                                data-search="{{ strtolower($dest->name . ' ' . $dest->category . ' ' . ($dest->municipality ? $dest->municipality->name : 'gubat') . ' ' . $dest->barangay_name . ' ' . $dest->description . ' ' . ($dest->featured ? 'featured' : 'standard') . ' ' . ($dest->is_spotlight ? 'spotlight signature highlight' : '') . ' ' . $sectionFilter) }}"
+                                data-category="{{ $sectionFilter }}"
+                                data-status="{{ $dest->featured ? 'featured' : 'standard' }}"
+                                data-spotlight="{{ $dest->is_spotlight ? 'spotlight' : '' }}">
+                                @php
+                                    $rowImg = $dest->image_url
+                                        ? (str_starts_with($dest->image_url, 'http') ? $dest->image_url : asset($dest->image_url))
+                                        : asset('images/destinations/rizal_beach.jpg');
+                                    $catLower = strtolower($dest->category ?? '');
+                                    if (str_contains($catLower, 'church') || str_contains($catLower, 'chapel') || str_contains($catLower, 'parish') || str_contains($catLower, 'grotto') || str_contains($catLower, 'shrine') || str_contains($catLower, 'religious')) {
+                                        $hpSection = 'Historic Churches'; $hpIcon = 'bi-bank'; $hpColor = '#d97706'; $hpAnchor = '#dest-card-' . $dest->id;
+                                    } elseif (str_contains($catLower, 'heritage') || str_contains($catLower, 'history') || str_contains($catLower, 'landmark') || str_contains($catLower, 'ancestral') || str_contains($catLower, 'civic')) {
+                                        $hpSection = 'History & Heritage'; $hpIcon = 'bi-hourglass-split'; $hpColor = '#92400e'; $hpAnchor = '#dest-card-' . $dest->id;
+                                    } elseif (str_contains($catLower, 'nature') || str_contains($catLower, 'forest') || str_contains($catLower, 'cave') || str_contains($catLower, 'eco') || str_contains($catLower, 'boardwalk') || str_contains($catLower, 'spring') || str_contains($catLower, 'farm') || str_contains($catLower, 'marine') || str_contains($catLower, 'mangrove')) {
+                                        $hpSection = 'Nature & Ecotourism'; $hpIcon = 'bi-tree-fill'; $hpColor = '#198754'; $hpAnchor = '#dest-card-' . $dest->id;
+                                    } else {
+                                        $hpSection = 'Featured Destinations'; $hpIcon = 'bi-geo-alt-fill'; $hpColor = '#0284c7'; $hpAnchor = '#dest-card-' . $dest->id;
+                                    }
+                                @endphp
                                 <td class="ps-4">
-                                    <div class="fw-bold text-dark dest-highlight-target">{{ $dest->name }}</div>
-                                    <small class="text-muted dest-highlight-target">{{ Str::limit($dest->description, 60) }}</small>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="{{ $rowImg }}" class="rounded-3 shadow-sm flex-shrink-0" style="width: 56px; height: 56px; object-fit: cover;" alt="{{ $dest->name }}">
+                                        <div>
+                                            <div class="fw-bold text-dark dest-highlight-target">{{ $dest->name }}</div>
+                                            <small class="text-muted dest-highlight-target">{{ Str::limit($dest->description, 50) }}</small>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <span class="badge bg-secondary bg-opacity-10 text-dark border px-3 py-1 rounded-pill dest-highlight-target">
                                         {{ $dest->category }}
                                     </span>
                                 </td>
-                                <td class="dest-highlight-target">{{ $dest->municipality ? $dest->municipality->name : 'Gubat' }}</td>
                                 <td>
-                                    <span class="text-warning fw-semibold">
-                                        <i class="bi bi-star-fill text-warning me-1"></i>{{ number_format($dest->rating, 1) }}
-                                    </span>
+                                    <div class="d-flex flex-column gap-1">
+                                        <span class="badge rounded-pill px-2 py-1 fw-semibold" style="background-color: {{ $hpColor }}15; color: {{ $hpColor }}; font-size: 0.72rem;">
+                                            <i class="bi {{ $hpIcon }} me-1"></i> {{ $hpSection }}
+                                        </span>
+                                        @if($dest->featured)
+                                            <a href="{{ route('home') }}{{ $hpAnchor }}" target="_blank" class="text-decoration-none small fw-semibold" style="color: {{ $hpColor }}; font-size: 0.7rem;">
+                                                <i class="bi bi-box-arrow-up-right me-1"></i>View on Homepage
+                                            </a>
+                                        @else
+                                            <span class="text-muted small" style="font-size: 0.7rem;">Not on homepage</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td>
                                     @if($dest->featured)
@@ -112,8 +242,29 @@
                                         <span class="text-muted small">Standard</span>
                                     @endif
                                 </td>
+                                <td>
+                                    @if($dest->is_spotlight)
+                                        <span class="badge bg-warning bg-opacity-20 text-warning-emphasis border border-warning rounded-pill px-2.5 py-1 fw-bold">
+                                            <i class="bi bi-stars text-warning me-1"></i> Spotlight
+                                        </span>
+                                    @else
+                                        <span class="text-muted small">—</span>
+                                    @endif
+                                </td>
                                 <td class="text-end pe-4">
                                     <div class="d-inline-flex align-items-center gap-1">
+                                        {{-- Quick Toggle Spotlight --}}
+                                        <form method="POST" action="{{ route('admin.destinations.toggle-spotlight', $dest) }}" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" 
+                                                    class="btn btn-sm {{ $dest->is_spotlight ? 'btn-warning text-dark fw-bold' : 'btn-outline-warning text-dark' }} rounded-pill px-2.5 py-1"
+                                                    title="{{ $dest->is_spotlight ? 'Click to unpin from Signature Spotlights' : 'Click to pin as Signature Spotlight (max 2)' }}">
+                                                <i class="bi {{ $dest->is_spotlight ? 'bi-stars' : 'bi-sparkles' }} me-1"></i>
+                                                <span class="small">{{ $dest->is_spotlight ? 'Spotlight' : 'Pin' }}</span>
+                                            </button>
+                                        </form>
+
                                         {{-- Quick Toggle Featured --}}
                                         <form method="POST" action="{{ route('admin.destinations.toggle-featured', $dest) }}" class="d-inline">
                                             @csrf
@@ -200,18 +351,36 @@
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
-                                    <input type="text" name="category" list="categoryOptionsNew" class="form-control rounded-3" placeholder="Select or type..." value="{{ old('category') }}" required>
-                                    <datalist id="categoryOptionsNew">
-                                        <option value="Surf Haven">
-                                        <option value="Public Beach">
-                                        <option value="Heritage Landmark">
-                                        <option value="Century-Old Church">
-                                        <option value="Traditional Pottery">
-                                        <option value="Livelihood Center">
-                                        <option value="Historical Heritage">
-                                        <option value="Eco-Tourism Site">
-                                        <option value="Nature Reserve">
-                                    </datalist>
+                                    <select name="category" class="form-select rounded-3" required>
+                                        <option value="" disabled {{ old('category') ? '' : 'selected' }}>Choose category...</option>
+                                        <optgroup label="🏖️ Beach & Surfing — Homepage: Featured Destinations">
+                                            <option value="Surf Haven" {{ old('category') == 'Surf Haven' ? 'selected' : '' }}>Surf Haven</option>
+                                            <option value="Public Beach" {{ old('category') == 'Public Beach' ? 'selected' : '' }}>Public Beach</option>
+                                            <option value="Surf Haven & Resort" {{ old('category') == 'Surf Haven & Resort' ? 'selected' : '' }}>Surf Haven & Resort</option>
+                                        </optgroup>
+                                        <optgroup label="⛪ Churches — Homepage: Historic Churches">
+                                            <option value="Century-Old Church" {{ old('category') == 'Century-Old Church' ? 'selected' : '' }}>Century-Old Church</option>
+                                            <option value="Parish Church" {{ old('category') == 'Parish Church' ? 'selected' : '' }}>Parish Church</option>
+                                            <option value="Chapel" {{ old('category') == 'Chapel' ? 'selected' : '' }}>Chapel</option>
+                                            <option value="Shrine" {{ old('category') == 'Shrine' ? 'selected' : '' }}>Shrine</option>
+                                        </optgroup>
+                                        <optgroup label="🏛️ Heritage — Homepage: History & Heritage">
+                                            <option value="Historical Heritage" {{ old('category') == 'Historical Heritage' ? 'selected' : '' }}>Historical Heritage</option>
+                                            <option value="Heritage Landmark" {{ old('category') == 'Heritage Landmark' ? 'selected' : '' }}>Heritage Landmark</option>
+                                            <option value="Civic Landmark" {{ old('category') == 'Civic Landmark' ? 'selected' : '' }}>Civic Landmark</option>
+                                        </optgroup>
+                                        <optgroup label="🌿 Nature — Homepage: Nature & Ecotourism">
+                                            <option value="Eco-Tourism Site" {{ old('category') == 'Eco-Tourism Site' ? 'selected' : '' }}>Eco-Tourism Site</option>
+                                            <option value="Nature Reserve" {{ old('category') == 'Nature Reserve' ? 'selected' : '' }}>Nature Reserve</option>
+                                            <option value="Mangrove Forest" {{ old('category') == 'Mangrove Forest' ? 'selected' : '' }}>Mangrove Forest</option>
+                                            <option value="Marine Reserve" {{ old('category') == 'Marine Reserve' ? 'selected' : '' }}>Marine Reserve</option>
+                                        </optgroup>
+                                        <optgroup label="🛠️ Other">
+                                            <option value="Traditional Pottery" {{ old('category') == 'Traditional Pottery' ? 'selected' : '' }}>Traditional Pottery</option>
+                                            <option value="Livelihood Center" {{ old('category') == 'Livelihood Center' ? 'selected' : '' }}>Livelihood Center</option>
+                                        </optgroup>
+                                    </select>
+                                    <small class="text-muted" style="font-size: 0.72rem;">Category determines which homepage section this item appears in.</small>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label small fw-bold text-muted">Description</label>
@@ -249,6 +418,15 @@
                                             Feature this destination
                                         </label>
                                         <div class="form-text text-muted small">Featured destinations appear prominently on the public homepage and featured spots section.</div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch mt-1">
+                                        <input class="form-check-input" type="checkbox" name="is_spotlight" id="spotlightCheckNew" value="1" {{ old('is_spotlight') ? 'checked' : '' }}>
+                                        <label class="form-check-label fw-semibold text-dark" for="spotlightCheckNew">
+                                            <i class="bi bi-stars text-warning me-1"></i> Pin to Signature Spotlights (Top of Public Attractions Page)
+                                        </label>
+                                        <div class="form-text text-muted small">Max 2 destinations can be pinned across the municipality.</div>
                                     </div>
                                 </div>
                             </div>
@@ -342,16 +520,42 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
-                                        <input type="text" name="category" list="categoryOptions" class="form-control rounded-3" value="{{ old('category', $dest->category) }}" required>
-                                        <datalist id="categoryOptions">
-                                            <option value="Surf Haven">
-                                            <option value="Public Beach">
-                                            <option value="Heritage Landmark">
-                                            <option value="Century-Old Church">
-                                            <option value="Traditional Pottery">
-                                            <option value="Livelihood Center">
-                                            <option value="Historical Heritage">
-                                        </datalist>
+                                        @php $editCat = old('category', $dest->category); @endphp
+                                        <select name="category" class="form-select rounded-3" required>
+                                            <option value="" disabled>Choose category...</option>
+                                            <optgroup label="🏖️ Beach & Surfing — Homepage: Featured Destinations">
+                                                <option value="Surf Haven" {{ $editCat == 'Surf Haven' ? 'selected' : '' }}>Surf Haven</option>
+                                                <option value="Public Beach" {{ $editCat == 'Public Beach' ? 'selected' : '' }}>Public Beach</option>
+                                                <option value="Surf Haven & Resort" {{ $editCat == 'Surf Haven & Resort' ? 'selected' : '' }}>Surf Haven & Resort</option>
+                                            </optgroup>
+                                            <optgroup label="⛪ Churches — Homepage: Historic Churches">
+                                                <option value="Century-Old Church" {{ $editCat == 'Century-Old Church' ? 'selected' : '' }}>Century-Old Church</option>
+                                                <option value="Parish Church" {{ $editCat == 'Parish Church' ? 'selected' : '' }}>Parish Church</option>
+                                                <option value="Chapel" {{ $editCat == 'Chapel' ? 'selected' : '' }}>Chapel</option>
+                                                <option value="Shrine" {{ $editCat == 'Shrine' ? 'selected' : '' }}>Shrine</option>
+                                            </optgroup>
+                                            <optgroup label="🏛️ Heritage — Homepage: History & Heritage">
+                                                <option value="Historical Heritage" {{ $editCat == 'Historical Heritage' ? 'selected' : '' }}>Historical Heritage</option>
+                                                <option value="Heritage Landmark" {{ $editCat == 'Heritage Landmark' ? 'selected' : '' }}>Heritage Landmark</option>
+                                                <option value="Civic Landmark" {{ $editCat == 'Civic Landmark' ? 'selected' : '' }}>Civic Landmark</option>
+                                            </optgroup>
+                                            <optgroup label="🌿 Nature — Homepage: Nature & Ecotourism">
+                                                <option value="Eco-Tourism Site" {{ $editCat == 'Eco-Tourism Site' ? 'selected' : '' }}>Eco-Tourism Site</option>
+                                                <option value="Nature Reserve" {{ $editCat == 'Nature Reserve' ? 'selected' : '' }}>Nature Reserve</option>
+                                                <option value="Mangrove Forest" {{ $editCat == 'Mangrove Forest' ? 'selected' : '' }}>Mangrove Forest</option>
+                                                <option value="Marine Reserve" {{ $editCat == 'Marine Reserve' ? 'selected' : '' }}>Marine Reserve</option>
+                                            </optgroup>
+                                            <optgroup label="🛠️ Other">
+                                                <option value="Traditional Pottery" {{ $editCat == 'Traditional Pottery' ? 'selected' : '' }}>Traditional Pottery</option>
+                                                <option value="Livelihood Center" {{ $editCat == 'Livelihood Center' ? 'selected' : '' }}>Livelihood Center</option>
+                                            </optgroup>
+                                            @if(!in_array($editCat, ['Surf Haven','Public Beach','Surf Haven & Resort','Century-Old Church','Parish Church','Chapel','Shrine','Historical Heritage','Heritage Landmark','Civic Landmark','Eco-Tourism Site','Nature Reserve','Mangrove Forest','Marine Reserve','Traditional Pottery','Livelihood Center']))
+                                                <optgroup label="📌 Current (Custom)">
+                                                    <option value="{{ $editCat }}" selected>{{ $editCat }}</option>
+                                                </optgroup>
+                                            @endif
+                                        </select>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Category determines which homepage section this item appears in.</small>
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label small fw-bold text-muted">Description</label>
@@ -412,6 +616,15 @@
                                                 Feature this destination
                                             </label>
                                             <div class="form-text text-muted small">Featured destinations appear prominently on the public homepage and featured spots section.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check form-switch mt-1">
+                                            <input class="form-check-input" type="checkbox" name="is_spotlight" id="spotlightCheck-{{ $dest->id }}" value="1" {{ $dest->is_spotlight ? 'checked' : '' }}>
+                                            <label class="form-check-label fw-semibold text-dark" for="spotlightCheck-{{ $dest->id }}">
+                                                <i class="bi bi-stars text-warning me-1"></i> Pin to Signature Spotlights (Top of Public Attractions Page)
+                                            </label>
+                                            <div class="form-text text-muted small">Max 2 destinations can be pinned across the municipality.</div>
                                         </div>
                                     </div>
                                 </div>
@@ -494,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const modal = document.querySelector(modalSelector);
         if (!modal) return;
         const nameInput = modal.querySelector('input[name="name"]');
-        const catInput = modal.querySelector('input[name="category"]');
+        const catInput = modal.querySelector('select[name="category"]') || modal.querySelector('input[name="category"]');
         const descInput = modal.querySelector('textarea[name="description"]');
         const featInput = modal.querySelector('input[name="featured"]');
 

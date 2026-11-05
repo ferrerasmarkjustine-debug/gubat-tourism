@@ -3,8 +3,24 @@
     <div class="container">
         <div class="row align-items-end mb-5">
             <div class="col-md-8 text-start">
-                
-                <h2 class="section-title text-start mb-0">Featured Destinations</h2>
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                    <h2 class="section-title text-start mb-0">Featured Destinations</h2>
+                    @if(Auth::check() && Auth::user()->isLguAdmin())
+                        <span class="badge bg-warning text-dark px-3 py-1.5 rounded-pill fw-bold small admin-section-controls">
+                            <i class="bi bi-star-fill me-1"></i> {{ $featuredDestinations->count() }} Featured
+                        </span>
+                    @endif
+                </div>
+                @if(Auth::check() && Auth::user()->isLguAdmin())
+                    <div class="admin-section-controls d-flex align-items-center gap-2 mt-2">
+                        <a href="{{ route('admin.destinations') }}" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-semibold text-white">
+                            <i class="bi bi-plus-circle me-1"></i> Add Destination
+                        </a>
+                        <a href="{{ route('admin.destinations') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">
+                            <i class="bi bi-gear-fill me-1"></i> Manage Destinations
+                        </a>
+                    </div>
+                @endif
             </div>
             <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
                 <a href="{{ route('destinations') }}" class="btn btn-tourism-outline rounded-pill">
@@ -20,7 +36,7 @@
                         ? $dest->image_url
                         : asset($dest->image_url ?? 'images/destinations/rizal_beach.jpg');
                 @endphp
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-4 col-md-6" id="dest-card-{{ $dest->id ?? '' }}">
                     <div class="card card-tourism h-100 home-spot-card-clickable"
                          style="cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease;"
                          data-id="{{ $dest->id }}"
@@ -34,6 +50,16 @@
                          data-gallery="{{ json_encode($dest->gallery_images ?? []) }}"
                          data-map="{{ $dest->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($dest->name . ' Gubat Sorsogon') }}">
                         <div class="card-tourism-img-wrapper position-relative">
+                            @if(Auth::check() && Auth::user()->isLguAdmin() && isset($dest->id))
+                                <div class="admin-card-overlay">
+                                    <button type="button" class="admin-card-btn admin-card-btn-warning" onclick="event.stopPropagation(); openAdminEditDestination('{{ $dest->id }}', '{{ addslashes($dest->name) }}', '{{ addslashes($dest->category) }}', '{{ addslashes($dest->description) }}', '{{ addslashes($dest->google_map_url ?? '') }}', '{{ $dest->featured ? 1 : 0 }}')" title="Quick Edit this destination">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </button>
+                                    <button type="button" class="admin-card-btn admin-card-btn-danger" onclick="event.stopPropagation(); unfeatureHomepageCard('{{ route('admin.destinations.toggle-featured', $dest->id) }}', this.closest('.col-lg-4'), '{{ addslashes($dest->name) }}')" title="Remove from Homepage without deleting">
+                                        <i class="bi bi-x-circle-fill"></i> Remove
+                                    </button>
+                                </div>
+                            @endif
                             <span class="badge bg-warning text-dark card-badge">
                                 <i class="bi bi-tsunami me-1"></i> {{ $dest->category }}
                             </span>

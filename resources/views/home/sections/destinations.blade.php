@@ -2,7 +2,24 @@
     <div class="container">
         <div class="row align-items-end mb-5">
             <div class="col-md-8 text-start">
-                <h2 class="section-title text-start mb-0">Featured Beach Resorts & Hotels</h2>
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                    <h2 class="section-title text-start mb-0">Featured Beach Resorts & Hotels</h2>
+                    @if(Auth::check() && Auth::user()->isLguAdmin())
+                        <span class="badge bg-success text-white px-3 py-1.5 rounded-pill fw-bold small admin-section-controls">
+                            <i class="bi bi-buildings-fill me-1"></i> {{ $featuredResorts->count() }} Featured
+                        </span>
+                    @endif
+                </div>
+                @if(Auth::check() && Auth::user()->isLguAdmin())
+                    <div class="admin-section-controls d-flex align-items-center gap-2 mt-2">
+                        <a href="{{ route('admin.resorts.create') }}" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-semibold">
+                            <i class="bi bi-plus-circle me-1"></i> Add Resort
+                        </a>
+                        <a href="{{ route('admin.resorts') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">
+                            <i class="bi bi-gear-fill me-1"></i> Manage Resorts
+                        </a>
+                    </div>
+                @endif
             </div>
             <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
                 <a href="{{ route('resorts') }}" class="btn btn-tourism-outline rounded-pill">
@@ -61,6 +78,16 @@
                          data-map="{{ $resort->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($resort->name . ' Gubat Sorsogon') }}"
                          data-book="{{ route('booking.create', ['resort_id' => $resort->id]) }}">
                         <div class="card-tourism-img-wrapper position-relative">
+                            @if(Auth::check() && Auth::user()->isLguAdmin() && isset($resort->id))
+                                <div class="admin-card-overlay">
+                                    <a href="{{ route('admin.resorts') }}" class="admin-card-btn admin-card-btn-warning text-decoration-none" onclick="event.stopPropagation();" title="Edit this resort in Admin Portal">
+                                        <i class="bi bi-pencil-fill"></i> Edit
+                                    </a>
+                                    <button type="button" class="admin-card-btn admin-card-btn-danger" onclick="event.stopPropagation(); unfeatureHomepageCard('{{ route('admin.resorts.toggle-featured', $resort->id) }}', this.closest('.col-lg-4'), '{{ addslashes($resort->name) }}')" title="Remove from Homepage without deleting">
+                                        <i class="bi bi-x-circle-fill"></i> Remove
+                                    </button>
+                                </div>
+                            @endif
                             <span class="badge bg-success text-white card-badge">From ₱{{ number_format($minPrice) }} / night</span>
                             @if(!empty($resort->gallery_images) && count($resort->gallery_images) > 0)
                                 <div class="position-absolute top-0 end-0 m-3" style="z-index: 3;">
