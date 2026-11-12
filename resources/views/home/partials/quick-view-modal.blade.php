@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Attach click listeners to Destinations cards & buttons
     document.querySelectorAll('.home-spot-card-clickable').forEach(card => {
         card.addEventListener('click', function(e) {
-            if (e.target.closest('a')) return;
+            if (e.target.closest('a') || e.target.closest('button') || e.target.closest('.admin-card-overlay')) return;
             openSpotQuickView(this);
         });
     });
@@ -532,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Attach click listeners to Resorts cards & buttons
     document.querySelectorAll('.home-resort-card-clickable').forEach(card => {
         card.addEventListener('click', function(e) {
-            if (e.target.closest('a')) return;
+            if (e.target.closest('a') || e.target.closest('button') || e.target.closest('.admin-card-overlay')) return;
             openResortQuickView(this);
         });
     });
@@ -548,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Attach click listeners to Crafts cards & buttons
     document.querySelectorAll('.home-craft-card-clickable').forEach(card => {
         card.addEventListener('click', function(e) {
-            if (e.target.closest('a')) return;
+            if (e.target.closest('a') || e.target.closest('button') || e.target.closest('.admin-card-overlay')) return;
             openCraftQuickView(this);
         });
     });
@@ -564,7 +564,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Attach click listeners to Events cards & buttons
     document.querySelectorAll('.home-event-card-clickable').forEach(card => {
         card.addEventListener('click', function(e) {
-            if (e.target.closest('a')) return;
+            if (e.target.closest('a') || e.target.closest('button') || e.target.closest('.admin-card-overlay')) return;
             openEventQuickView(this);
         });
     });

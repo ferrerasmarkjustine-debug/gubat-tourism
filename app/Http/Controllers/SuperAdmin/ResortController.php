@@ -27,8 +27,12 @@ class ResortController extends Controller
         $unassignedAdmins = User::where('role', 'resort_admin')
             ->orderBy('name')
             ->get();
+        $trashedResorts = Resort::onlyTrashed()
+            ->with(['barangay', 'accommodations.amenities', 'admins'])
+            ->orderByDesc('deleted_at')
+            ->get();
 
-        return view('super-admin.resorts', compact('resorts', 'barangays', 'unassignedAdmins'));
+        return view('super-admin.resorts', compact('resorts', 'barangays', 'unassignedAdmins', 'trashedResorts'));
     }
 
     /**
@@ -143,15 +147,39 @@ class ResortController extends Controller
     }
 
     /**
-     * Delete the specified resort from storage.
+     * Soft delete the specified resort from storage (move to Recently Deleted).
      */
     public function destroy(Resort $resort): RedirectResponse
     {
         $name = $resort->name;
-        User::where('resort_id', $resort->id)->update(['resort_id' => null]);
         $resort->delete();
 
-        return redirect()->route('admin.resorts')->with('success', "Resort '{$name}' has been deleted.");
+        return redirect()->route('admin.resorts')->with('success', "Resort '{$name}' has been moved to Recently Deleted.");
+    }
+
+    /**
+     * Restore the specified soft-deleted resort.
+     */
+    public function restore(int $id): RedirectResponse
+    {
+        $resort = Resort::onlyTrashed()->findOrFail($id);
+        $name = $resort->name;
+        $resort->restore();
+
+        return redirect()->route('admin.resorts')->with('success', "Resort '{$name}' has been successfully restored!");
+    }
+
+    /**
+     * Permanently delete the specified resort from storage.
+     */
+    public function forceDelete(int $id): RedirectResponse
+    {
+        $resort = Resort::onlyTrashed()->findOrFail($id);
+        $name = $resort->name;
+        User::where('resort_id', $resort->id)->update(['resort_id' => null]);
+        $resort->forceDelete();
+
+        return redirect()->route('admin.resorts')->with('success', "Resort '{$name}' has been permanently deleted from the database.");
     }
 
     /**

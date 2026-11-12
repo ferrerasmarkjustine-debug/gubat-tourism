@@ -2,6 +2,9 @@
     <div class="container">
         <div class="row align-items-end mb-5">
             <div class="col-md-8 text-start">
+                <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase mb-2 shadow-sm" style="background-color: rgba(13, 110, 253, 0.12); color: #0d6efd; font-size: 0.8rem;">
+                    <i class="bi bi-buildings-fill me-1"></i> Stay &amp; Unwind in Coastal Serenity
+                </span>
                 <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
                     <h2 class="section-title text-start mb-0">Featured Beach Resorts & Hotels</h2>
                     @if(Auth::check() && Auth::user()->isLguAdmin())
@@ -10,11 +13,12 @@
                         </span>
                     @endif
                 </div>
+                <p class="text-muted mt-2 mb-0">Relax in oceanfront eco-lodges, beachfront villas, and comfortable accommodations in Gubat.</p>
                 @if(Auth::check() && Auth::user()->isLguAdmin())
                     <div class="admin-section-controls d-flex align-items-center gap-2 mt-2">
-                        <a href="{{ route('admin.resorts.create') }}" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-semibold">
+                        <button type="button" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-semibold text-white" onclick="openFeaturePicker('resort')">
                             <i class="bi bi-plus-circle me-1"></i> Add Resort
-                        </a>
+                        </button>
                         <a href="{{ route('admin.resorts') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">
                             <i class="bi bi-gear-fill me-1"></i> Manage Resorts
                         </a>
@@ -83,7 +87,7 @@
                                     <a href="{{ route('admin.resorts') }}" class="admin-card-btn admin-card-btn-warning text-decoration-none" onclick="event.stopPropagation();" title="Edit this resort in Admin Portal">
                                         <i class="bi bi-pencil-fill"></i> Edit
                                     </a>
-                                    <button type="button" class="admin-card-btn admin-card-btn-danger" onclick="event.stopPropagation(); unfeatureHomepageCard('{{ route('admin.resorts.toggle-featured', $resort->id) }}', this.closest('.col-lg-4'), '{{ addslashes($resort->name) }}')" title="Remove from Homepage without deleting">
+                                    <button type="button" class="admin-card-btn admin-card-btn-danger" onclick="event.stopPropagation(); unfeatureHomepageCard('{{ route('admin.resorts.toggle-featured', $resort->id) }}', this);" title="Remove from Homepage without deleting">
                                         <i class="bi bi-x-circle-fill"></i> Remove
                                     </button>
                                 </div>
@@ -143,7 +147,7 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     <a href="{{ $resort->google_map_url }}" target="_blank" onclick="event.stopPropagation();" class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-2">
-                                        <i class="bi bi-geo-alt me-1"></i> Location
+                                        <i class="bi bi-map me-1"></i> View Maps
                                     </a>
                                 </div>
                                 <div class="col-6">

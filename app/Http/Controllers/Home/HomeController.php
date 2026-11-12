@@ -24,6 +24,7 @@ class HomeController extends Controller
         try {
             $allDestinations = Destination::with('municipality')->get();
             $featuredDestinations = Destination::where('featured', true)->with('municipality')->get();
+            $allResorts = Resort::with(['barangay', 'accommodations.amenities'])->get();
             $featuredResorts = Resort::where('featured', true)->with(['barangay', 'accommodations.amenities'])->get();
             $heritageSpots = Destination::where('featured', false)->with('municipality')->get();
             $events = Event::orderBy('event_date', 'asc')->with('municipality')->get();
@@ -105,9 +106,13 @@ class HomeController extends Controller
             $announcements = $this->getFallbackAnnouncements();
             $testimonials = $this->getFallbackTestimonials();
             $weatherTips = $this->getFallbackWeatherTips();
+            $allDestinations = $featuredDestinations;
+            $allResorts = $featuredResorts;
         }
 
         return view('home.index', compact(
+            'allDestinations',
+            'allResorts',
             'featuredDestinations',
             'featuredResorts',
             'heritageSpots',

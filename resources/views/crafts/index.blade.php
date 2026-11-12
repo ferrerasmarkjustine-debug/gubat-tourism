@@ -194,25 +194,7 @@
             @endforelse
         </div>
 
-        {{-- LGU Community Artisan Support Callout --}}
-        <div class="card mt-5 border-0 shadow-sm text-white overflow-hidden" style="background: linear-gradient(135deg, #0b2545 0%, #154c79 100%); border-radius: 20px;">
-            <div class="card-body p-4 p-md-5">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill mb-3">Community Partnership</span>
-                        <h3 class="fw-bold font-outfit text-white mb-2">Support Gubat's Local Producers &amp; Weavers</h3>
-                        <p class="text-white-50 mb-0" style="max-width: 650px;">
-                            By purchasing directly from Gubat's artisan associations, you empower local families, sustain traditional craft techniques passed through generations, and take home authentic handmade heritage pieces.
-                        </p>
-                    </div>
-                    <div class="col-lg-4 text-center text-lg-end mt-4 mt-lg-0">
-                        <a href="https://maps.google.com/?q=Gubat+Sorsogon" target="_blank" class="btn btn-warning btn-lg rounded-pill px-4 py-3 fw-bold text-dark shadow">
-                            <i class="bi bi-compass-fill me-2"></i> Visit Artisan Studios
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </div>
 </section>
 

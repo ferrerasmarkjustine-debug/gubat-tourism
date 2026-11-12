@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Destination extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'municipality_id', 'name', 'description', 'category', 'image_url', 'gallery_images', 'rating', 'reviews_count', 'google_map_url', 'featured', 'is_spotlight'
     ];

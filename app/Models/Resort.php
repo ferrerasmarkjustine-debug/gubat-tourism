@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Resort extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'barangay_id', 'name', 'description', 'address', 'google_map_url',
         'rating', 'reviews_count', 'category', 'image_url', 'gallery_images', 'is_lgu_approved', 'featured'

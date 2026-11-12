@@ -28,7 +28,12 @@ class DestinationController extends Controller
             ->with('municipality')
             ->get();
 
-        return view('super-admin.destinations', compact('destinations', 'spotlightDestinations'));
+        $trashedDestinations = Destination::onlyTrashed()
+            ->with('municipality')
+            ->orderByDesc('deleted_at')
+            ->get();
+
+        return view('super-admin.destinations', compact('destinations', 'spotlightDestinations', 'trashedDestinations'));
     }
 
     /**
@@ -197,13 +202,37 @@ class DestinationController extends Controller
     }
 
     /**
-     * Remove the specified destination from storage.
+     * Soft delete the specified destination (move to Recently Deleted).
      */
     public function destroy(Destination $destination): RedirectResponse
     {
         $name = $destination->name;
         $destination->delete();
 
-        return back()->with('success', "Destination '{$name}' has been deleted successfully.");
+        return back()->with('success', "Destination '{$name}' has been moved to Recently Deleted.");
+    }
+
+    /**
+     * Restore the specified soft-deleted destination.
+     */
+    public function restore(int $id): RedirectResponse
+    {
+        $destination = Destination::onlyTrashed()->findOrFail($id);
+        $name = $destination->name;
+        $destination->restore();
+
+        return back()->with('success', "Destination '{$name}' has been successfully restored!");
+    }
+
+    /**
+     * Permanently remove the specified destination from storage.
+     */
+    public function forceDelete(int $id): RedirectResponse
+    {
+        $destination = Destination::onlyTrashed()->findOrFail($id);
+        $name = $destination->name;
+        $destination->forceDelete();
+
+        return back()->with('success', "Destination '{$name}' has been permanently deleted from the database.");
     }
 }

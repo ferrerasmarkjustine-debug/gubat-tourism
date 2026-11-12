@@ -120,7 +120,7 @@
         </div>
 
         <!-- Page-Specific Live Table Search & Quick Filter Toolbar -->
-        <div class="card border-0 shadow-sm rounded-4 mb-3 bg-white p-3">
+        <div class="card border-0 shadow-sm rounded-4 mb-3 bg-white p-3" id="destSearchCard">
             <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
                 <div class="position-relative flex-grow-1" style="max-width: 520px;">
                     <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
@@ -136,32 +136,40 @@
             </div>
 
             <!-- Quick Filter Pills (Mapped to Homepage Sections) -->
-            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-3 pt-2 border-top">
-                <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Homepage Sections:</span>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold dest-filter-pill active btn-primary text-white" data-filter="all">All</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="beach">
-                    <i class="bi bi-water me-1 text-primary"></i>Beach & Surfing
-                </button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="church">
-                    <i class="bi bi-bank me-1 text-warning"></i>Churches
-                </button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="heritage">
-                    <i class="bi bi-hourglass-split me-1" style="color:#92400e;"></i>History & Heritage
-                </button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="nature">
-                    <i class="bi bi-tree-fill me-1 text-success"></i>Nature & Eco
-                </button>
-                <span class="border-start mx-1" style="height:18px;"></span>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="featured">
-                    <i class="bi bi-star-fill me-1 text-success"></i>Featured
-                </button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="spotlight">
-                    <i class="bi bi-stars me-1 text-warning"></i>Spotlight
-                </button>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3 pt-2 border-top">
+                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                    <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Homepage Sections:</span>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold dest-filter-pill active btn-primary text-white" data-filter="all" id="btnShowActiveDest" onclick="toggleTrashView(false)">All Active</button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="beach">
+                        <i class="bi bi-water me-1 text-primary"></i>Beach & Surfing
+                    </button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="church">
+                        <i class="bi bi-bank me-1 text-warning"></i>Churches
+                    </button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="heritage">
+                        <i class="bi bi-hourglass-split me-1" style="color:#92400e;"></i>History & Heritage
+                    </button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="nature">
+                        <i class="bi bi-tree-fill me-1 text-success"></i>Nature & Eco
+                    </button>
+                    <span class="border-start mx-1" style="height:18px;"></span>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="featured">
+                        <i class="bi bi-star-fill me-1 text-success"></i>Featured
+                    </button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted dest-filter-pill" data-filter="spotlight">
+                        <i class="bi bi-stars me-1 text-warning"></i>Spotlight
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1.5 btn-outline-danger fw-bold d-inline-flex align-items-center gap-1 shadow-sm" id="btnShowTrashDest" onclick="toggleTrashView(true)">
+                        <i class="bi bi-trash3-fill"></i> Recently Deleted
+                        <span class="badge bg-danger text-white rounded-pill ms-1">{{ count($trashedDestinations) }}</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4" id="activeDestinationsCard">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
@@ -251,8 +259,8 @@
                                         <span class="text-muted small">—</span>
                                     @endif
                                 </td>
-                                <td class="text-end pe-4">
-                                    <div class="d-inline-flex align-items-center gap-1">
+                                <td class="text-end pe-4 text-nowrap">
+                                    <div class="d-inline-flex align-items-center gap-1 flex-nowrap">
                                         {{-- Quick Toggle Spotlight --}}
                                         <form method="POST" action="{{ route('admin.destinations.toggle-spotlight', $dest) }}" class="d-inline">
                                             @csrf
@@ -284,6 +292,15 @@
                                                 data-bs-target="#editModal-{{ $dest->id }}"
                                                 title="Edit destination details">
                                             <i class="bi bi-pencil-square me-1"></i> Edit
+                                        </button>
+
+                                        {{-- Delete Button (triggers confirmation modal) --}}
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteModal-{{ $dest->id }}"
+                                                title="Delete this destination (move to trash)">
+                                            <i class="bi bi-trash3"></i>
                                         </button>
 
                                         {{-- Google Maps Link --}}
@@ -325,6 +342,94 @@
                     {{ $destinations->links('pagination::bootstrap-5') }}
                 </div>
             @endif
+        </div>
+
+        <!-- Recently Deleted Destinations Card (Trash) -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 d-none" id="trashedDestinationsCard">
+            <div class="card-header bg-danger bg-opacity-10 border-0 p-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-danger text-white rounded-pill p-2"><i class="bi bi-trash3-fill fs-6"></i></span>
+                    <div>
+                        <h6 class="fw-bold text-danger mb-0">Recently Deleted Destinations (Trash)</h6>
+                        <small class="text-muted">Items here are removed from the public website. You can restore them anytime or delete them permanently.</small>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-semibold shadow-sm" onclick="toggleTrashView(false)">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Active Destinations
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4" style="min-width: 280px;">Destination</th>
+                            <th>Category</th>
+                            <th>Deleted When</th>
+                            <th class="text-end pe-4" style="min-width: 220px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($trashedDestinations as $td)
+                            @php
+                                $tImg = $td->image_url
+                                    ? (str_starts_with($td->image_url, 'http') ? $td->image_url : asset($td->image_url))
+                                    : asset('images/destinations/rizal_beach.jpg');
+                            @endphp
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="{{ $tImg }}" class="rounded-3 shadow-sm flex-shrink-0 opacity-75" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ $td->name }}">
+                                        <div>
+                                            <div class="fw-bold text-dark text-decoration-line-through">{{ $td->name }}</div>
+                                            <small class="text-muted">{{ Str::limit($td->description, 50) }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border px-3 py-1 rounded-pill">
+                                        {{ $td->category }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="small text-muted">
+                                        <i class="bi bi-clock-history me-1"></i> {{ $td->deleted_at ? $td->deleted_at->diffForHumans() : 'Recently' }}
+                                    </span>
+                                    <div class="text-muted" style="font-size: 0.72rem;">{{ $td->deleted_at ? $td->deleted_at->format('M d, Y h:i A') : '' }}</div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-inline-flex align-items-center gap-2">
+                                        {{-- Restore Form --}}
+                                        <form method="POST" action="{{ route('admin.destinations.restore', $td->id) }}" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-semibold" title="Restore this destination to active list">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Restore
+                                            </button>
+                                        </form>
+
+                                        {{-- Permanent Delete Form --}}
+                                        <form method="POST" action="{{ route('admin.destinations.force-delete', $td->id) }}" class="d-inline" onsubmit="return confirm('PERMANENTLY DELETE \'{{ addslashes($td->name) }}\'?\n\nWARNING: This cannot be undone! The destination and all its photos will be purged from the database.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1" title="Permanently delete from database">
+                                                <i class="bi bi-trash3-fill me-1"></i> Delete Forever
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted bg-white">
+                                    <i class="bi bi-trash3 text-muted display-6 d-block mb-2 opacity-25"></i>
+                                    <h6 class="fw-bold text-dark">Recently Deleted is Empty</h6>
+                                    <p class="text-muted small mb-0">No destinations have been deleted recently.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -583,7 +688,7 @@
                                         @if(!empty($dest->gallery_images) && is_array($dest->gallery_images) && count($dest->gallery_images) > 0)
                                             <div class="p-2 bg-light rounded-3 mb-2 border">
                                                 <div class="small fw-semibold text-muted mb-2">
-                                                    Current Gallery ({{ count($dest->gallery_images) }}/10 photos):
+                                                    Current Gallery (<span class="retained-count-text-{{ $dest->id }}">{{ count($dest->gallery_images) }}</span>/10 photos):
                                                 </div>
                                                 <div class="d-flex flex-wrap gap-2">
                                                     @foreach($dest->gallery_images as $gIdx => $gPath)
@@ -593,7 +698,7 @@
                                                         <div class="position-relative border rounded-3 p-1 bg-white shadow-sm" style="width: 75px; height: 75px;">
                                                             <img src="{{ $gSrc }}" class="w-100 h-100 rounded-2" style="object-fit: cover;">
                                                             <input type="hidden" name="retained_gallery_images[]" value="{{ $gPath }}">
-                                                            <button type="button" class="btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 11px; line-height: 1;" title="Remove this photo" onclick="this.parentElement.remove();">
+                                                            <button type="button" class="btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center" style="width: 22px; height: 22px; font-size: 11px; line-height: 1;" title="Remove this photo" onclick="const pWrap = this.closest('.p-2'); this.parentElement.remove(); if (pWrap) { const remaining = pWrap.querySelectorAll('input[name=\'retained_gallery_images[]\']').length; const countEl = pWrap.querySelector('.retained-count-text-{{ $dest->id }}'); if (countEl) countEl.textContent = remaining; if (remaining === 0) pWrap.remove(); }">
                                                                 <i class="bi bi-x"></i>
                                                             </button>
                                                         </div>
@@ -689,19 +794,85 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer border-top px-4 py-3 bg-light rounded-bottom-4">
-                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
-                            <i class="bi bi-check-lg me-1"></i> Save Changes
+                    <div class="modal-footer border-top px-4 py-3 bg-light rounded-bottom-4 d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-danger rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ $dest->id }}" data-bs-dismiss="modal">
+                            <i class="bi bi-trash3 me-1"></i> Delete Destination
                         </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                                <i class="bi bi-check-lg me-1"></i> Save Changes
+                            </button>
+                        </div>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Delete Confirmation Modal for this Destination --}}
+    <div class="modal fade" id="deleteModal-{{ $dest->id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ $dest->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header bg-danger text-white border-0 py-3 px-4">
+                    <h5 class="modal-title fw-bold d-flex align-items-center" id="deleteModalLabel-{{ $dest->id }}">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Move to Recently Deleted?
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded-3">
+                        <img src="{{ $destImgSrc }}" class="rounded-3 shadow-sm" style="width: 54px; height: 54px; object-fit: cover;">
+                        <div>
+                            <div class="fw-bold text-dark fs-6">{{ $dest->name }}</div>
+                            <span class="badge bg-secondary-subtle text-secondary small">{{ $dest->category }}</span>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning small mb-3 border-0 bg-warning-subtle text-warning-emphasis">
+                        <i class="bi bi-info-circle-fill me-1"></i>
+                        <strong>Safety Note:</strong> This destination will immediately disappear from the public website. It will be safely archived in <strong>Recently Deleted</strong> where you can restore it anytime or delete it permanently later.
+                    </div>
+                    <p class="text-muted small mb-0">Are you sure you want to move <strong>{{ $dest->name }}</strong> to trash?</p>
+                </div>
+                <div class="modal-footer bg-light border-0 py-3 px-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ route('admin.destinations.destroy', $dest) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold shadow-sm">
+                            <i class="bi bi-trash3-fill me-1"></i> Move to Trash
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 @endforeach
 
 <script>
+window.toggleTrashView = function(showTrash) {
+    const activeCard = document.getElementById('activeDestinationsCard');
+    const trashCard = document.getElementById('trashedDestinationsCard');
+    const searchCounter = document.getElementById('destSearchCounter');
+    const btnTrash = document.getElementById('btnShowTrashDest');
+    const btnActive = document.getElementById('btnShowActiveDest');
+    const spotlightPanel = document.querySelector('.card[style*="linear-gradient"]');
+
+    if (showTrash) {
+        if (activeCard) activeCard.classList.add('d-none');
+        if (trashCard) trashCard.classList.remove('d-none');
+        if (btnTrash) { btnTrash.classList.add('btn-danger', 'text-white'); btnTrash.classList.remove('btn-outline-danger'); }
+        if (btnActive) { btnActive.classList.remove('active', 'btn-primary', 'text-white'); btnActive.classList.add('btn-light', 'text-muted'); }
+        if (spotlightPanel) spotlightPanel.classList.add('d-none');
+    } else {
+        if (activeCard) activeCard.classList.remove('d-none');
+        if (trashCard) trashCard.classList.add('d-none');
+        if (btnTrash) { btnTrash.classList.remove('btn-danger', 'text-white'); btnTrash.classList.add('btn-outline-danger'); }
+        if (btnActive) { btnActive.classList.add('active', 'btn-primary', 'text-white'); btnActive.classList.remove('btn-light', 'text-muted'); }
+        if (spotlightPanel) spotlightPanel.classList.remove('d-none');
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     function initDestSync(modalSelector, uploaderId) {
         const modal = document.querySelector(modalSelector);
@@ -750,32 +921,111 @@ document.addEventListener('DOMContentLoaded', function () {
         initDestSync('#editModal-{{ $dest->id }}', 'dest_{{ $dest->id }}');
     @endforeach
 
-    // Instant client-side thumbnail preview for multiple gallery photos
+    // Cumulative multi-photo upload & preview store (accumulates photos across multiple "Choose Files" clicks)
+    const galleryFileStores = new Map();
+
+    function renderGalleryPreviews(input, previewContainer, filesArray) {
+        previewContainer.replaceChildren();
+
+        if (filesArray.length > 0) {
+            const header = document.createElement('div');
+            header.className = 'w-100 small fw-semibold text-primary mb-1 d-flex align-items-center justify-content-between';
+            header.innerHTML = `<span><i class="bi bi-images me-1"></i> New Photos Ready to Upload (${filesArray.length}):</span>
+                <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none p-0 small" style="font-size: 0.78rem;">Clear all new</button>`;
+            header.querySelector('button').addEventListener('click', function(ev) {
+                ev.preventDefault();
+                filesArray.length = 0;
+                syncInputFiles(input, filesArray);
+                renderGalleryPreviews(input, previewContainer, filesArray);
+            });
+            previewContainer.appendChild(header);
+        }
+
+        filesArray.forEach((file, idx) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+            wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+
+            const img = document.createElement('img');
+            img.className = 'w-100 h-100 rounded-2';
+            img.style.objectFit = 'cover';
+            wrap.appendChild(img);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center shadow-sm';
+            removeBtn.style.cssText = 'width: 22px; height: 22px; font-size: 11px; line-height: 1; z-index: 5;';
+            removeBtn.title = 'Remove this photo';
+            removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+            removeBtn.addEventListener('click', function(ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                filesArray.splice(idx, 1);
+                syncInputFiles(input, filesArray);
+                renderGalleryPreviews(input, previewContainer, filesArray);
+            });
+            wrap.appendChild(removeBtn);
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            previewContainer.appendChild(wrap);
+        });
+    }
+
+    function syncInputFiles(input, filesArray) {
+        try {
+            const dt = new DataTransfer();
+            filesArray.forEach(f => dt.items.add(f));
+            input.files = dt.files;
+        } catch (err) {
+            console.warn('DataTransfer error:', err);
+        }
+    }
+
+    // Instant client-side thumbnail preview and accumulation for multiple gallery photos
     document.addEventListener('change', function(e) {
         if (e.target.matches('.gallery-input')) {
-            const previewId = e.target.id + '_preview';
+            const input = e.target;
+            const previewId = input.id + '_preview';
             const previewContainer = document.getElementById(previewId);
             if (!previewContainer) return;
-            previewContainer.replaceChildren();
 
-            const files = Array.from(e.target.files).slice(0, 10);
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        const wrap = document.createElement('div');
-                        wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
-                        wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
-                        const img = document.createElement('img');
-                        img.src = evt.target.result;
-                        img.className = 'w-100 h-100 rounded-2';
-                        img.style.objectFit = 'cover';
-                        wrap.appendChild(img);
-                        previewContainer.appendChild(wrap);
-                    };
-                    reader.readAsDataURL(file);
+            if (!galleryFileStores.has(input.id)) {
+                galleryFileStores.set(input.id, []);
+            }
+            const filesArray = galleryFileStores.get(input.id);
+
+            // Calculate retained photos in this modal
+            const modal = input.closest('.modal') || input.closest('form');
+            const retainedCount = modal ? modal.querySelectorAll('input[name="retained_gallery_images[]"]').length : 0;
+            const maxNewAllowed = Math.max(0, 10 - retainedCount);
+
+            const newlySelected = Array.from(input.files).filter(f => f.type.startsWith('image/'));
+
+            let addedCount = 0;
+            newlySelected.forEach(file => {
+                const isDuplicate = filesArray.some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified);
+                if (!isDuplicate) {
+                    if (filesArray.length < maxNewAllowed) {
+                        filesArray.push(file);
+                        addedCount++;
+                    }
                 }
             });
+
+            if (retainedCount + filesArray.length >= 10 && newlySelected.length > addedCount) {
+                alert(`Maximum 10 gallery photos reached (${retainedCount} saved + ${filesArray.length} new). Some photos could not be added.`);
+            }
+
+            // Sync input.files to retain all accumulated files
+            syncInputFiles(input, filesArray);
+
+            // Render all accumulated thumbnail previews with individual remove buttons
+            renderGalleryPreviews(input, previewContainer, filesArray);
         }
     });
 

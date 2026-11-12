@@ -697,31 +697,106 @@ document.addEventListener('DOMContentLoaded', function () {
     @endforeach
 
     // Instant client-side thumbnail preview for craft gallery photos
+    // Cumulative multi-photo upload & preview store for crafts
+    const craftGalleryFileStores = new Map();
+
+    function renderCraftGalleryPreviews(input, previewContainer, filesArray) {
+        previewContainer.replaceChildren();
+
+        if (filesArray.length > 0) {
+            const header = document.createElement('div');
+            header.className = 'w-100 small fw-semibold text-primary mb-1 d-flex align-items-center justify-content-between';
+            header.innerHTML = `<span><i class="bi bi-images me-1"></i> New Photos Ready to Upload (${filesArray.length}):</span>
+                <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none p-0 small" style="font-size: 0.78rem;">Clear all new</button>`;
+            header.querySelector('button').addEventListener('click', function(ev) {
+                ev.preventDefault();
+                filesArray.length = 0;
+                syncCraftInputFiles(input, filesArray);
+                renderCraftGalleryPreviews(input, previewContainer, filesArray);
+            });
+            previewContainer.appendChild(header);
+        }
+
+        filesArray.forEach((file, idx) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+            wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+
+            const img = document.createElement('img');
+            img.className = 'w-100 h-100 rounded-2';
+            img.style.objectFit = 'cover';
+            wrap.appendChild(img);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center shadow-sm';
+            removeBtn.style.cssText = 'width: 22px; height: 22px; font-size: 11px; line-height: 1; z-index: 5;';
+            removeBtn.title = 'Remove this photo';
+            removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+            removeBtn.addEventListener('click', function(ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                filesArray.splice(idx, 1);
+                syncCraftInputFiles(input, filesArray);
+                renderCraftGalleryPreviews(input, previewContainer, filesArray);
+            });
+            wrap.appendChild(removeBtn);
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            previewContainer.appendChild(wrap);
+        });
+    }
+
+    function syncCraftInputFiles(input, filesArray) {
+        try {
+            const dt = new DataTransfer();
+            filesArray.forEach(f => dt.items.add(f));
+            input.files = dt.files;
+        } catch (err) {
+            console.warn('DataTransfer error:', err);
+        }
+    }
+
     document.addEventListener('change', function(e) {
         if (e.target.matches('.craft-gallery-input')) {
-            const previewId = e.target.id + '_preview';
+            const input = e.target;
+            const previewId = input.id + '_preview';
             const previewContainer = document.getElementById(previewId);
             if (!previewContainer) return;
-            previewContainer.replaceChildren();
 
-            const files = Array.from(e.target.files).slice(0, 10);
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        const wrap = document.createElement('div');
-                        wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
-                        wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
-                        const img = document.createElement('img');
-                        img.src = evt.target.result;
-                        img.className = 'w-100 h-100 rounded-2';
-                        img.style.objectFit = 'cover';
-                        wrap.appendChild(img);
-                        previewContainer.appendChild(wrap);
-                    };
-                    reader.readAsDataURL(file);
+            if (!craftGalleryFileStores.has(input.id)) {
+                craftGalleryFileStores.set(input.id, []);
+            }
+            const filesArray = craftGalleryFileStores.get(input.id);
+
+            const modal = input.closest('.modal') || input.closest('form');
+            const retainedCount = modal ? modal.querySelectorAll('input[name="retained_gallery_images[]"]').length : 0;
+            const maxNewAllowed = Math.max(0, 10 - retainedCount);
+
+            const newlySelected = Array.from(input.files).filter(f => f.type.startsWith('image/'));
+
+            let addedCount = 0;
+            newlySelected.forEach(file => {
+                const isDuplicate = filesArray.some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified);
+                if (!isDuplicate) {
+                    if (filesArray.length < maxNewAllowed) {
+                        filesArray.push(file);
+                        addedCount++;
+                    }
                 }
             });
+
+            if (retainedCount + filesArray.length >= 10 && newlySelected.length > addedCount) {
+                alert(`Maximum 10 gallery photos reached (${retainedCount} saved + ${filesArray.length} new). Some photos could not be added.`);
+            }
+
+            syncCraftInputFiles(input, filesArray);
+            renderCraftGalleryPreviews(input, previewContainer, filesArray);
         }
     });
 

@@ -3,6 +3,9 @@
     <div class="container">
         <div class="row align-items-end mb-5">
             <div class="col-md-8 text-start">
+                <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase mb-2 shadow-sm" style="background-color: rgba(245, 158, 11, 0.15); color: #d97706; font-size: 0.8rem;">
+                    <i class="bi bi-tsunami me-1"></i> Sun, Surf &amp; Coastal Wonders
+                </span>
                 <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
                     <h2 class="section-title text-start mb-0">Featured Destinations</h2>
                     @if(Auth::check() && Auth::user()->isLguAdmin())
@@ -11,11 +14,12 @@
                         </span>
                     @endif
                 </div>
+                <p class="text-muted mt-2 mb-0">Discover premier beaches, coastal promenades, and world-class surfing breaks across Gubat.</p>
                 @if(Auth::check() && Auth::user()->isLguAdmin())
                     <div class="admin-section-controls d-flex align-items-center gap-2 mt-2">
-                        <a href="{{ route('admin.destinations') }}" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-semibold text-white">
+                        <button type="button" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-semibold text-white" onclick="openFeaturePicker('beach')">
                             <i class="bi bi-plus-circle me-1"></i> Add Destination
-                        </a>
+                        </button>
                         <a href="{{ route('admin.destinations') }}" class="btn btn-sm btn-outline-dark rounded-pill px-3">
                             <i class="bi bi-gear-fill me-1"></i> Manage Destinations
                         </a>
@@ -48,14 +52,16 @@
                          data-reviews="{{ $dest->reviews_count }}"
                          data-cover="{{ $coverUrl }}"
                          data-gallery="{{ json_encode($dest->gallery_images ?? []) }}"
-                         data-map="{{ $dest->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($dest->name . ' Gubat Sorsogon') }}">
+                         data-map="{{ $dest->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($dest->name . ' Gubat Sorsogon') }}"
+                         data-featured="{{ $dest->featured ? 1 : 0 }}"
+                         data-spotlight="{{ ($dest->is_spotlight ?? false) ? 1 : 0 }}">
                         <div class="card-tourism-img-wrapper position-relative">
                             @if(Auth::check() && Auth::user()->isLguAdmin() && isset($dest->id))
                                 <div class="admin-card-overlay">
-                                    <button type="button" class="admin-card-btn admin-card-btn-warning" onclick="event.stopPropagation(); openAdminEditDestination('{{ $dest->id }}', '{{ addslashes($dest->name) }}', '{{ addslashes($dest->category) }}', '{{ addslashes($dest->description) }}', '{{ addslashes($dest->google_map_url ?? '') }}', '{{ $dest->featured ? 1 : 0 }}')" title="Quick Edit this destination">
+                                    <button type="button" class="admin-card-btn admin-card-btn-warning" onclick="event.stopPropagation(); openAdminEditDestination(this);" title="Quick Edit this destination">
                                         <i class="bi bi-pencil-fill"></i> Edit
                                     </button>
-                                    <button type="button" class="admin-card-btn admin-card-btn-danger" onclick="event.stopPropagation(); unfeatureHomepageCard('{{ route('admin.destinations.toggle-featured', $dest->id) }}', this.closest('.col-lg-4'), '{{ addslashes($dest->name) }}')" title="Remove from Homepage without deleting">
+                                    <button type="button" class="admin-card-btn admin-card-btn-danger" onclick="event.stopPropagation(); unfeatureHomepageCard('{{ route('admin.destinations.toggle-featured', $dest->id) }}', this);" title="Remove from Homepage without deleting">
                                         <i class="bi bi-x-circle-fill"></i> Remove
                                     </button>
                                 </div>

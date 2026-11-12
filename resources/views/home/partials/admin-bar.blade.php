@@ -73,7 +73,7 @@
         /* Admin Action Overlay on Cards */
         .admin-card-overlay {
             position: absolute;
-            top: 10px;
+            bottom: 10px;
             right: 10px;
             z-index: 25;
             display: inline-flex;
@@ -137,57 +137,40 @@
 
         function setLguEditMode(isActive) {
             const body = document.body;
-            const btnOn = document.getElementById('btnEditModeOn');
-            const btnOff = document.getElementById('btnEditModeOff');
+            const toolbar = document.getElementById('lguAdminToolbar');
+            const restorePill = document.getElementById('lguAdminRestorePill');
 
             if (isActive) {
                 body.classList.add('lgu-edit-active');
-                if (btnOn) {
-                    btnOn.classList.add('active-edit-btn');
-                    btnOn.classList.remove('text-white-50');
-                }
-                if (btnOff) {
-                    btnOff.classList.remove('active-edit-btn');
-                    btnOff.classList.add('text-white-50');
+                // Show full toolbar, hide restore pill
+                if (toolbar) toolbar.classList.remove('d-none');
+                if (restorePill) {
+                    restorePill.classList.add('d-none');
+                    restorePill.classList.remove('d-flex');
                 }
                 localStorage.setItem('lgu_edit_mode', '1');
             } else {
                 body.classList.remove('lgu-edit-active');
-                if (btnOn) {
-                    btnOn.classList.remove('active-edit-btn');
-                    btnOn.classList.add('text-white-50');
-                }
-                if (btnOff) {
-                    btnOff.classList.add('active-edit-btn');
-                    btnOff.classList.remove('text-white-50');
+                // Collapse toolbar, show restore pill
+                if (toolbar) toolbar.classList.add('d-none');
+                if (restorePill) {
+                    restorePill.classList.remove('d-none');
+                    restorePill.classList.add('d-flex');
                 }
                 localStorage.setItem('lgu_edit_mode', '0');
             }
         }
 
         function toggleVisitorPreview(isVisitor) {
-            const toolbar = document.getElementById('lguAdminToolbar');
-            const restorePill = document.getElementById('lguAdminRestorePill');
-
             if (isVisitor) {
                 setLguEditMode(false);
-                if (toolbar) toolbar.classList.add('d-none');
-                if (restorePill) {
-                    restorePill.classList.remove('d-none');
-                    restorePill.classList.add('d-flex');
-                }
             } else {
                 setLguEditMode(true);
-                if (toolbar) toolbar.classList.remove('d-none');
-                if (restorePill) {
-                    restorePill.classList.add('d-none');
-                    restorePill.classList.remove('d-flex');
-                }
             }
         }
 
         function toggleAdminBarCollapse() {
-            toggleVisitorPreview(true);
+            setLguEditMode(false);
         }
     </script>
 @endif

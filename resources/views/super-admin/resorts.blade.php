@@ -51,18 +51,26 @@
             </div>
 
             <!-- Quick Filter Pills -->
-            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-3 pt-2 border-top">
-                <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Filters:</span>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold resort-filter-pill active btn-primary text-white" data-filter="all">All</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="luxury">Luxury</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="eco">Eco-Lodge</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="budget">Budget</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="accredited">Accredited</button>
-                <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="pending">Pending</button>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3 pt-2 border-top">
+                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                    <span class="text-muted small fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Filters:</span>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 fw-semibold resort-filter-pill active btn-primary text-white" data-filter="all" id="btnShowActiveResorts" onclick="toggleTrashResortView(false)">All Active</button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="luxury">Luxury</button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="eco">Eco-Lodge</button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="budget">Budget</button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="accredited">Accredited</button>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1 btn-light text-muted resort-filter-pill" data-filter="pending">Pending</button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-xs rounded-pill px-3 py-1.5 btn-outline-danger fw-bold d-inline-flex align-items-center gap-1 shadow-sm" id="btnShowTrashResorts" onclick="toggleTrashResortView(true)">
+                        <i class="bi bi-trash3-fill"></i> Recently Deleted
+                        <span class="badge bg-danger text-white rounded-pill ms-1">{{ count($trashedResorts) }}</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4" id="activeResortsCard">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
@@ -73,7 +81,7 @@
                             <th>LGU Status</th>
                             <th>Accommodations</th>
                             <th>Assigned Resort Admin</th>
-                            <th class="text-end pe-4">Actions</th>
+                            <th class="text-end pe-4" style="min-width: 250px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="resortsTableBody">
@@ -138,13 +146,16 @@
                                         </a>
                                     @endif
                                 </td>
-                                <td class="text-end pe-4">
-                                    <div class="d-flex justify-content-end gap-1">
-                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editResortModal-{{ $resort->id }}">
+                                <td class="text-end pe-4 text-nowrap">
+                                    <div class="d-inline-flex align-items-center justify-content-end gap-1.5 flex-nowrap">
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 d-inline-flex align-items-center flex-nowrap" data-bs-toggle="modal" data-bs-target="#editResortModal-{{ $resort->id }}" title="Edit resort details">
                                             <i class="bi bi-pencil-square me-1"></i> Edit
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#viewRoomsModal-{{ $resort->id }}" title="View registered accommodations and room inventory">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 d-inline-flex align-items-center flex-nowrap" data-bs-toggle="modal" data-bs-target="#viewRoomsModal-{{ $resort->id }}" title="View registered accommodations and room inventory">
                                             <i class="bi bi-door-open me-1"></i> Rooms ({{ $resort->accommodations->count() }})
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 d-inline-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#deleteResortModal-{{ $resort->id }}" title="Delete this resort (move to trash)">
+                                            <i class="bi bi-trash3"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -359,11 +370,16 @@
                                                 </div>
                                             </div>
 
-                                            <div class="modal-footer border-top py-3 px-4">
-                                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
-                                                    <i class="bi bi-save me-1"></i> Save Changes
+                                            <div class="modal-footer border-top py-3 px-4 d-flex justify-content-between">
+                                                <button type="button" class="btn btn-outline-danger rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#deleteResortModal-{{ $resort->id }}" data-bs-dismiss="modal">
+                                                    <i class="bi bi-trash3 me-1"></i> Delete Resort
                                                 </button>
+                                                <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+                                                        <i class="bi bi-save me-1"></i> Save Changes
+                                                    </button>
+                                                </div>
                                             </div>
                                         </form>
                                     </div>
@@ -476,6 +492,54 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Delete Confirmation Modal for Resort -->
+                            <div class="modal fade" id="deleteResortModal-{{ $resort->id }}" tabindex="-1" aria-labelledby="deleteResortModalLabel-{{ $resort->id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content rounded-4 border-0 shadow">
+                                        <div class="modal-header bg-danger text-white border-0 py-3 px-4">
+                                            <h5 class="modal-title fw-bold d-flex align-items-center" id="deleteResortModalLabel-{{ $resort->id }}">
+                                                <i class="bi bi-exclamation-triangle-fill me-2"></i> Move to Recently Deleted?
+                                            </h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded-3">
+                                                <img src="{{ \Illuminate\Support\Str::startsWith($resort->image_url ?? '', ['http://', 'https://']) ? $resort->image_url : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg') }}" class="rounded-3 shadow-sm" style="width: 54px; height: 54px; object-fit: cover;">
+                                                <div>
+                                                    <div class="fw-bold text-dark fs-6">{{ $resort->name }}</div>
+                                                    <span class="badge bg-info-subtle text-info small">{{ ucfirst($resort->category) }}</span>
+                                                    <span class="text-muted small ms-1">Brgy. {{ $resort->barangay ? $resort->barangay->name : 'Gubat' }}</span>
+                                                </div>
+                                            </div>
+
+                                            @if($resort->accommodations->count() > 0)
+                                                <div class="alert alert-warning small mb-3 border-0 bg-warning-subtle text-warning-emphasis">
+                                                    <i class="bi bi-door-closed me-1"></i>
+                                                    <strong>Registered Rooms:</strong> This resort currently has <strong>{{ $resort->accommodations->count() }} registered accommodation(s)</strong>. Moving this resort to trash will temporarily hide its rooms from public booking.
+                                                </div>
+                                            @endif
+
+                                            <div class="alert alert-danger-subtle text-danger-emphasis small mb-3 border-0">
+                                                <i class="bi bi-shield-check me-1"></i>
+                                                <strong>Safety Guarantee:</strong> No room listings or booking records will be deleted! The resort will be safely archived in <strong>Recently Deleted</strong> where you can restore it anytime with one click.
+                                            </div>
+
+                                            <p class="text-muted small mb-0">Are you sure you want to move <strong>{{ $resort->name }}</strong> to trash?</p>
+                                        </div>
+                                        <div class="modal-footer bg-light border-0 py-3 px-4 d-flex justify-content-between">
+                                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                                            <form method="POST" action="{{ route('admin.resorts.destroy', $resort->id) }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold shadow-sm">
+                                                    <i class="bi bi-trash3-fill me-1"></i> Move to Trash
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @empty
                             <tr>
                                 <td colspan="7" class="text-center py-4 text-muted">No resorts found.</td>
@@ -498,40 +562,231 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-end">
+        <div id="activeResortsPagination" class="d-flex justify-content-end mb-4">
             {{ $resorts->links() }}
+        </div>
+
+        <!-- Recently Deleted Resorts Card (Trash) -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 d-none" id="trashedResortsCard">
+            <div class="card-header bg-danger bg-opacity-10 border-0 p-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-danger text-white rounded-pill p-2"><i class="bi bi-trash3-fill fs-6"></i></span>
+                    <div>
+                        <h6 class="fw-bold text-danger mb-0">Recently Deleted Resorts (Trash)</h6>
+                        <small class="text-muted">Resorts here are removed from public booking. You can restore them anytime with all their room data intact.</small>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-semibold shadow-sm" onclick="toggleTrashResortView(false)">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Active Resorts
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4" style="min-width: 280px;">Resort Name</th>
+                            <th>Category</th>
+                            <th>Barangay</th>
+                            <th>Preserved Rooms</th>
+                            <th>Deleted When</th>
+                            <th class="text-end pe-4" style="min-width: 220px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($trashedResorts as $tr)
+                            @php
+                                $trImg = \Illuminate\Support\Str::startsWith($tr->image_url ?? '', ['http://', 'https://']) ? $tr->image_url : asset($tr->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg');
+                            @endphp
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="{{ $trImg }}" class="rounded-3 shadow-sm flex-shrink-0 opacity-75" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ $tr->name }}">
+                                        <div>
+                                            <div class="fw-bold text-dark text-decoration-line-through">{{ $tr->name }}</div>
+                                            <small class="text-muted">{{ $tr->address ?? 'Gubat, Sorsogon' }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border px-3 py-1 rounded-pill">
+                                        {{ ucfirst($tr->category) }}
+                                    </span>
+                                </td>
+                                <td>{{ $tr->barangay ? $tr->barangay->name : 'Gubat Proper' }}</td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-door-closed me-1"></i> {{ $tr->accommodations->count() }} rooms preserved
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="small text-muted">
+                                        <i class="bi bi-clock-history me-1"></i> {{ $tr->deleted_at ? $tr->deleted_at->diffForHumans() : 'Recently' }}
+                                    </span>
+                                    <div class="text-muted" style="font-size: 0.72rem;">{{ $tr->deleted_at ? $tr->deleted_at->format('M d, Y h:i A') : '' }}</div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-inline-flex align-items-center gap-2">
+                                        {{-- Restore Form --}}
+                                        <form method="POST" action="{{ route('admin.resorts.restore', $tr->id) }}" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-semibold" title="Restore this resort and its accommodations">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Restore
+                                            </button>
+                                        </form>
+
+                                        {{-- Permanent Delete Form --}}
+                                        <form method="POST" action="{{ route('admin.resorts.force-delete', $tr->id) }}" class="d-inline" onsubmit="return confirm('PERMANENTLY DELETE \'{{ addslashes($tr->name) }}\'?\n\nWARNING: This cannot be undone! The resort, all its rooms, and booking records will be permanently purged from the database.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1" title="Permanently delete from database">
+                                                <i class="bi bi-trash3-fill me-1"></i> Delete Forever
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted bg-white">
+                                    <i class="bi bi-trash3 text-muted display-6 d-block mb-2 opacity-25"></i>
+                                    <h6 class="fw-bold text-dark">Recently Deleted is Empty</h6>
+                                    <p class="text-muted small mb-0">No resorts have been deleted recently.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+window.toggleTrashResortView = function(showTrash) {
+    const activeCard = document.getElementById('activeResortsCard');
+    const trashCard = document.getElementById('trashedResortsCard');
+    const pagination = document.getElementById('activeResortsPagination');
+    const btnTrash = document.getElementById('btnShowTrashResorts');
+    const btnActive = document.getElementById('btnShowActiveResorts');
+
+    if (showTrash) {
+        if (activeCard) activeCard.classList.add('d-none');
+        if (pagination) pagination.classList.add('d-none');
+        if (trashCard) trashCard.classList.remove('d-none');
+        if (btnTrash) { btnTrash.classList.add('btn-danger', 'text-white'); btnTrash.classList.remove('btn-outline-danger'); }
+        if (btnActive) { btnActive.classList.remove('active', 'btn-primary', 'text-white'); btnActive.classList.add('btn-light', 'text-muted'); }
+    } else {
+        if (activeCard) activeCard.classList.remove('d-none');
+        if (pagination) pagination.classList.remove('d-none');
+        if (trashCard) trashCard.classList.add('d-none');
+        if (btnTrash) { btnTrash.classList.remove('btn-danger', 'text-white'); btnTrash.classList.add('btn-outline-danger'); }
+        if (btnActive) { btnActive.classList.add('active', 'btn-primary', 'text-white'); btnActive.classList.remove('btn-light', 'text-muted'); }
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Instant client-side thumbnail preview for multiple resort gallery photos
+    // Cumulative multi-photo upload & preview store for resorts
+    const resortGalleryFileStores = new Map();
+
+    function renderResortGalleryPreviews(input, previewContainer, filesArray) {
+        previewContainer.replaceChildren();
+
+        if (filesArray.length > 0) {
+            const header = document.createElement('div');
+            header.className = 'w-100 small fw-semibold text-primary mb-1 d-flex align-items-center justify-content-between';
+            header.innerHTML = `<span><i class="bi bi-images me-1"></i> New Photos Ready to Upload (${filesArray.length}):</span>
+                <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none p-0 small" style="font-size: 0.78rem;">Clear all new</button>`;
+            header.querySelector('button').addEventListener('click', function(ev) {
+                ev.preventDefault();
+                filesArray.length = 0;
+                syncResortInputFiles(input, filesArray);
+                renderResortGalleryPreviews(input, previewContainer, filesArray);
+            });
+            previewContainer.appendChild(header);
+        }
+
+        filesArray.forEach((file, idx) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+            wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+
+            const img = document.createElement('img');
+            img.className = 'w-100 h-100 rounded-2';
+            img.style.objectFit = 'cover';
+            wrap.appendChild(img);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center shadow-sm';
+            removeBtn.style.cssText = 'width: 22px; height: 22px; font-size: 11px; line-height: 1; z-index: 5;';
+            removeBtn.title = 'Remove this photo';
+            removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+            removeBtn.addEventListener('click', function(ev) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                filesArray.splice(idx, 1);
+                syncResortInputFiles(input, filesArray);
+                renderResortGalleryPreviews(input, previewContainer, filesArray);
+            });
+            wrap.appendChild(removeBtn);
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            previewContainer.appendChild(wrap);
+        });
+    }
+
+    function syncResortInputFiles(input, filesArray) {
+        try {
+            const dt = new DataTransfer();
+            filesArray.forEach(f => dt.items.add(f));
+            input.files = dt.files;
+        } catch (err) {
+            console.warn('DataTransfer error:', err);
+        }
+    }
+
     document.addEventListener('change', function(e) {
         if (e.target.matches('.resort-gallery-input')) {
-            const previewId = e.target.id + '_preview';
+            const input = e.target;
+            const previewId = input.id + '_preview';
             const previewContainer = document.getElementById(previewId);
             if (!previewContainer) return;
-            previewContainer.replaceChildren();
 
-            const files = Array.from(e.target.files).slice(0, 10);
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        const wrap = document.createElement('div');
-                        wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
-                        wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
-                        const img = document.createElement('img');
-                        img.src = evt.target.result;
-                        img.className = 'w-100 h-100 rounded-2';
-                        img.style.objectFit = 'cover';
-                        wrap.appendChild(img);
-                        previewContainer.appendChild(wrap);
-                    };
-                    reader.readAsDataURL(file);
+            if (!resortGalleryFileStores.has(input.id)) {
+                resortGalleryFileStores.set(input.id, []);
+            }
+            const filesArray = resortGalleryFileStores.get(input.id);
+
+            const modal = input.closest('.modal') || input.closest('form');
+            const retainedCount = modal ? modal.querySelectorAll('input[name="retained_gallery_images[]"]').length : 0;
+            const maxNewAllowed = Math.max(0, 10 - retainedCount);
+
+            const newlySelected = Array.from(input.files).filter(f => f.type.startsWith('image/'));
+
+            let addedCount = 0;
+            newlySelected.forEach(file => {
+                const isDuplicate = filesArray.some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified);
+                if (!isDuplicate) {
+                    if (filesArray.length < maxNewAllowed) {
+                        filesArray.push(file);
+                        addedCount++;
+                    }
                 }
             });
+
+            if (retainedCount + filesArray.length >= 10 && newlySelected.length > addedCount) {
+                alert(`Maximum 10 gallery photos reached (${retainedCount} saved + ${filesArray.length} new). Some photos could not be added.`);
+            }
+
+            syncResortInputFiles(input, filesArray);
+            renderResortGalleryPreviews(input, previewContainer, filesArray);
         }
     });
 

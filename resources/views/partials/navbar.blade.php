@@ -38,7 +38,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top glass-panel py-3" style="background: rgba(15, 76, 129, 0.9); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
     <div class="container">
         <a class="navbar-brand fw-bold d-flex align-items-center fs-4" href="{{ route('home') }}">
-            <i class="bi bi-compass-fill text-warning me-2 animate-float"></i>
             <span class="font-outfit text-white tracking-wide">GUBAT <span class="text-warning">TOURISM</span></span>
         </a>
 
