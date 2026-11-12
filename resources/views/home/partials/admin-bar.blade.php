@@ -19,25 +19,15 @@
                 </button>
             </div>
 
-            <!-- View as Public Visitor -->
-            <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 fw-semibold d-none d-sm-inline-flex align-items-center" id="btnVisitorPreview" onclick="toggleVisitorPreview(true)" title="Preview homepage exactly as ordinary visitors see it">
-                <i class="bi bi-eye me-1"></i> Visitor View
-            </button>
-
             <!-- Full Admin Portal Link -->
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-semibold d-none d-md-inline-flex align-items-center" title="Open complete Admin Portal">
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-semibold d-inline-flex align-items-center" title="Open complete Admin Portal">
                 <i class="bi bi-speedometer2 me-1"></i> Dashboard
             </a>
-
-            <!-- Minimize / Hide Toolbar Button -->
-            <button type="button" class="btn btn-sm text-white-50 p-1 border-0" onclick="toggleAdminBarCollapse()" title="Minimize toolbar">
-                <i class="bi bi-dash-circle fs-6"></i>
-            </button>
         </div>
     </div>
 
-    <!-- Collapsed Admin Pill (Shown when visitor preview is active or toolbar minimized) -->
-    <div id="lguAdminRestorePill" class="position-fixed shadow-lg d-none align-items-center gap-2 py-2 px-3 rounded-pill bg-dark text-white" style="bottom: 25px; left: 25px; z-index: 1050; cursor: pointer; border: 2px solid #ffc107;" onclick="toggleVisitorPreview(false)" title="Click to restore LGU Admin Edit Mode">
+    <!-- Collapsed Floating Admin Pill (Animated in bottom-left when edit mode is OFF) -->
+    <div id="lguAdminRestorePill" class="lgu-admin-restore-pill is-hidden" onclick="setLguEditMode(true)" title="Click to restore LGU Admin Edit Mode">
         <i class="bi bi-shield-lock-fill text-warning fs-5"></i>
         <span class="small fw-bold">Restore Admin Edit Mode</span>
     </div>
@@ -47,21 +37,76 @@
             position: fixed;
             top: 86px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(0) scale(1);
             width: 94%;
-            max-width: 1100px;
+            max-width: 1080px;
             z-index: 1040;
             background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1.5px solid rgba(255, 193, 7, 0.4);
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
-            transition: all 0.3s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(255, 193, 7, 0.45);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.38);
+            border-radius: 50px;
+            opacity: 1;
+            pointer-events: auto;
+            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+                        opacity 0.35s ease, 
+                        box-shadow 0.35s ease;
+        }
+
+        .lgu-admin-toolbar.is-collapsed {
+            transform: translateX(-50%) translateY(-65px) scale(0.92);
+            opacity: 0;
+            pointer-events: none;
         }
 
         .active-edit-btn {
             background-color: #ffc107 !important;
             color: #0f172a !important;
+        }
+
+        /* Bottom-Left Restore Pill with Spring Bounce & Pulse Glow */
+        .lgu-admin-restore-pill {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 1050;
+            cursor: pointer;
+            background: #0f172a;
+            color: #ffffff;
+            border: 2px solid #ffc107;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 193, 7, 0.35);
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 18px;
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        opacity 0.3s ease, 
+                        box-shadow 0.25s ease,
+                        border-color 0.25s ease;
+            animation: lguPillPulse 3s infinite alternate ease-in-out;
+        }
+
+        @keyframes lguPillPulse {
+            0% { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 193, 7, 0.25); }
+            100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 193, 7, 0.5); }
+        }
+
+        .lgu-admin-restore-pill:hover {
+            transform: translateY(-3px) scale(1.05);
+            border-color: #fbbf24;
+            animation: none;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55), 0 0 25px rgba(255, 193, 7, 0.6);
+        }
+
+        .lgu-admin-restore-pill.is-hidden {
+            transform: translateY(35px) scale(0.8);
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* Show/Hide Admin Badges on Cards based on Edit Mode */
@@ -129,48 +174,62 @@
             // Restore Edit Mode state from localStorage
             const savedMode = localStorage.getItem('lgu_edit_mode');
             if (savedMode === '0') {
-                setLguEditMode(false);
+                setLguEditMode(false, true);
             } else {
-                setLguEditMode(true);
+                setLguEditMode(true, true);
             }
         });
 
-        function setLguEditMode(isActive) {
+        function setLguEditMode(isActive, isInitial) {
             const body = document.body;
             const toolbar = document.getElementById('lguAdminToolbar');
             const restorePill = document.getElementById('lguAdminRestorePill');
+            const btnOn = document.getElementById('btnEditModeOn');
+            const btnOff = document.getElementById('btnEditModeOff');
 
             if (isActive) {
                 body.classList.add('lgu-edit-active');
-                // Show full toolbar, hide restore pill
-                if (toolbar) toolbar.classList.remove('d-none');
+                if (btnOn) {
+                    btnOn.classList.add('active-edit-btn');
+                    btnOn.classList.remove('text-white-50');
+                }
+                if (btnOff) {
+                    btnOff.classList.remove('active-edit-btn');
+                    btnOff.classList.add('text-white-50');
+                }
+
                 if (restorePill) {
-                    restorePill.classList.add('d-none');
-                    restorePill.classList.remove('d-flex');
+                    restorePill.classList.add('is-hidden');
+                }
+                if (toolbar) {
+                    toolbar.classList.remove('is-collapsed');
                 }
                 localStorage.setItem('lgu_edit_mode', '1');
             } else {
                 body.classList.remove('lgu-edit-active');
-                // Collapse toolbar, show restore pill
-                if (toolbar) toolbar.classList.add('d-none');
+                if (btnOn) {
+                    btnOn.classList.remove('active-edit-btn');
+                    btnOn.classList.add('text-white-50');
+                }
+                if (btnOff) {
+                    btnOff.classList.add('active-edit-btn');
+                    btnOff.classList.remove('text-white-50');
+                }
+
+                if (toolbar) {
+                    toolbar.classList.add('is-collapsed');
+                }
                 if (restorePill) {
-                    restorePill.classList.remove('d-none');
-                    restorePill.classList.add('d-flex');
+                    if (isInitial) {
+                        restorePill.classList.remove('is-hidden');
+                    } else {
+                        setTimeout(() => {
+                            restorePill.classList.remove('is-hidden');
+                        }, 120);
+                    }
                 }
                 localStorage.setItem('lgu_edit_mode', '0');
             }
-        }
-
-        function toggleVisitorPreview(isVisitor) {
-            if (isVisitor) {
-                setLguEditMode(false);
-            } else {
-                setLguEditMode(true);
-            }
-        }
-
-        function toggleAdminBarCollapse() {
-            setLguEditMode(false);
         }
     </script>
 @endif

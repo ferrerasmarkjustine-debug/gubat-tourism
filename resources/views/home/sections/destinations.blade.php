@@ -33,7 +33,7 @@
         </div>
 
         <div class="row g-4">
-            @foreach($featuredResorts as $resort)
+            @forelse($featuredResorts as $resort)
                 @php
                     $minPrice = isset($resort->accommodations) && $resort->accommodations->isNotEmpty()
                         ? $resort->accommodations->min('price_per_night')
@@ -159,7 +159,20 @@
                         </div>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="col-12 text-center py-5">
+                    <div class="p-4 rounded-4 bg-white border shadow-sm d-inline-block text-center" style="max-width: 480px;">
+                        <i class="bi bi-buildings-fill display-6 text-muted mb-2 d-block opacity-50"></i>
+                        <h6 class="fw-bold text-dark mb-1">No Resorts Currently Featured</h6>
+                        <p class="text-muted small mb-0">Browse all accommodations in the directory or feature resorts from the Admin Portal.</p>
+                        @if(Auth::check() && Auth::user()->isLguAdmin())
+                            <button type="button" class="btn btn-sm btn-success rounded-pill px-4 mt-3 shadow-sm fw-semibold" onclick="openFeaturePicker('resort')">
+                                <i class="bi bi-plus-circle me-1"></i> Add Resort to Homepage
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            @endforelse
         </div>
     </div>
 </section>

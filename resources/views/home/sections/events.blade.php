@@ -75,12 +75,9 @@
                                 </div>
                             </div>
                             <h5 class="fw-bold text-dark mb-2">{{ $event->title }}</h5>
-                            <p class="text-muted small flex-grow-1">{{ Str::limit($event->description, 110) }}</p>
-                            <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center text-muted small">
-                                <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $event->location }}</span>
-                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-semibold view-event-details-btn" style="font-size: 0.75rem;">
-                                    Enlarge <i class="bi bi-arrows-fullscreen ms-1"></i>
-                                </button>
+                            <p class="text-muted small flex-grow-1 mb-3">{{ Str::limit($event->description, 110) }}</p>
+                            <div class="mt-auto pt-3 border-top d-flex align-items-center text-muted small">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i> <span>{{ $event->location }}</span>
                             </div>
                         </div>
                     </div>

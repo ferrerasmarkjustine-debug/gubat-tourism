@@ -23,74 +23,83 @@ class HomeController extends Controller
     {
         try {
             $allDestinations = Destination::with('municipality')->get();
-            $featuredDestinations = Destination::where('featured', true)->with('municipality')->get();
             $allResorts = Resort::with(['barangay', 'accommodations.amenities'])->get();
-            $featuredResorts = Resort::where('featured', true)->with(['barangay', 'accommodations.amenities'])->get();
-            $heritageSpots = Destination::where('featured', false)->with('municipality')->get();
             $events = Event::orderBy('event_date', 'asc')->with('municipality')->get();
             $announcements = Announcement::orderBy('published_at', 'desc')->take(3)->get();
             $testimonials = Testimonial::all();
             $weatherTips = WeatherTip::all();
 
-            // If empty, fall back to static data to ensure robust operation
-            if ($featuredDestinations->isEmpty()) {
+            // Only use static fallbacks if the database table itself has zero records
+            if ($allDestinations->isEmpty()) {
                 $featuredDestinations = $this->getFallbackDestinations();
-            }
-            if ($featuredResorts->isEmpty()) {
-                $featuredResorts = $this->getFallbackResorts();
-            }
-            if ($heritageSpots->isEmpty()) {
+                $churchSpots = $this->getFallbackChurches();
+                $historySpots = $this->getFallbackHistory();
+                $natureSpots = $this->getFallbackNature();
                 $heritageSpots = $this->getFallbackHeritage();
-            }
-            if ($events->isEmpty()) {
-                $events = $this->getFallbackEvents();
-            }
-            if ($announcements->isEmpty()) {
-                $announcements = $this->getFallbackAnnouncements();
-            }
-            if ($testimonials->isEmpty()) {
-                $testimonials = $this->getFallbackTestimonials();
-            }
-            if ($weatherTips->isEmpty()) {
-                $weatherTips = $this->getFallbackWeatherTips();
+            } else {
+                // Strictly respect the admin's 'featured' flag (only featured == true appear on the homepage)
+                $featuredOnly = $allDestinations->where('featured', true)->values();
+
+                // Historic Churches section
+                $churchSpots = $featuredOnly->filter(function($s) {
+                    $c = strtolower($s->category ?? '');
+                    return str_contains($c, 'church') || str_contains($c, 'chapel') || str_contains($c, 'parish') || str_contains($c, 'grotto') || str_contains($c, 'shrine') || str_contains($c, 'pilgrimage') || str_contains($c, 'religious');
+                })->values();
+
+                // History & Heritage Landmarks section
+                $historySpots = $featuredOnly->filter(function($s) {
+                    $c = strtolower($s->category ?? '');
+                    return (str_contains($c, 'heritage') || str_contains($c, 'history') || str_contains($c, 'landmark') || str_contains($c, 'ancestral') || str_contains($c, 'civic') || str_contains($c, 'park') || str_contains($c, 'boulevard'))
+                        && !str_contains($c, 'church') && !str_contains($c, 'chapel') && !str_contains($c, 'shrine') && !str_contains($c, 'religious') && !str_contains($c, 'beach') && !str_contains($c, 'surf');
+                })->values();
+
+                // Nature & Ecotourism section
+                $natureSpots = $featuredOnly->filter(function($s) {
+                    $c = strtolower($s->category ?? '');
+                    return (str_contains($c, 'nature') || str_contains($c, 'forest') || str_contains($c, 'cave') || str_contains($c, 'ecotourism') || str_contains($c, 'boardwalk') || str_contains($c, 'spring') || str_contains($c, 'marine') || str_contains($c, 'mangrove'))
+                        && !str_contains($c, 'surf') && !str_contains($c, 'beach');
+                })->values();
+
+                // Featured Destinations (Beach, Surfing, and Coastal section)
+                $featuredDestinations = $featuredOnly->filter(function($s) use ($churchSpots, $historySpots, $natureSpots) {
+                    $isChurch = $churchSpots->contains('id', $s->id);
+                    $isHistory = $historySpots->contains('id', $s->id);
+                    $isNature = $natureSpots->contains('id', $s->id);
+                    return !$isChurch && !$isHistory && !$isNature;
+                })->values();
+
+                $heritageSpots = $historySpots;
             }
 
-            $sourceDestinations = $allDestinations->isNotEmpty() ? $allDestinations : $heritageSpots;
+            // Resorts: only show featured == true
+            if ($allResorts->isEmpty()) {
+                $featuredResorts = $this->getFallbackResorts();
+            } else {
+                $featuredResorts = $allResorts->where('featured', true)->values();
+            }
 
-            $churchSpots = $sourceDestinations->filter(function($s) {
-                $c = strtolower($s->category ?? '');
-                return str_contains($c, 'church') || str_contains($c, 'chapel') || str_contains($c, 'parish') || str_contains($c, 'grotto') || str_contains($c, 'shrine') || str_contains($c, 'pilgrimage') || str_contains($c, 'religious');
-            })->values();
-
-            $historySpots = $sourceDestinations->filter(function($s) {
-                $c = strtolower($s->category ?? '');
-                return str_contains($c, 'heritage') || str_contains($c, 'history') || str_contains($c, 'landmark') || str_contains($c, 'ancestral') || str_contains($c, 'park') || str_contains($c, 'boulevard') || str_contains($c, 'promenade');
-            })->values();
-
-            $natureSpots = $sourceDestinations->filter(function($s) {
-                $c = strtolower($s->category ?? '');
-                return str_contains($c, 'nature') || str_contains($c, 'forest') || str_contains($c, 'cave') || str_contains($c, 'ecotourism') || str_contains($c, 'boardwalk') || str_contains($c, 'spring') || str_contains($c, 'farm');
-            })->values();
-
+            // Crafts: only show featured == true
             $featuredCrafts = Craft::where('is_featured', true)->get();
-            if ($featuredCrafts->isEmpty()) {
-                $featuredCrafts = Craft::take(3)->get();
-            }
             if ($featuredCrafts->isNotEmpty()) {
                 $craftSpots = $featuredCrafts;
-            } else {
+            } elseif (Craft::count() === 0) {
                 $craftSpots = $this->getFallbackCrafts();
+            } else {
+                $craftSpots = collect([]);
             }
 
-            if ($natureSpots->isEmpty()) {
-                $natureSpots = $this->getFallbackNature();
+            // Fallback for events, announcements, testimonials, weather tips if table is empty
+            if ($events->isEmpty() && Event::count() === 0) {
+                $events = $this->getFallbackEvents();
             }
-
-            if ($churchSpots->isEmpty()) {
-                $churchSpots = $this->getFallbackChurches();
+            if ($announcements->isEmpty() && Announcement::count() === 0) {
+                $announcements = $this->getFallbackAnnouncements();
             }
-            if ($historySpots->isEmpty()) {
-                $historySpots = $this->getFallbackHistory();
+            if ($testimonials->isEmpty() && Testimonial::count() === 0) {
+                $testimonials = $this->getFallbackTestimonials();
+            }
+            if ($weatherTips->isEmpty() && WeatherTip::count() === 0) {
+                $weatherTips = $this->getFallbackWeatherTips();
             }
 
         } catch (Exception $e) {

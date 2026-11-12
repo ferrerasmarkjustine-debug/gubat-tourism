@@ -33,7 +33,7 @@
         </div>
 
         <div class="row g-4">
-            @foreach($craftSpots as $spot)
+            @forelse($craftSpots as $spot)
                 @php
                     $craftImg = str_starts_with($spot->image_url ?? '', 'http') 
                         ? $spot->image_url 
@@ -104,7 +104,20 @@
                         </div>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="col-12 text-center py-5">
+                    <div class="p-4 rounded-4 bg-white border shadow-sm d-inline-block text-center" style="max-width: 480px;">
+                        <i class="bi bi-tools display-6 text-muted mb-2 d-block opacity-50"></i>
+                        <h6 class="fw-bold text-dark mb-1">No Crafts Currently Featured</h6>
+                        <p class="text-muted small mb-0">Browse all local artisans in the crafts directory or feature items from the Admin Portal.</p>
+                        @if(Auth::check() && Auth::user()->isLguAdmin())
+                            <a href="{{ route('admin.crafts.index') }}" class="btn btn-sm btn-success rounded-pill px-4 mt-3 shadow-sm fw-semibold text-white">
+                                <i class="bi bi-gear-fill me-1"></i> Manage Crafts in Admin Portal
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endforelse
         </div>
     </div>
 </section>

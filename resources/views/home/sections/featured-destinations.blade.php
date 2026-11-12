@@ -34,7 +34,7 @@
         </div>
 
         <div class="row g-4">
-            @foreach($featuredDestinations as $dest)
+            @forelse($featuredDestinations as $dest)
                 @php
                     $coverUrl = str_starts_with($dest->image_url ?? '', 'http')
                         ? $dest->image_url
@@ -120,7 +120,20 @@
                         </div>
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="col-12 text-center py-5">
+                    <div class="p-4 rounded-4 bg-white border shadow-sm d-inline-block text-center" style="max-width: 480px;">
+                        <i class="bi bi-tsunami display-6 text-muted mb-2 d-block opacity-50"></i>
+                        <h6 class="fw-bold text-dark mb-1">No Beach or Surfing Spots Currently Featured</h6>
+                        <p class="text-muted small mb-0">Browse all attractions in the public directory or feature spots from the Admin Portal.</p>
+                        @if(Auth::check() && Auth::user()->isLguAdmin())
+                            <button type="button" class="btn btn-sm btn-success rounded-pill px-4 mt-3 shadow-sm fw-semibold" onclick="openFeaturePicker('beach')">
+                                <i class="bi bi-plus-circle me-1"></i> Add Destination to Homepage
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            @endforelse
         </div>
     </div>
 </section>

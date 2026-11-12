@@ -6,23 +6,23 @@
      PAGE HERO
 ================================================================ --}}
 <section class="position-relative text-white overflow-hidden d-flex align-items-center"
-         style="min-height: 320px; background: linear-gradient(135deg, #0f4c81 0%, #1565a8 60%, #0e7490 100%);">
+         style="min-height: 420px; background: linear-gradient(135deg, #072e54 0%, #0a5275 45%, #0f766e 80%, #15803d 100%);">
 
-    {{-- Decorative wave --}}
-    <div class="position-absolute bottom-0 start-0 w-100 overflow-hidden" style="height: 50px; z-index: 2; transform: translateY(1px);">
-        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="position:relative;display:block;width:calc(100% + 1.3px);height:50px;">
+    {{-- Decorative wave divider --}}
+    <div class="position-absolute bottom-0 start-0 w-100 overflow-hidden" style="height: 60px; z-index: 2; transform: translateY(1px);">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="position:relative;display:block;width:calc(100% + 1.3px);height:60px;">
             <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C26.9,8.75,57.05,18.3,86.64,25.8,168,46.7,250.75,67.8,321.39,56.44Z"
                   style="fill:#F4F7FA;"></path>
         </svg>
     </div>
 
-    {{-- Floating decorative circles --}}
-    <div class="position-absolute" style="width:300px;height:300px;background:rgba(255,255,255,0.04);border-radius:50%;top:-80px;right:-60px;"></div>
-    <div class="position-absolute" style="width:200px;height:200px;background:rgba(255,255,255,0.06);border-radius:50%;bottom:-40px;left:10%;"></div>
+    {{-- Floating ambient glow circles --}}
+    <div class="position-absolute" style="width:360px;height:360px;background:rgba(255,193,7,0.08);border-radius:50%;top:-100px;right:-40px;filter:blur(40px);"></div>
+    <div class="position-absolute" style="width:260px;height:260px;background:rgba(20,184,166,0.12);border-radius:50%;bottom:-50px;left:5%;filter:blur(40px);"></div>
 
     <div class="container position-relative py-5" style="z-index:3;">
         <div class="row align-items-center">
-            <div class="col-lg-8">
+            <div class="col-lg-9">
                 {{-- Breadcrumb --}}
                 <nav aria-label="breadcrumb" class="mb-3">
                     <ol class="breadcrumb mb-0">
@@ -35,19 +35,48 @@
                     </ol>
                 </nav>
 
-                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase mb-3 shadow-sm" style="font-size:0.8rem;">
-                    <i class="bi bi-building me-1"></i> Where To Stay
-                </span>
-                <h1 class="display-5 fw-bold font-outfit text-white mb-3" style="line-height:1.2;text-shadow:0 4px 15px rgba(0,0,0,0.3);">
-                    Beach Resorts &amp; <span class="text-warning">Accommodations</span>
+                <div class="d-inline-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase shadow-sm" style="font-size:0.8rem; letter-spacing:0.5px;">
+                        <i class="bi bi-building me-1"></i> Where To Stay
+                    </span>
+                    <span class="badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill fw-semibold shadow-sm" style="font-size:0.8rem;">
+                        <i class="bi bi-patch-check-fill text-warning me-1"></i> Verified Stays
+                    </span>
+                </div>
+
+                <h1 class="display-4 fw-bold font-outfit text-white mb-3" style="line-height:1.15; text-shadow:0 4px 18px rgba(0,0,0,0.4);">
+                    Beach Resorts &amp; <br class="d-none d-md-inline">
+                    <span class="text-warning">Accommodations</span>
                 </h1>
-                <p class="lead text-white-50 mb-0" style="max-width:600px;">
+                <p class="lead text-white-50 mb-4" style="max-width:720px; font-size:1.15rem; text-shadow:0 2px 8px rgba(0,0,0,0.3);">
                     Find your perfect stay in Gubat — from luxury beachfront suites and eco-lodges to cozy surf cabins and family villas.
                 </p>
+
+                {{-- Fast Quick Stats Pills --}}
+                <div class="d-flex flex-wrap gap-2 pt-1">
+                    <span class="badge bg-dark bg-opacity-40 border border-white border-opacity-10 text-white rounded-pill px-3 py-2 small">
+                        <i class="bi bi-tsunami text-info me-1"></i> Beachfront Resorts
+                    </span>
+                    <span class="badge bg-dark bg-opacity-40 border border-white border-opacity-10 text-white rounded-pill px-3 py-2 small">
+                        <i class="bi bi-water text-primary me-1"></i> Private Pools
+                    </span>
+                    <span class="badge bg-dark bg-opacity-40 border border-white border-opacity-10 text-white rounded-pill px-3 py-2 small">
+                        <i class="bi bi-houses-fill text-warning me-1"></i> Family Villas
+                    </span>
+                    <span class="badge bg-dark bg-opacity-40 border border-white border-opacity-10 text-white rounded-pill px-3 py-2 small">
+                        <i class="bi bi-cup-hot-fill text-danger me-1"></i> Dining &amp; Cafes
+                    </span>
+                    <span class="badge bg-dark bg-opacity-40 border border-white border-opacity-10 text-white rounded-pill px-3 py-2 small">
+                        <i class="bi bi-shield-check text-success me-1"></i> LGU Accredited
+                    </span>
+                </div>
             </div>
-            <div class="col-lg-4 d-none d-lg-flex justify-content-end">
-                <div class="text-center" style="opacity:0.15;">
-                    <i class="bi bi-building" style="font-size:9rem; color:white;"></i>
+
+            <div class="col-lg-3 d-none d-lg-flex justify-content-end">
+                <div class="text-center p-4 rounded-4" style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 15px 35px rgba(0,0,0,0.25);">
+                    <i class="bi bi-building-check text-warning mb-2" style="font-size:3.5rem;"></i>
+                    <h5 class="text-white fw-bold mb-1">Pacific Retreats</h5>
+                    <p class="text-white-50 small mb-0">Ocean Breeze &bull; Peaceful Stays &bull; Warm Hospitality</p>
                 </div>
             </div>
         </div>
