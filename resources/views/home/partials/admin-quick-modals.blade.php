@@ -24,11 +24,11 @@
                             <!-- Left: Form Inputs Column -->
                             <div class="col-lg-7">
                                 <div class="row g-3">
-                                    <div class="col-md-8">
+                                    <div class="col-md-6">
                                         <label class="form-label small fw-bold text-muted">Destination Name <span class="text-danger">*</span></label>
                                         <input type="text" name="name" id="quickEditNameInput" class="form-control rounded-3" required>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
                                         <select name="category" id="quickEditCategorySelect" class="form-select rounded-3" required>
                                             <option value="" disabled>Choose category...</option>
@@ -64,6 +64,22 @@
                                             </optgroup>
                                         </select>
                                         <small class="text-muted" style="font-size: 0.72rem;">Category determines which homepage section this item appears in.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Barangay <span class="text-danger">*</span></label>
+                                        <select name="barangay_id" id="quickEditBarangaySelect" class="form-select rounded-3" required>
+                                            <option value="" disabled selected>Choose barangay...</option>
+                                            @php
+                                                $quickModalBarangays = $barangays ?? \App\Models\Barangay::orderBy('name')->get();
+                                            @endphp
+                                            @foreach($quickModalBarangays as $b)
+                                                <option value="{{ $b->id }}" data-bname="{{ $b->name }}">{{ $b->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Municipality / Location</label>
+                                        <input type="text" class="form-control rounded-3 bg-light text-muted" value="Gubat, Sorsogon" readonly>
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label small fw-bold text-muted">Description</label>
@@ -221,6 +237,231 @@
                     <div class="modal-footer border-top px-4 py-3 bg-light rounded-bottom-4 d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-danger rounded-pill px-3" id="quickEditDeleteBtn" onclick="deleteDestinationFromQuickEdit()">
                             <i class="bi bi-trash3 me-1"></i> Delete Destination
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                                <i class="bi bi-check-lg me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         LGU Admin Quick Edit Resort / Accommodation Modal
+         Rich 2-Column Layout with Live Card Preview & Image Framing
+         ======================================================== -->
+    <div class="modal fade" id="adminQuickEditResortModal" tabindex="-1" aria-labelledby="adminQuickEditResortLabel" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-bottom px-4 pt-4 pb-3 bg-white">
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center" id="adminQuickEditResortLabel">
+                        <i class="bi bi-pencil-square text-primary me-2"></i> Edit Resort: <span id="quickEditResortModalTitle" class="ms-1"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="" enctype="multipart/form-data" id="adminQuickEditResortForm">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body px-4 py-3">
+                        <div class="row g-4">
+                            <!-- Left: Form Inputs Column -->
+                            <div class="col-lg-7">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold text-muted">Establishment Name <span class="text-danger">*</span></label>
+                                        <input type="text" name="name" id="quickEditResortNameInput" class="form-control rounded-3" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted">Category <span class="text-danger">*</span></label>
+                                        <select name="category" id="quickEditResortCategorySelect" class="form-select rounded-3" required>
+                                            <option value="luxury">Luxury Resort</option>
+                                            <option value="eco">Eco Lodge</option>
+                                            <option value="homestay">Homestay / Villa</option>
+                                            <option value="budget">Budget Lodging</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Barangay <span class="text-danger">*</span></label>
+                                        <select name="barangay_id" id="quickEditResortBarangaySelect" class="form-select rounded-3" required>
+                                            <option value="" disabled>Select barangay...</option>
+                                            @foreach($quickModalBarangays as $b)
+                                                <option value="{{ $b->id }}" data-bname="{{ $b->name }}">{{ $b->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Specific Address / Landmark</label>
+                                        <input type="text" name="address" id="quickEditResortAddressInput" class="form-control rounded-3" placeholder="e.g. Buenavista, Gubat, Sorsogon">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted">Description</label>
+                                        <textarea name="description" id="quickEditResortDescInput" class="form-control rounded-3" rows="3"></textarea>
+                                    </div>
+
+                                    <!-- Cover Photo Card Uploader -->
+                                    <div class="col-12">
+                                        <div class="card border border-2 border-dashed rounded-4 p-3 mb-2 bg-light bg-opacity-50">
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <label class="form-label fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                                                    <i class="bi bi-image text-primary fs-5"></i>
+                                                    <span>Resort Cover Photo</span>
+                                                </label>
+                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-2 py-1 small">
+                                                    <i class="bi bi-laptop me-1"></i> From Pictures / PC
+                                                </span>
+                                            </div>
+
+                                            <div class="text-center mb-3">
+                                                <div class="position-relative mx-auto rounded-3 overflow-hidden bg-white shadow-sm border d-flex align-items-center justify-content-center"
+                                                     style="height: 190px; max-width: 100%;">
+                                                    <img id="quickEditResortPreviewImg" src="" alt="Image Preview" class="w-100 h-100" style="object-fit: cover; display: none;">
+                                                    <div id="quickEditResortPlaceholder" class="p-4 text-center text-muted">
+                                                        <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 text-primary mb-2">
+                                                            <i class="bi bi-cloud-arrow-up fs-2"></i>
+                                                        </div>
+                                                        <div class="fw-semibold text-dark small">Select a photo from your computer</div>
+                                                        <div class="text-muted" style="font-size: 0.75rem;">Supports JPG, PNG, WEBP (Max 5MB)</div>
+                                                    </div>
+                                                    <button type="button" id="quickEditResortCropTrigger" class="btn btn-dark btn-sm rounded-pill px-3 position-absolute bottom-0 end-0 m-2 shadow-sm" style="display: none; align-items: center; gap: 0.35rem; font-size: 0.78rem; opacity: 0.9;">
+                                                        <i class="bi bi-crop"></i>
+                                                        <span>Crop &amp; Frame</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-semibold text-secondary mb-1">
+                                                    <i class="bi bi-folder2-open text-primary me-1"></i> Choose photo from your computer:
+                                                </label>
+                                                <input type="file" class="form-control rounded-3" id="quickEditResortFileInput" name="image" accept="image/jpeg,image/png,image/jpg,image/webp">
+                                                <div class="form-text small text-muted">
+                                                    <i class="bi bi-info-circle me-1"></i> Click to select from Pictures. You can crop and reposition it right after selecting.
+                                                </div>
+                                            </div>
+
+                                            <div class="pt-2 border-top">
+                                                <a class="small text-decoration-none text-muted d-inline-flex align-items-center" data-bs-toggle="collapse" href="#quickEditResortCollapseUrl" role="button" aria-expanded="false">
+                                                    <i class="bi bi-link-45deg me-1"></i> Or provide an external image URL instead
+                                                </a>
+                                                <div class="collapse mt-2" id="quickEditResortCollapseUrl">
+                                                    <input type="url" class="form-control form-control-sm rounded-3" id="quickEditResortUrlInput" name="image_url" placeholder="https://images.unsplash.com/...">
+                                                    <div class="form-text small text-muted">If both a file and URL are provided, the uploaded file will be prioritized.</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Additional Gallery Photos (Up to 10 Photos) -->
+                                    <div class="col-12 mt-2 pt-3 border-top">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label small fw-bold text-dark mb-0">
+                                                <i class="bi bi-images text-primary me-1"></i> Additional Gallery Photos (Up to 10 Photos)
+                                            </label>
+                                            <span class="badge bg-light text-muted border small">Max 10 photos</span>
+                                        </div>
+                                        <div class="form-text text-muted small mb-2">
+                                            Select up to 10 extra photos. You can choose photos one-by-one or multiple at once without overwriting previous selections.
+                                        </div>
+                                        <div id="quickEditResortRetainedGalleryWrap" class="p-2 bg-light rounded-3 mb-2 border" style="display: none;">
+                                            <div class="small fw-semibold text-muted mb-2">
+                                                Current Gallery (<span id="quickEditResortRetainedCount">0</span>/10 photos):
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2" id="quickEditResortRetainedGalleryList"></div>
+                                        </div>
+                                        <input type="file" name="gallery_images[]" id="quickEditResortGalleryInput" class="form-control rounded-3" multiple accept="image/jpeg,image/png,image/webp">
+                                        <div id="quickEditResortGalleryPreview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted">Google Maps Pin URL</label>
+                                        <input type="url" name="google_map_url" id="quickEditResortMapInput" class="form-control rounded-3" placeholder="https://maps.google.com/...">
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-check form-switch mt-2">
+                                            <input class="form-check-input" type="checkbox" name="is_lgu_approved" id="quickEditResortApprovedInput" value="1">
+                                            <label class="form-check-label fw-semibold text-dark" for="quickEditResortApprovedInput">
+                                                <i class="bi bi-patch-check-fill text-success me-1"></i> Accredited by LGU
+                                            </label>
+                                            <div class="form-text text-muted small">Marks this resort as officially registered and approved by the Local Government Unit.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check form-switch mt-1">
+                                            <input class="form-check-input" type="checkbox" name="featured" id="quickEditResortFeaturedInput" value="1">
+                                            <label class="form-check-label fw-semibold text-dark" for="quickEditResortFeaturedInput">
+                                                <i class="bi bi-star-fill text-warning me-1"></i> Feature this resort on Homepage
+                                            </label>
+                                            <div class="form-text text-muted small">Featured resorts appear in the "Featured Beach Resorts & Hotels" section on the public homepage.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Live Card Preview Column -->
+                            <div class="col-lg-5 align-self-start">
+                                <div class="sticky-top" style="top: 15px;">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1 rounded-pill fw-semibold">
+                                            <i class="bi bi-eye-fill me-1"></i> Live Card Preview
+                                        </span>
+                                        <small class="text-muted">Public card layout</small>
+                                    </div>
+
+                                    <div class="card card-tourism border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+                                        <div class="card-tourism-img-wrapper position-relative overflow-hidden" style="height: 200px;">
+                                            <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-1" style="z-index: 2;">
+                                                <span class="badge bg-success text-white px-2 py-1 rounded-pill small fw-bold shadow-sm" id="quickEditResortLiveAccredited">
+                                                    <i class="bi bi-check-circle-fill me-1"></i> Accredited
+                                                </span>
+                                                <span class="badge bg-warning text-dark px-2 py-1 rounded-pill small fw-bold shadow-sm" id="quickEditResortLiveFeat">
+                                                    <i class="bi bi-star-fill text-dark me-1"></i> Featured
+                                                </span>
+                                            </div>
+                                            <span class="badge bg-success text-white card-badge shadow-sm px-3 py-2" id="quickEditResortLivePrice" style="z-index: 2;">
+                                                From ₱1,200 / night
+                                            </span>
+                                            <img id="quickEditResortLiveImg" src="" alt="Resort Preview" class="w-100 h-100" style="object-fit: cover;">
+                                        </div>
+                                        <div class="card-body p-4 d-flex flex-column">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="small text-muted fw-semibold">
+                                                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> <span id="quickEditResortLiveLocation">Buenavista, Gubat, Sorsogon</span>
+                                                </span>
+                                                <span class="badge rounded-pill text-primary border border-primary small px-2 py-1" id="quickEditResortLiveCat">
+                                                    Eco Lodge
+                                                </span>
+                                            </div>
+                                            <h5 class="fw-bold text-dark mb-1" id="quickEditResortLiveName">Resort Name</h5>
+                                            <p class="small text-muted mb-3" id="quickEditResortLiveDesc">A boutique design hotel harmonizing natural woods...</p>
+                                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                                <span class="badge bg-secondary-subtle text-secondary small" id="quickEditResortLiveUnits"><i class="bi bi-house-door me-1"></i> 1 Registered Units</span>
+                                                <span class="badge bg-secondary-subtle text-secondary small" id="quickEditResortLiveGalleryCount"><i class="bi bi-images me-1"></i> 0 Gallery Photos</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                                <div class="text-warning small">
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <i class="bi bi-star-fill"></i>
+                                                    <span class="text-dark fw-bold ms-1" id="quickEditResortLiveRating">4.8</span>
+                                                </div>
+                                                <span class="btn btn-sm btn-outline-primary rounded-pill px-3">Explore &rarr;</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top px-4 py-3 bg-light rounded-bottom-4 d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-danger rounded-pill px-3" id="quickEditResortDeleteBtn" onclick="deleteResortFromQuickEdit()">
+                            <i class="bi bi-trash3 me-1"></i> Delete Resort
                         </button>
                         <div class="d-flex gap-2">
                             <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
@@ -567,6 +808,12 @@
         let quickEditCurrentRawImageSrc = '';
         const quickEditGalleryFiles = [];
 
+        // Resort Quick Edit State
+        let currentQuickEditResortId = null;
+        let quickEditResortCurrentRawImageSrc = '';
+        const quickEditResortGalleryFiles = [];
+        let cropperContext = 'destination'; // 'destination' or 'resort'
+
         function showQuickEditModal() {
             const modalEl = document.getElementById('adminQuickEditDestinationModal');
             if (!modalEl) return;
@@ -588,6 +835,242 @@
                 }
             }
         }
+
+        function showQuickEditResortModal() {
+            const modalEl = document.getElementById('adminQuickEditResortModal');
+            if (!modalEl) return;
+            const bs = window.bootstrap || (typeof bootstrap !== 'undefined' ? bootstrap : null);
+            if (bs && bs.Modal) {
+                const modal = bs.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            } else if (typeof jQuery !== 'undefined' && jQuery(modalEl).modal) {
+                jQuery(modalEl).modal('show');
+            } else {
+                modalEl.classList.add('show');
+                modalEl.style.display = 'block';
+                document.body.classList.add('modal-open');
+                let backdrop = document.querySelector('.modal-backdrop');
+                if (!backdrop) {
+                    backdrop = document.createElement('div');
+                    backdrop.className = 'modal-backdrop fade show';
+                    document.body.appendChild(backdrop);
+                }
+            }
+        }
+
+        function openAdminEditResort(target) {
+            try {
+                let cardEl = target;
+                if (target && (target instanceof HTMLElement || target.nodeType === 1)) {
+                    cardEl = target.closest('.card') || target.closest('.home-resort-card-clickable') || target.closest('[id^="resort-card-"]');
+                }
+                if (!cardEl) return;
+
+                const id = cardEl.getAttribute('data-id') || '';
+                const name = cardEl.getAttribute('data-title') || '';
+                const category = cardEl.getAttribute('data-raw-category') || cardEl.getAttribute('data-category') || 'eco';
+                const barangayId = cardEl.getAttribute('data-barangay-id') || '';
+                const barangayName = cardEl.getAttribute('data-barangay-name') || '';
+                const address = cardEl.getAttribute('data-address') || '';
+                const desc = cardEl.getAttribute('data-desc') || '';
+                const mapUrl = cardEl.getAttribute('data-map') || '';
+                const cover = cardEl.getAttribute('data-cover') || '';
+                const rating = cardEl.getAttribute('data-rating') || '4.8';
+                const minPrice = cardEl.getAttribute('data-min-price') || '1,200';
+                const units = cardEl.getAttribute('data-units') || '1';
+                const isFeatured = cardEl.getAttribute('data-featured') === '1' || cardEl.getAttribute('data-featured') === true;
+                const isApproved = cardEl.getAttribute('data-approved') === '1' || cardEl.getAttribute('data-approved') === true;
+                let gallery = [];
+                try {
+                    gallery = JSON.parse(cardEl.getAttribute('data-gallery') || '[]');
+                } catch(e) { gallery = []; }
+
+                currentQuickEditResortId = id;
+                const form = document.getElementById('adminQuickEditResortForm');
+                if (form) form.action = `/super-admin/resorts/${id}`;
+
+                const titleEl = document.getElementById('quickEditResortModalTitle');
+                if (titleEl) titleEl.textContent = name;
+
+                const nameInput = document.getElementById('quickEditResortNameInput');
+                if (nameInput) nameInput.value = name;
+
+                const catSelect = document.getElementById('quickEditResortCategorySelect');
+                if (catSelect) catSelect.value = category.toLowerCase();
+
+                const bgySelect = document.getElementById('quickEditResortBarangaySelect');
+                if (bgySelect) {
+                    if (barangayId) {
+                        bgySelect.value = barangayId;
+                    } else if (barangayName) {
+                        for (let opt of bgySelect.options) {
+                            if (opt.getAttribute('data-bname') === barangayName || opt.textContent.trim().toLowerCase() === barangayName.toLowerCase()) {
+                                bgySelect.value = opt.value;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                const addressInput = document.getElementById('quickEditResortAddressInput');
+                if (addressInput) addressInput.value = address;
+
+                const descInput = document.getElementById('quickEditResortDescInput');
+                if (descInput) descInput.value = desc;
+
+                const mapInput = document.getElementById('quickEditResortMapInput');
+                if (mapInput) mapInput.value = mapUrl;
+
+                const featInput = document.getElementById('quickEditResortFeaturedInput');
+                if (featInput) featInput.checked = isFeatured;
+
+                const apprInput = document.getElementById('quickEditResortApprovedInput');
+                if (apprInput) apprInput.checked = isApproved;
+
+                // Cover Photo setup
+                quickEditResortCurrentRawImageSrc = cover || '';
+                const prevImg = document.getElementById('quickEditResortPreviewImg');
+                const placeholder = document.getElementById('quickEditResortPlaceholder');
+                const cropTrigger = document.getElementById('quickEditResortCropTrigger');
+                const fileInput = document.getElementById('quickEditResortFileInput');
+                const urlInput = document.getElementById('quickEditResortUrlInput');
+                if (fileInput) fileInput.value = '';
+                if (urlInput) urlInput.value = '';
+
+                if (cover) {
+                    if (prevImg) { prevImg.src = cover; prevImg.style.display = 'block'; }
+                    if (placeholder) placeholder.style.display = 'none';
+                    if (cropTrigger) cropTrigger.style.display = 'inline-flex';
+                } else {
+                    if (prevImg) { prevImg.src = ''; prevImg.style.display = 'none'; }
+                    if (placeholder) placeholder.style.display = 'block';
+                    if (cropTrigger) cropTrigger.style.display = 'none';
+                }
+
+                // Retained gallery
+                renderQuickEditResortGallery(gallery);
+
+                // Live Card Preview
+                const liveName = document.getElementById('quickEditResortLiveName');
+                const liveCat = document.getElementById('quickEditResortLiveCat');
+                const liveLoc = document.getElementById('quickEditResortLiveLocation');
+                const liveDesc = document.getElementById('quickEditResortLiveDesc');
+                const liveImg = document.getElementById('quickEditResortLiveImg');
+                const livePrice = document.getElementById('quickEditResortLivePrice');
+                const liveAccredited = document.getElementById('quickEditResortLiveAccredited');
+                const liveFeat = document.getElementById('quickEditResortLiveFeat');
+                const liveUnits = document.getElementById('quickEditResortLiveUnits');
+                const liveGalleryCount = document.getElementById('quickEditResortLiveGalleryCount');
+                const liveRating = document.getElementById('quickEditResortLiveRating');
+
+                if (liveName) liveName.textContent = name || 'Resort Name';
+                if (liveCat) {
+                    const catMap = { luxury: 'Luxury Resort', eco: 'Eco Lodge', homestay: 'Homestay / Villa', budget: 'Budget Lodging' };
+                    liveCat.textContent = catMap[category.toLowerCase()] || 'Eco Lodge';
+                }
+                const bNameText = (bgySelect && bgySelect.selectedIndex >= 0 && bgySelect.options[bgySelect.selectedIndex].text) || barangayName || 'Buenavista';
+                if (liveLoc) liveLoc.textContent = address || `${bNameText}, Gubat, Sorsogon`;
+                if (liveDesc) liveDesc.textContent = desc ? (desc.length > 90 ? desc.substring(0, 90) + '...' : desc) : 'A boutique design hotel...';
+                if (liveImg) liveImg.src = cover || '/images/resorts/gubat_bay_beach_resort.jpg';
+                if (livePrice) livePrice.textContent = `From ₱${minPrice} / night`;
+                if (liveAccredited) liveAccredited.style.display = isApproved ? 'inline-block' : 'none';
+                if (liveFeat) liveFeat.style.display = isFeatured ? 'inline-block' : 'none';
+                if (liveUnits) liveUnits.innerHTML = `<i class="bi bi-house-door me-1"></i> ${units} Registered Units`;
+                if (liveGalleryCount) liveGalleryCount.innerHTML = `<i class="bi bi-images me-1"></i> ${gallery.length} Gallery Photos`;
+                if (liveRating) liveRating.textContent = rating;
+
+                showQuickEditResortModal();
+            } catch(err) {
+                console.error('Error in openAdminEditResort:', err);
+            }
+        }
+        window.openAdminEditResort = openAdminEditResort;
+
+        function renderQuickEditResortGallery(images) {
+            const list = document.getElementById('quickEditResortRetainedGalleryList');
+            const wrap = document.getElementById('quickEditResortRetainedGalleryWrap');
+            const countEl = document.getElementById('quickEditResortRetainedCount');
+            if (!list || !wrap) return;
+
+            list.replaceChildren();
+            quickEditResortGalleryFiles.length = 0;
+            const newPrev = document.getElementById('quickEditResortGalleryPreview');
+            if (newPrev) newPrev.replaceChildren();
+
+            if (images && images.length > 0) {
+                wrap.style.display = 'block';
+                if (countEl) countEl.textContent = images.length;
+
+                images.forEach((imgUrl, i) => {
+                    const fullUrl = imgUrl.startsWith('http') ? imgUrl : ('/' + imgUrl.replace(/^\//, ''));
+                    const itemWrap = document.createElement('div');
+                    itemWrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+                    itemWrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+
+                    const img = document.createElement('img');
+                    img.src = fullUrl;
+                    img.className = 'w-100 h-100 rounded-2';
+                    img.style.objectFit = 'cover';
+
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'retained_gallery_images[]';
+                    hiddenInput.value = imgUrl;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center shadow-sm';
+                    removeBtn.style.cssText = 'width: 22px; height: 22px; font-size: 11px; line-height: 1; z-index: 5;';
+                    removeBtn.title = 'Remove this saved photo';
+                    removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+                    removeBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        itemWrap.remove();
+                        const remCount = list.querySelectorAll('input[name="retained_gallery_images[]"]').length;
+                        if (countEl) countEl.textContent = remCount;
+                        const liveGal = document.getElementById('quickEditResortLiveGalleryCount');
+                        if (liveGal) liveGal.innerHTML = `<i class="bi bi-images me-1"></i> ${remCount + quickEditResortGalleryFiles.length} Gallery Photos`;
+                        if (remCount === 0) wrap.style.display = 'none';
+                    });
+
+                    itemWrap.appendChild(img);
+                    itemWrap.appendChild(hiddenInput);
+                    itemWrap.appendChild(removeBtn);
+                    list.appendChild(itemWrap);
+                });
+            } else {
+                wrap.style.display = 'none';
+                if (countEl) countEl.textContent = '0';
+            }
+        }
+
+        function deleteResortFromQuickEdit() {
+            if (!currentQuickEditResortId) return;
+            const name = document.getElementById('quickEditResortNameInput') ? document.getElementById('quickEditResortNameInput').value : 'this resort';
+            if (!confirm(`Are you sure you want to move "${name}" to Recently Deleted?\n\n(It will disappear from the public website and be safely archived in Recently Deleted in Admin Portal.)`)) {
+                return;
+            }
+
+            const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+            const token = tokenMeta ? tokenMeta.getAttribute('content') : '';
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/super-admin/resorts/${currentQuickEditResortId}`;
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = token;
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(csrfInput);
+            form.appendChild(methodInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+        window.deleteResortFromQuickEdit = deleteResortFromQuickEdit;
 
         function openAdminEditDestination(target, name, category, desc, mapUrl, isFeatured, imageUrl, locationName, rating, isSpotlight) {
             try {
@@ -624,6 +1107,9 @@
                     }
                 }
 
+                let barangayId = cardEl ? (cardEl.getAttribute('data-barangay-id') || '') : '';
+                let barangayName = cardEl ? (cardEl.getAttribute('data-barangay-name') || '') : '';
+
                 currentQuickEditDestId = id;
                 const form = document.getElementById('adminQuickEditDestForm');
                 if (form) {
@@ -645,6 +1131,20 @@
                         opt.textContent = category;
                         opt.selected = true;
                         catSelect.appendChild(opt);
+                    }
+                }
+
+                const bgySelect = document.getElementById('quickEditBarangaySelect');
+                if (bgySelect) {
+                    if (barangayId) {
+                        bgySelect.value = barangayId;
+                    } else if (barangayName) {
+                        for (let opt of bgySelect.options) {
+                            if (opt.getAttribute('data-bname') === barangayName || opt.textContent.trim().toLowerCase() === barangayName.toLowerCase()) {
+                                bgySelect.value = opt.value;
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -874,11 +1374,26 @@
 
             if (cropTrigger) {
                 cropTrigger.addEventListener('click', function() {
+                    cropperContext = 'destination';
                     if (quickEditCurrentRawImageSrc) {
                         if (!quickEditCropModal && window.bootstrap) {
                             quickEditCropModal = new bootstrap.Modal(cropModalEl);
                         }
                         if (cropperTargetImg) cropperTargetImg.src = quickEditCurrentRawImageSrc;
+                        if (quickEditCropModal) quickEditCropModal.show();
+                    }
+                });
+            }
+
+            const rCropTrigger = document.getElementById('quickEditResortCropTrigger');
+            if (rCropTrigger) {
+                rCropTrigger.addEventListener('click', function() {
+                    cropperContext = 'resort';
+                    if (quickEditResortCurrentRawImageSrc) {
+                        if (!quickEditCropModal && window.bootstrap) {
+                            quickEditCropModal = new bootstrap.Modal(cropModalEl);
+                        }
+                        if (cropperTargetImg) cropperTargetImg.src = quickEditResortCurrentRawImageSrc;
                         if (quickEditCropModal) quickEditCropModal.show();
                     }
                 });
@@ -918,20 +1433,40 @@
 
                     if (canvas) {
                         canvas.toBlob(function(blob) {
-                            if (blob && fileInput) {
-                                try {
-                                    const file = new File([blob], 'cropped_' + Date.now() + '.jpg', { type: 'image/jpeg' });
-                                    const dt = new DataTransfer();
-                                    dt.items.add(file);
-                                    fileInput.files = dt.files;
-                                } catch (e) {
-                                    console.warn('DataTransfer fallback:', e);
+                            if (cropperContext === 'resort') {
+                                const rFileInput = document.getElementById('quickEditResortFileInput');
+                                const rPrevImg = document.getElementById('quickEditResortPreviewImg');
+                                const rLiveImg = document.getElementById('quickEditResortLiveImg');
+                                if (blob && rFileInput) {
+                                    try {
+                                        const file = new File([blob], 'cropped_resort_' + Date.now() + '.jpg', { type: 'image/jpeg' });
+                                        const dt = new DataTransfer();
+                                        dt.items.add(file);
+                                        rFileInput.files = dt.files;
+                                    } catch (e) {
+                                        console.warn('DataTransfer fallback:', e);
+                                    }
                                 }
+                                const croppedUrl = canvas.toDataURL('image/jpeg', 0.92);
+                                quickEditResortCurrentRawImageSrc = croppedUrl;
+                                if (rPrevImg) rPrevImg.src = croppedUrl;
+                                if (rLiveImg) rLiveImg.src = croppedUrl;
+                            } else {
+                                if (blob && fileInput) {
+                                    try {
+                                        const file = new File([blob], 'cropped_' + Date.now() + '.jpg', { type: 'image/jpeg' });
+                                        const dt = new DataTransfer();
+                                        dt.items.add(file);
+                                        fileInput.files = dt.files;
+                                    } catch (e) {
+                                        console.warn('DataTransfer fallback:', e);
+                                    }
+                                }
+                                const croppedUrl = canvas.toDataURL('image/jpeg', 0.92);
+                                quickEditCurrentRawImageSrc = croppedUrl;
+                                if (previewImg) previewImg.src = croppedUrl;
+                                if (liveImg) liveImg.src = croppedUrl;
                             }
-                            const croppedUrl = canvas.toDataURL('image/jpeg', 0.92);
-                            quickEditCurrentRawImageSrc = croppedUrl;
-                            if (previewImg) previewImg.src = croppedUrl;
-                            if (liveImg) liveImg.src = croppedUrl;
                             if (quickEditCropModal) quickEditCropModal.hide();
                         }, 'image/jpeg', 0.92);
                     }
@@ -1027,6 +1562,211 @@
                         reader.readAsDataURL(file);
 
                         qGalleryPreview.appendChild(wrap);
+                    });
+                });
+            }
+
+            // Destination Barangay Live Sync
+            const dBarangaySelect = document.getElementById('quickEditBarangaySelect');
+            const dLiveLoc = document.getElementById('quickEditLiveLocation');
+            if (dBarangaySelect && dLiveLoc) {
+                dBarangaySelect.addEventListener('change', function() {
+                    const opt = this.options[this.selectedIndex];
+                    const bName = opt ? (opt.getAttribute('data-bname') || opt.textContent.trim()) : 'Gubat';
+                    dLiveLoc.textContent = `Brgy. ${bName}, Gubat`;
+                });
+            }
+
+            // ========================================================
+            // Resort Live Synchronizers for adminQuickEditResortModal
+            // ========================================================
+            const rNameInput = document.getElementById('quickEditResortNameInput');
+            const rCatSelect = document.getElementById('quickEditResortCategorySelect');
+            const rBgySelect = document.getElementById('quickEditResortBarangaySelect');
+            const rAddrInput = document.getElementById('quickEditResortAddressInput');
+            const rDescInput = document.getElementById('quickEditResortDescInput');
+            const rFeatInput = document.getElementById('quickEditResortFeaturedInput');
+            const rApprInput = document.getElementById('quickEditResortApprovedInput');
+            const rFileInput = document.getElementById('quickEditResortFileInput');
+            const rUrlInput = document.getElementById('quickEditResortUrlInput');
+            const rPrevImg = document.getElementById('quickEditResortPreviewImg');
+            const rPlaceholder = document.getElementById('quickEditResortPlaceholder');
+            const rCropBtn = document.getElementById('quickEditResortCropTrigger');
+
+            const rLiveName = document.getElementById('quickEditResortLiveName');
+            const rLiveCat = document.getElementById('quickEditResortLiveCat');
+            const rLiveLoc = document.getElementById('quickEditResortLiveLocation');
+            const rLiveDesc = document.getElementById('quickEditResortLiveDesc');
+            const rLiveImg = document.getElementById('quickEditResortLiveImg');
+            const rLiveFeat = document.getElementById('quickEditResortLiveFeat');
+            const rLiveAppr = document.getElementById('quickEditResortLiveAccredited');
+
+            if (rNameInput) {
+                rNameInput.addEventListener('input', function() {
+                    const titleEl = document.getElementById('quickEditResortModalTitle');
+                    if (titleEl) titleEl.textContent = this.value.trim() || 'Resort';
+                    if (rLiveName) rLiveName.textContent = this.value.trim() || 'Resort Name';
+                });
+            }
+
+            if (rCatSelect) {
+                rCatSelect.addEventListener('change', function() {
+                    const catMap = { luxury: 'Luxury Resort', eco: 'Eco Lodge', homestay: 'Homestay / Villa', budget: 'Budget Lodging' };
+                    if (rLiveCat) rLiveCat.textContent = catMap[this.value] || 'Eco Lodge';
+                });
+            }
+
+            function updateResortLiveLocation() {
+                if (!rLiveLoc) return;
+                const specific = rAddrInput ? rAddrInput.value.trim() : '';
+                if (specific) {
+                    rLiveLoc.textContent = specific;
+                } else if (rBgySelect && rBgySelect.selectedIndex >= 0) {
+                    const opt = rBgySelect.options[rBgySelect.selectedIndex];
+                    const bName = opt ? (opt.getAttribute('data-bname') || opt.textContent.trim()) : 'Buenavista';
+                    rLiveLoc.textContent = `${bName}, Gubat, Sorsogon`;
+                }
+            }
+
+            if (rBgySelect) rBgySelect.addEventListener('change', updateResortLiveLocation);
+            if (rAddrInput) rAddrInput.addEventListener('input', updateResortLiveLocation);
+
+            if (rDescInput) {
+                rDescInput.addEventListener('input', function() {
+                    const t = this.value.trim();
+                    if (rLiveDesc) rLiveDesc.textContent = t ? (t.length > 90 ? t.substring(0, 90) + '...' : t) : 'A boutique design hotel...';
+                });
+            }
+
+            if (rFeatInput) {
+                rFeatInput.addEventListener('change', function() {
+                    if (rLiveFeat) rLiveFeat.style.display = this.checked ? 'inline-block' : 'none';
+                });
+            }
+
+            if (rApprInput) {
+                rApprInput.addEventListener('change', function() {
+                    if (rLiveAppr) rLiveAppr.style.display = this.checked ? 'inline-block' : 'none';
+                });
+            }
+
+            if (rFileInput) {
+                rFileInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            quickEditResortCurrentRawImageSrc = e.target.result;
+                            if (rPrevImg) { rPrevImg.src = e.target.result; rPrevImg.style.display = 'block'; }
+                            if (rPlaceholder) rPlaceholder.style.display = 'none';
+                            if (rCropBtn) rCropBtn.style.display = 'inline-flex';
+                            if (rLiveImg) rLiveImg.src = e.target.result;
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
+
+            if (rUrlInput) {
+                rUrlInput.addEventListener('input', function() {
+                    const url = this.value.trim();
+                    if (url) {
+                        quickEditResortCurrentRawImageSrc = url;
+                        if (rPrevImg) { rPrevImg.src = url; rPrevImg.style.display = 'block'; }
+                        if (rPlaceholder) rPlaceholder.style.display = 'none';
+                        if (rCropBtn) rCropBtn.style.display = 'inline-flex';
+                        if (rLiveImg) rLiveImg.src = url;
+                    }
+                });
+            }
+
+            // Resort Gallery Accumulation
+            const rGalleryInput = document.getElementById('quickEditResortGalleryInput');
+            const rGalleryPreview = document.getElementById('quickEditResortGalleryPreview');
+            if (rGalleryInput && rGalleryPreview) {
+                rGalleryInput.addEventListener('change', function(e) {
+                    const retainedCount = document.querySelectorAll('#quickEditResortRetainedGalleryList input[name="retained_gallery_images[]"]').length;
+                    const maxNewAllowed = Math.max(0, 10 - retainedCount);
+
+                    const newlySelected = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+                    let addedCount = 0;
+                    newlySelected.forEach(file => {
+                        const isDuplicate = quickEditResortGalleryFiles.some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified);
+                        if (!isDuplicate) {
+                            if (quickEditResortGalleryFiles.length < maxNewAllowed) {
+                                quickEditResortGalleryFiles.push(file);
+                                addedCount++;
+                            }
+                        }
+                    });
+
+                    if (retainedCount + quickEditResortGalleryFiles.length >= 10 && newlySelected.length > addedCount) {
+                        alert(`Maximum 10 gallery photos reached (${retainedCount} saved + ${quickEditResortGalleryFiles.length} new).`);
+                    }
+
+                    try {
+                        const dt = new DataTransfer();
+                        quickEditResortGalleryFiles.forEach(f => dt.items.add(f));
+                        rGalleryInput.files = dt.files;
+                    } catch (err) {
+                        console.warn('DataTransfer error:', err);
+                    }
+
+                    rGalleryPreview.replaceChildren();
+                    if (quickEditResortGalleryFiles.length > 0) {
+                        const header = document.createElement('div');
+                        header.className = 'w-100 small fw-semibold text-primary mb-1 d-flex align-items-center justify-content-between';
+                        header.innerHTML = `<span><i class="bi bi-images me-1"></i> New Photos (${quickEditResortGalleryFiles.length}):</span>
+                            <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none p-0 small" style="font-size: 0.78rem;">Clear all new</button>`;
+                        header.querySelector('button').addEventListener('click', function(ev) {
+                            ev.preventDefault();
+                            quickEditResortGalleryFiles.length = 0;
+                            const emptyDt = new DataTransfer();
+                            rGalleryInput.files = emptyDt.files;
+                            rGalleryPreview.replaceChildren();
+                            const remCount = document.querySelectorAll('#quickEditResortRetainedGalleryList input[name="retained_gallery_images[]"]').length;
+                            const liveGal = document.getElementById('quickEditResortLiveGalleryCount');
+                            if (liveGal) liveGal.innerHTML = `<i class="bi bi-images me-1"></i> ${remCount} Gallery Photos`;
+                        });
+                        rGalleryPreview.appendChild(header);
+                    }
+
+                    const liveGal = document.getElementById('quickEditResortLiveGalleryCount');
+                    if (liveGal) liveGal.innerHTML = `<i class="bi bi-images me-1"></i> ${retainedCount + quickEditResortGalleryFiles.length} Gallery Photos`;
+
+                    quickEditResortGalleryFiles.forEach((file, idx) => {
+                        const wrap = document.createElement('div');
+                        wrap.className = 'border rounded-3 p-1 bg-white shadow-sm position-relative';
+                        wrap.style.cssText = 'width: 75px; height: 75px; overflow: hidden;';
+
+                        const img = document.createElement('img');
+                        img.className = 'w-100 h-100 rounded-2';
+                        img.style.objectFit = 'cover';
+                        wrap.appendChild(img);
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.className = 'btn btn-danger btn-sm p-0 rounded-circle position-absolute top-0 end-0 translate-middle d-flex align-items-center justify-content-center shadow-sm';
+                        removeBtn.style.cssText = 'width: 22px; height: 22px; font-size: 11px; line-height: 1; z-index: 5;';
+                        removeBtn.title = 'Remove this photo';
+                        removeBtn.innerHTML = '<i class="bi bi-x"></i>';
+                        removeBtn.addEventListener('click', function(ev) {
+                            ev.stopPropagation();
+                            ev.preventDefault();
+                            quickEditResortGalleryFiles.splice(idx, 1);
+                            const newDt = new DataTransfer();
+                            quickEditResortGalleryFiles.forEach(f => newDt.items.add(f));
+                            rGalleryInput.files = newDt.files;
+                            rGalleryInput.dispatchEvent(new Event('change'));
+                        });
+                        wrap.appendChild(removeBtn);
+
+                        const reader = new FileReader();
+                        reader.onload = function(evt) {
+                            img.src = evt.target.result;
+                        };
+                        reader.readAsDataURL(file);
+
+                        rGalleryPreview.appendChild(wrap);
                     });
                 });
             }

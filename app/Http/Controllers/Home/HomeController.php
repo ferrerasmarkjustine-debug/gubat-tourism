@@ -10,6 +10,7 @@ use App\Models\Announcement;
 use App\Models\Testimonial;
 use App\Models\WeatherTip;
 use App\Models\Craft;
+use App\Models\Barangay;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 use Exception;
@@ -22,8 +23,9 @@ class HomeController extends Controller
     public function index(): View
     {
         try {
-            $allDestinations = Destination::with('municipality')->get();
+            $allDestinations = Destination::with(['municipality', 'barangay'])->get();
             $allResorts = Resort::with(['barangay', 'accommodations.amenities'])->get();
+            $barangays = Barangay::orderBy('name')->get();
             $events = Event::orderBy('event_date', 'asc')->with('municipality')->get();
             $announcements = Announcement::orderBy('published_at', 'desc')->take(3)->get();
             $testimonials = Testimonial::all();
@@ -117,11 +119,13 @@ class HomeController extends Controller
             $weatherTips = $this->getFallbackWeatherTips();
             $allDestinations = $featuredDestinations;
             $allResorts = $featuredResorts;
+            $barangays = Barangay::orderBy('name')->get();
         }
 
         return view('home.index', compact(
             'allDestinations',
             'allResorts',
+            'barangays',
             'featuredDestinations',
             'featuredResorts',
             'heritageSpots',

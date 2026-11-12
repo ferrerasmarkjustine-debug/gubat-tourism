@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Destination;
+use App\Models\Barangay;
 use App\Traits\HandlesImageUpload;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,22 +19,24 @@ class DestinationController extends Controller
      */
     public function index(): View
     {
-        $destinations = Destination::with('municipality')
+        $destinations = Destination::with(['municipality', 'barangay'])
             ->orderByDesc('is_spotlight')
             ->orderByDesc('featured')
             ->orderBy('name')
             ->paginate(20);
 
         $spotlightDestinations = Destination::where('is_spotlight', true)
-            ->with('municipality')
+            ->with(['municipality', 'barangay'])
             ->get();
 
         $trashedDestinations = Destination::onlyTrashed()
-            ->with('municipality')
+            ->with(['municipality', 'barangay'])
             ->orderByDesc('deleted_at')
             ->get();
 
-        return view('super-admin.destinations', compact('destinations', 'spotlightDestinations', 'trashedDestinations'));
+        $barangays = Barangay::orderBy('name')->get();
+
+        return view('super-admin.destinations', compact('destinations', 'spotlightDestinations', 'trashedDestinations', 'barangays'));
     }
 
     /**
@@ -43,6 +46,7 @@ class DestinationController extends Controller
     {
         $validated = $request->validate([
             'name'             => ['required', 'string', 'max:255'],
+            'barangay_id'      => ['nullable', 'exists:barangays,id'],
             'category'         => ['required', 'string', 'max:100'],
             'description'      => ['nullable', 'string', 'max:2000'],
             'image'            => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
@@ -69,6 +73,7 @@ class DestinationController extends Controller
 
         $destination = Destination::create([
             'municipality_id' => 1, // Default to Gubat
+            'barangay_id'     => $validated['barangay_id'] ?? null,
             'name'            => $validated['name'],
             'category'        => $validated['category'],
             'description'     => $validated['description'] ?? null,
@@ -91,6 +96,7 @@ class DestinationController extends Controller
     {
         $validated = $request->validate([
             'name'                    => ['required', 'string', 'max:255'],
+            'barangay_id'             => ['nullable', 'exists:barangays,id'],
             'category'                => ['required', 'string', 'max:100'],
             'description'             => ['nullable', 'string', 'max:2000'],
             'image'                   => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
@@ -120,6 +126,7 @@ class DestinationController extends Controller
         }
 
         $destination->update([
+            'barangay_id'    => $validated['barangay_id'] ?? null,
             'name'           => $validated['name'],
             'category'       => $validated['category'],
             'description'    => $validated['description'] ?? null,

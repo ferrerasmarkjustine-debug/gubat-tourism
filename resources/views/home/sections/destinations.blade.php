@@ -63,12 +63,16 @@
                         ? $resort->image_url
                         : asset($resort->image_url ?? 'images/resorts/gubat_bay_beach_resort.jpg');
                 @endphp
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-4 col-md-6" id="resort-card-{{ $resort->id ?? '' }}">
                     <div class="card card-tourism h-100 home-resort-card-clickable"
                          style="cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease;"
                          data-id="{{ $resort->id }}"
                          data-title="{{ $resort->name }}"
                          data-category="{{ ucfirst($resort->category) }}"
+                         data-raw-category="{{ $resort->category }}"
+                         data-barangay-id="{{ $resort->barangay_id ?? '' }}"
+                         data-barangay-name="{{ $resort->barangay->name ?? '' }}"
+                         data-address="{{ $resort->address ?? '' }}"
                          data-location="Brgy. {{ $resort->barangay->name ?? 'Rizal' }}, Gubat"
                          data-desc="{{ $resort->description }}"
                          data-rating="{{ number_format($resort->rating, 1) }}"
@@ -80,13 +84,15 @@
                          data-gallery="{{ json_encode($resort->gallery_images ?? []) }}"
                          data-amenities="{{ json_encode($resortAmenities) }}"
                          data-map="{{ $resort->google_map_url ?? 'https://maps.google.com/?q=' . urlencode($resort->name . ' Gubat Sorsogon') }}"
-                         data-book="{{ route('booking.create', ['resort_id' => $resort->id]) }}">
+                         data-book="{{ route('booking.create', ['resort_id' => $resort->id]) }}"
+                         data-featured="{{ $resort->featured ? 1 : 0 }}"
+                         data-approved="{{ $resort->is_lgu_approved ? 1 : 0 }}">
                         <div class="card-tourism-img-wrapper position-relative">
                             @if(Auth::check() && Auth::user()->isLguAdmin() && isset($resort->id))
                                 <div class="admin-card-overlay">
-                                    <a href="{{ route('admin.resorts') }}" class="admin-card-btn admin-card-btn-warning text-decoration-none" onclick="event.stopPropagation();" title="Edit this resort in Admin Portal">
+                                    <button type="button" class="admin-card-btn admin-card-btn-warning" onclick="event.stopPropagation(); openAdminEditResort(this);" title="Quick Edit this resort">
                                         <i class="bi bi-pencil-fill"></i> Edit
-                                    </a>
+                                    </button>
                                     <button type="button" class="admin-card-btn admin-card-btn-danger" onclick="event.stopPropagation(); unfeatureHomepageCard('{{ route('admin.resorts.toggle-featured', $resort->id) }}', this);" title="Remove from Homepage without deleting">
                                         <i class="bi bi-x-circle-fill"></i> Remove
                                     </button>

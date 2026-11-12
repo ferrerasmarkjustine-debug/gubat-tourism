@@ -220,7 +220,9 @@
                                         <img src="{{ $rowImg }}" class="rounded-3 shadow-sm flex-shrink-0" style="width: 56px; height: 56px; object-fit: cover;" alt="{{ $dest->name }}">
                                         <div>
                                             <div class="fw-bold text-dark dest-highlight-target">{{ $dest->name }}</div>
-                                            <small class="text-muted dest-highlight-target">{{ Str::limit($dest->description, 50) }}</small>
+                                            <small class="text-muted dest-highlight-target">
+                                                <i class="bi bi-geo-alt text-danger me-1"></i>Brgy. {{ $dest->barangay->name ?? ($dest->barangay_name ?? 'Gubat') }} &bull; {{ Str::limit($dest->description, 40) }}
+                                            </small>
                                         </div>
                                     </div>
                                 </td>
@@ -487,6 +489,19 @@
                                     </select>
                                     <small class="text-muted" style="font-size: 0.72rem;">Category determines which homepage section this item appears in.</small>
                                 </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Barangay <span class="text-danger">*</span></label>
+                                    <select name="barangay_id" class="form-select rounded-3" required>
+                                        <option value="" disabled {{ old('barangay_id') ? '' : 'selected' }}>Select barangay...</option>
+                                        @foreach($barangays as $b)
+                                            <option value="{{ $b->id }}" {{ old('barangay_id') == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">Municipality / Location</label>
+                                    <input type="text" class="form-control rounded-3 bg-light text-muted" value="Gubat, Sorsogon" readonly>
+                                </div>
                                 <div class="col-12">
                                     <label class="form-label small fw-bold text-muted">Description</label>
                                     <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Describe the destination highlights, activities, views, and visitor attractions...">{{ old('description') }}</textarea>
@@ -661,6 +676,19 @@
                                             @endif
                                         </select>
                                         <small class="text-muted" style="font-size: 0.72rem;">Category determines which homepage section this item appears in.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Barangay <span class="text-danger">*</span></label>
+                                        <select name="barangay_id" class="form-select rounded-3" required>
+                                            <option value="" disabled>Select barangay...</option>
+                                            @foreach($barangays as $b)
+                                                <option value="{{ $b->id }}" {{ old('barangay_id', $dest->barangay_id) == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Municipality / Location</label>
+                                        <input type="text" class="form-control rounded-3 bg-light text-muted" value="Gubat, Sorsogon" readonly>
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label small fw-bold text-muted">Description</label>

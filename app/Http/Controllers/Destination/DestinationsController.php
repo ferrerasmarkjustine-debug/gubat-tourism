@@ -15,9 +15,9 @@ class DestinationsController extends Controller
     public function index(): View
     {
         try {
-            $allDestinations      = Destination::with('municipality')->orderBy('featured', 'desc')->get();
-            $featuredDestinations = Destination::where('featured', true)->with('municipality')->get();
-            $heritageSpots        = Destination::where('featured', false)->with('municipality')->get();
+            $allDestinations      = Destination::with(['municipality', 'barangay'])->orderBy('featured', 'desc')->get();
+            $featuredDestinations = Destination::where('featured', true)->with(['municipality', 'barangay'])->get();
+            $heritageSpots        = Destination::where('featured', false)->with(['municipality', 'barangay'])->get();
 
             if ($allDestinations->isEmpty()) {
                 $featuredDestinations = $this->getFallbackDestinations();

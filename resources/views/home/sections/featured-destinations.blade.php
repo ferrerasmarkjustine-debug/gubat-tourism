@@ -46,7 +46,9 @@
                          data-id="{{ $dest->id }}"
                          data-title="{{ $dest->name }}"
                          data-category="{{ $dest->category }}"
-                         data-location="{{ $dest->barangay->name ?? '' }}{{ isset($dest->barangay->name) ? ', ' : '' }}{{ $dest->municipality->name ?? 'Sorsogon' }}"
+                         data-barangay-id="{{ $dest->barangay_id ?? '' }}"
+                         data-barangay-name="{{ $dest->barangay->name ?? ($dest->barangay_name ?? '') }}"
+                         data-location="Brgy. {{ $dest->barangay->name ?? ($dest->barangay_name ?? 'Rizal') }}, {{ $dest->municipality->name ?? 'Gubat' }}"
                          data-desc="{{ $dest->description }}"
                          data-rating="{{ number_format($dest->rating, 1) }}"
                          data-reviews="{{ $dest->reviews_count }}"
@@ -82,7 +84,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="small text-muted">
                                     <i class="bi bi-geo-alt-fill text-danger me-1"></i> 
-                                    {{ $dest->barangay->name ?? '' }}{{ isset($dest->barangay->name) ? ', ' : '' }}{{ $dest->municipality->name ?? 'Sorsogon' }}
+                                    Brgy. {{ $dest->barangay->name ?? ($dest->barangay_name ?? 'Rizal') }}, {{ $dest->municipality->name ?? 'Gubat' }}
                                 </span>
                             </div>
                             <h5 class="card-title fw-bold text-dark mb-2">{{ $dest->name }}</h5>

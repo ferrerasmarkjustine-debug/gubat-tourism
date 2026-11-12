@@ -48,6 +48,8 @@
                          data-id="{{ $spot->id }}"
                          data-title="{{ $spot->name }}"
                          data-category="{{ $spot->category ?? 'Historical Landmark' }}"
+                         data-barangay-id="{{ $spot->barangay_id ?? '' }}"
+                         data-barangay-name="{{ $bgyName }}"
                          data-location="Brgy. {{ $bgyName }}, {{ $munName }}"
                          data-desc="{{ $spot->description }}"
                          data-rating="{{ number_format($spot->rating ?? 4.8, 1) }}"

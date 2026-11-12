@@ -143,7 +143,7 @@ class ResortController extends Controller
             }
         }
 
-        return redirect()->route('admin.resorts')->with('success', "Resort '{$resort->name}' has been successfully updated!");
+        return back()->with('success', "Resort '{$resort->name}' has been successfully updated!");
     }
 
     /**
